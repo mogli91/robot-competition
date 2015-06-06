@@ -1,12 +1,56 @@
 #include "Masks.h"
 
-BottleFar::BottleFar(int blocksize) {
+Mask::Mask(int blocksize, int type) {
     m_blocksize = blocksize;
-    m_roi.height = m_blocksize;
-    m_roi.width = m_blocksize;
+    
+    switch (type) {
+        case FAR:
+            m_roi.height = m_blocksize;
+            m_roi.width = m_blocksize;
+            break;
+        case CLOSE_UPRIGHT:
+            m_roi.height = (m_blocksize * 3) / 2;
+            m_roi.width = m_blocksize;
+            break;
+        case CLOSE_FLAT:
+            m_roi.height = m_blocksize;
+            m_roi.width = (m_blocksize * 3) / 2;
+        case CLOSE_45P:
+            m_roi.height = (m_blocksize * 3) / 2;
+            m_roi.width = (m_blocksize * 3) / 2;
+            break;
+        case CLOSE_45N:
+            m_roi.height = (m_blocksize * 3) / 2;
+            m_roi.width = (m_blocksize * 3) / 2;
+            break;
+        case VERY_CLOSE_UPRIGHT:
+            m_roi.height = m_blocksize * 2;
+            m_roi.width = m_blocksize;
+            break;
+        case VERY_CLOSE_FLAT:
+            m_roi.height = m_blocksize;
+            m_roi.width = m_blocksize * 2;
+        case VERY_CLOSE_45P:
+            m_roi.height = (m_blocksize * 3) / 2;
+            m_roi.width = m_blocksize * 2;
+            break;
+        case VERY_CLOSE_45N:
+            m_roi.height = (m_blocksize * 3) / 2;
+            m_roi.width = m_blocksize * 2;
+            break;
+        default:
+            break;
+    }
+    
 }
 
-void BottleFar::computeMeanInner(cv::Mat img_integral, cv::Rect roi, double *dst) {
+double Mask::dist(double* a, double *b) {
+    double dist = sqrt((a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1]) + (a[2] - b[2]) * (a[2] - b[2]));
+            std::cout << dist << std::endl;
+    return dist;
+}
+
+void Mask::computeMeanInnerRect(const cv::Mat &img_integral, cv::Rect roi, double *dst) {
     int col0 = roi.x;
     int row0 = roi.y;
     
@@ -31,25 +75,25 @@ void BottleFar::computeMeanInner(cv::Mat img_integral, cv::Rect roi, double *dst
     }
 }
 
-bool BottleFar::match(cv::Mat img_integral, cv::Rect roi, double threshold) {
-    if ((roi.x - m_blocksize / 2) < 0
-        || (roi.y - m_blocksize / 2) < 0
-        || (roi.y + roi.height + m_blocksize / 2) >= img_integral.rows
-        || (roi.x + roi.width + m_blocksize / 2) >= img_integral.cols) {
+bool Mask::matchRect(const cv::Mat &img_integral, cv::Point p, double threshold) {
+    if ((p.x - m_blocksize / 2) < 0
+        || (p.y - m_blocksize / 2) < 0
+        || (p.y + m_roi.height + m_blocksize / 2) >= img_integral.rows
+        || (p.x + m_roi.width + m_blocksize / 2) >= img_integral.cols) {
         
         return false;
     }
     
-    roi.height = m_blocksize;
-    roi.width = m_blocksize;
-    computeMeanInner(img_integral, roi, m_mean);
+    m_roi.x = p.x;
+    m_roi.y = p.y;
+    computeMeanInnerRect(img_integral, m_roi, m_mean);
     
     Rect tmp;
     double color_dist;
     
     // left
-    tmp.x = roi.x - m_blocksize/ 2; tmp.y = roi.y; tmp.width = m_blocksize / 2; tmp.height = m_blocksize;
-    computeMeanInner(img_integral, tmp, m_compare);
+    tmp.x = m_roi.x - m_blocksize/ 2; tmp.y = m_roi.y; tmp.width = m_blocksize / 2; tmp.height = m_blocksize;
+    computeMeanInnerRect(img_integral, tmp, m_compare);
     
     color_dist = dist(m_compare, m_mean);
     
@@ -58,8 +102,8 @@ bool BottleFar::match(cv::Mat img_integral, cv::Rect roi, double threshold) {
     }
     
     // right
-    tmp.x = roi.x + roi.width; tmp.y = roi.y; tmp.width = m_blocksize / 2; tmp.height = m_blocksize;
-    computeMeanInner(img_integral, tmp, m_compare);
+    tmp.x = m_roi.x + m_roi.width; tmp.y = m_roi.y; tmp.width = m_blocksize / 2; tmp.height = m_blocksize;
+    computeMeanInnerRect(img_integral, tmp, m_compare);
     
     color_dist = dist(m_compare, m_mean);
     
@@ -68,8 +112,8 @@ bool BottleFar::match(cv::Mat img_integral, cv::Rect roi, double threshold) {
     }
     
     // top
-    tmp.x = roi.x; tmp.y = roi.y - m_blocksize / 2; tmp.width = m_blocksize; tmp.height = m_blocksize / 2;
-    computeMeanInner(img_integral, tmp, m_compare);
+    tmp.x = m_roi.x; tmp.y = m_roi.y - m_blocksize / 2; tmp.width = m_blocksize; tmp.height = m_blocksize / 2;
+    computeMeanInnerRect(img_integral, tmp, m_compare);
     
     color_dist = dist(m_compare, m_mean);
     
@@ -78,8 +122,8 @@ bool BottleFar::match(cv::Mat img_integral, cv::Rect roi, double threshold) {
     }
     
     // bottom
-    tmp.x = roi.x; tmp.y = roi.y + roi.height; tmp.width = m_blocksize; tmp.height = m_blocksize / 2;
-    computeMeanInner(img_integral, tmp, m_compare);
+    tmp.x = m_roi.x; tmp.y = m_roi.y + m_roi.height; tmp.width = m_blocksize; tmp.height = m_blocksize / 2;
+    computeMeanInnerRect(img_integral, tmp, m_compare);
     
     color_dist = dist(m_compare, m_mean);
     
@@ -87,14 +131,24 @@ bool BottleFar::match(cv::Mat img_integral, cv::Rect roi, double threshold) {
         return false;
     }
     
-    m_roi = Rect(roi);
-    
     return true;
     
 }
 
-double Mask::dist(double* a, double *b) {
-    double dist = sqrt((a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1]) + (a[2] - b[2]) * (a[2] - b[2]));
-    //        std::cout << dist << std::endl;
-    return dist;
-}
+
+//// ---------------------- BOTTLE FAR AWAY ----------------------------
+//
+//bool BottleFar::match(const cv::Mat &img_integral, cv::Point p, double threshold) {
+//    if ((p.x - m_roi.height - m_blocksize / 2) < 0
+//        || (p.y - m_blocksize / 2) < 0
+//        || (p.y + m_blocksize / 2) >= img_integral.rows
+//        || (p.x + m_roi.width + m_blocksize / 2) >= img_integral.cols) {
+//        
+//        return false;
+//    }
+//    
+//    return matchRect(img_integral, p, threshold);
+//}
+
+// ------------------------- BOTTLE CLOSE ------------------------
+
