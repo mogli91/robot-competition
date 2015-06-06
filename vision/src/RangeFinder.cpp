@@ -131,3 +131,25 @@ void RangeFinder::drawMask(Mat dst) {
     }
     m_mask.copyTo(dst);
 }
+
+void RangeFinder::getBottleCoordinates(vector<Point> &dst) {
+//    int x, y, x_world, y_world;
+//    dst.clear();
+//    for (vector<Rect>::iterator it = m_bottles.begin(); it != m_bottles.end(); ++it) {
+//        x = it->x + it->width / 2;  // want center of bottle
+//        y = it->y + it->height;     // want closest point of bottle
+//        
+//        y_world = VISION_DIST_BOTTOM + (m_height - y - 1) * m_height / (VISION_DIST_TOP - VISION_DIST_BOTTOM);
+//        
+//        // TODO: proper x coordinate
+//        if (x < m_width / 3) {
+//            x_world = -1;
+//        } else if (x < 2 * m_width / 3) {
+//            x_world = 0;
+//        } else {
+//            x_world = 1;
+//        }
+//        
+//        dst.push_back(Point(x_world, y_world));
+//    }
+}

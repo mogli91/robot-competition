@@ -40,12 +40,12 @@ Mask::Mask(int blocksize, int type) {
         case VERY_CLOSE_45P:
             m_roi.height = (m_blocksize * 3) / 2;
             m_roi.width = m_blocksize * 2;
-            m_area =  m_blocksize * m_blocksize * 5/ 3;
+            m_area =  m_blocksize * m_blocksize * 5/ 2;
             break;
         case VERY_CLOSE_45N:
             m_roi.height = (m_blocksize * 3) / 2;
             m_roi.width = m_blocksize * 2;
-            m_area =  m_blocksize * m_blocksize * 5/ 3;
+            m_area =  m_blocksize * m_blocksize * 5/ 2;
             break;
         default:
             break;

@@ -52,6 +52,8 @@ public:
     
     void locateBottles();
     
+    void getBottleCoordinates(vector<Point> &dst);
+    
     cv::Mat getMask() {return m_mask;};
     
 };
