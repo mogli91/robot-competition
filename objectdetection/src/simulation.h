@@ -48,7 +48,6 @@ private:
 	void emptyTailGate();
 	void liftBottle();
 
-
 	int m_currentState;
 	Robot* m_robot;
 	int m_displacementVector[2];

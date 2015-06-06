@@ -36,6 +36,9 @@ public:
 	int getSensorValue(char sensorId);
 	int getBrushCurrent();
 
+	int getBottleAngle();
+	int getBottleDistance();
+
 	Pose getPose();
 
 	void changeTileState(int x, int y, Tile newTile); // adds values to the map

@@ -58,7 +58,7 @@ void Simulation::liftBottle()
 {
 	m_robot->setShovel(VAL_LIFT_HIGH);
 	m_robot->setWheelSpeeds(VAL_WHEELS_STOP, VAL_WHEELS_STOP);
-
+	m_robot->sendInstructions();
 	sleep(3);
 	m_robot->setShovel(VAL_LIFT_LOW);
 	m_robot->sendInstructions();
@@ -67,9 +67,10 @@ void Simulation::liftBottle()
 
 bool Simulation::bottleCaptured()
 {
-	if(brushIsBlocked() || m_robot->getBrushCurrent() > 220)
+	//if(brushIsBlocked() || m_robot->getBrushCurrent() > 220)
+	if(m_robot->getSensorValue(SENSOR_IR_FRONT_BOTTOM_R) < 20)
 	{
-		usleep(500000);
+		//usleep(500000);
 		return true;
 	}
 	return false;
@@ -80,7 +81,7 @@ void Simulation::moveWithVector()
 	int wl, wr; //wheel speeds left and right
 	wl = m_displacementVector[Y] + m_displacementVector[X];
 	wr = m_displacementVector[Y] - m_displacementVector[X];
-/*
+
 	if(wl > VAL_WHEELS_FW)
 	{
 		wr -= wl-VAL_WHEELS_FW;
@@ -100,15 +101,15 @@ void Simulation::moveWithVector()
 		wl += VAL_WHEELS_BW - wl;
 		wr = VAL_WHEELS_BW;
 	}
-	*/
-	if(wr > VAL_WHEELS_FW)
+
+	/*if(wr > VAL_WHEELS_FW)
 	{
 		wr = VAL_WHEELS_FW;
 	}
 	if(wr < VAL_WHEELS_BW)
 	{
 		wr = VAL_WHEELS_BW;
-	}
+	}*/
 	if(wl > VAL_WHEELS_FW)
 	{
 		wl = VAL_WHEELS_FW;
@@ -124,6 +125,7 @@ void Simulation::moveWithVector()
 void Simulation::approachBottlesCam()
 {
 	//TODO : real function
+	m_displacementVector[X] -= 150*abs(m_robot->getBottleAngle());
 }
 
 void Simulation::avoidObstaclesCam()

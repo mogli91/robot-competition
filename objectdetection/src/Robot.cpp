@@ -21,6 +21,16 @@ void Robot::updateData() {
 	m_brain->updateReadings();
 }
 
+int Robot::getBottleAngle()
+{
+	return m_brain->getReading(SENSOR_BOTTLE_ANGLE);
+}
+
+int Robot::getBottleDistance()
+{
+	return m_brain->getReading(SENSOR_BOTTLE_DISTANCE);
+}
+
 void Robot::setWheelSpeeds(int left, int right) {
 	m_brain->setWheelSpeeds(left, right);
 }

@@ -340,7 +340,7 @@ int main(int argc, char** args) {
 		}
 	}
 
-	int camnum = 0;
+	int camnum = 1;
 
 	// thread handles
 	pthread_t thread_camera_loop; // 'handle' of camera-loop thread.
@@ -352,7 +352,8 @@ int main(int argc, char** args) {
     if(video) {
         cout << "trying to connect to camera " << camnum << endl;
         /* ----- create needed objects ---- */
-        detector = new Detector(camnum, exposure, 240, 320, &detector_mutex);
+//        detector = new Detector(camnum, exposure, 240, 320, &detector_mutex);
+        detector = new Detector(camnum, exposure, 480, 640, &detector_mutex);
 
         // threading stuff
         if (detector->isReady()) {
