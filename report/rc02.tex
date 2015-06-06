@@ -1,0 +1,169 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   Semester project, fall term 2014
+%   Author: Jakob Ehrl, born 01/24/91
+%   Study program: Computer science, MA 1
+%   
+%   Professor Dr. Francesco Mondada
+%   Assistant: Dr. Stefan Witwicki
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{The Robot}
+%(short introduction w/ pics of the robot.)
+Since the beginning we aimed to develop a robot that could move in every part of the arena and theoretically capable of grasping all the bottles.
+Therefore to accomplish this goal all the strategies that have been evaluated at the beginning aimed to conceive a robot whose first characteristic was robustness. All the solutions that could be specific just to a particular situation or environment have been discarded.
+Keeping in mind this idea the robot’s characteristics came up as a consequence.
+Indeed the first consequence was the actual size of the robot. The width had to respect the constraint to be smaller than 45 cm in order to be able to take the ramp and access to the zone 4 of the arena.
+Furthermore the robot shall not have components distant from the ground less than a certain threshold, that has been decided to be of 4 cm, so that any possible contact of these components with the rocks while passing from the zone 1 to the zone 3 would be avoided.
+However, in order to be able to collect bottles, the elevator couldn't respect such a constraint. Therefore when it comes to corss the rocky passage the elevator is lifted up.
+Our wish was to design a small robot in order to be agile enough to easily avoid the unmodeled  obstacles represented by the bricks distributed all over the arena.
+Indeed a smaller robot is more likely to avoid them with ease if compared to a bigger one that needs more precision in the maneuvers in order to accomplish the same goal.
+
+\section{Features}
+The interactions of such a system with the environment are done by exploiting sensors and actuators. 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{RoboticSystem.jpg}
+\caption{Conceptual schema of a robotic system and its interactions with the environment.}
+\label{fig:RoboticSystem}
+\end{figure}
+
+As a result the main components of our robot can be clustered according to this division:
+\begin{itemize}
+\item Sensors
+\subitem - Ultrasonic
+\subitem  - IR
+\subitem  - Camera
+\item Brain
+\subitem  - Odroid
+\subitem  - Wild Thumper controller
+\subitem  - 2 Arduino Micro
+\item Actuators
+\subitem  - 3 Servo-Actuators
+\subitem  - Brush motor
+\end{itemize}
+
+Using such a system the bottles will be grasped thanks to the cooperation between the rotating brush and the mobile plate (actuated by the servo) and put in a storage area above the robot in order to stock ~4 bottles before dropping them into the recycling area opening the back door.
+This storage area upon the robot was conceived since we wanted also to be able to store several bottles on the robot in order to not have to return to the recycling area each time a pet bottle was grasped.
+The way of grasping bottles has been thought in way to be as much greedy as possible, meaning that detection of the exact position and orientation of the bottles had to be avoided because it would require a lot of time and precision from the sensors decreasing the robustness of the solution since in case of unforeseen difficulties it would get stuck in a dead end.
+Therefore the way to pick up bottles resulted in a mobile plate that aided by a moving brush sponge could retain the bottles until the  plate reach a position from where the bottles can roll in the storage part upon the robot.
+The moving plate is shaped in a way that bottles don’t need to be perfectly aligned  to be grasped by the “pick-up bottle” system. Furthermore the brush can slightly move in a range of $\pm 5^{\circ}$ Avoiding the possibility of a bottle getting blocked under it.
+ This characteristic has been exploited also to detect when a bottle was actually grasped. Indeed getting in the contact with a bottle, the brush had to generate more force to displace it. This change could be felt by the motor of the sponge in terms of a change in the current that could be read by the “brain of the robot”
+
+\section{Mechanical principle}
+
+\begin{wrapfigure}{l}{0.5\textwidth}
+\begin{center}
+\includegraphics[width=0.3\textwidth]{WoodenModel1.JPG}
+\end{center}
+\caption{Back view of the robot's wooden model.}
+\label{fig:WoodenModel1}
+\end{wrapfigure}
+
+After deciding the robot’s working principles, in order to verify the effectiveness of our ideas, some tests of the single components constituting the robot have been conducted.
+Firstly, a wooden model of the principal parts has been realized.
+%Some pics of this model from different points of view are %shown in the figures below. 
+
+
+During this process the experiment conducted on it allowed us to realize some small changes that have made our initial draft evolve toward the final idea.
+
+These tests were useful to determine the effectiveness of the “pick-up bottle” system and to comprehend in which cases the bottles could get stuck in undesired positions. This made us modify the shape of the elevator removing the lateral walls that represented an obstacle for bottles not perfectly centered with respect to the center of the robot.
+
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+\begin{center}
+\includegraphics[width=0.3\textwidth]{WoodenModel2.JPG}
+\end{center}
+\caption{Lateral view of the robot's wooden model.}
+\label{fig:WoodenModel2}
+\end{wrapfigure}
+
+Furthermore we shaped it in a more rounded fashion in order to allow even almost bottles vertically oriented to be successfully collected by the robotic system by turning within the elevator thanks to the help of the curvature.
+
+These modifications pointed toward the obtainment of a “greedy” mechanism that could deal with almost every possible situation, even the most challenging ones.
+Furthermore, the tests on the wooden model, have made possible the optimization of the storage part in terms of:
+
+\begin{itemize}
+\item Number of bottles that could be stored
+\item Space for electronics
+\end{itemize}
+
+\begin{wrapfigure}{l}{0.5\textwidth}
+\begin{center}
+ \includegraphics[width=0.3\textwidth]{WoodenModel3.JPG}
+\end{center} 
+ \caption{Upper-Front view of the robot's wooden model.}
+\label{fig:WoodenModel3}
+\end{wrapfigure}
+
+Indeed below the storage plate there is an hidden space that was decided to be reserved for the electronic components in order to guarantee a compact design where no space is wasted as wanted since  the beginning.
+Thus all the electronics has been disposed under the storage part of the robot that is attached to the robot in a way to form a ramp in order to favorize the rolling of the bottles coming from the moving plate.
+Moreover, this ramp was conceived in a way that its height is adjustable, simplifying a lot the assembly of the final robot without incurring in unpredicted inaccuracies.
+This adjustable slope mechanism is depicted by the Figure \ref{fig:AdjustableHeight3} below.
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=0.5\textwidth]{AdjustableHeight3.JPG}
+ \caption{Adjustable height mechanism of the storage compartement.}
+\label{fig:AdjustableHeight3}
+\end{figure}
+
+After some test the slope for an aluminum plate that allowed the bottles to roll without getting stuck resulted to be of about 30°.
+Furthermore, the electronics has been arranged in a way to allow an easy access to it and in particular for what it concerns the disposition of the batteries.
+
+Thanks to the good quality of the described model manufactured in wood we have even been able to test on it the real actuators that afterwards has been used on the final model.
+Being satisfied with this first mechanical verification of our idea a SolidWork model of the final robot has been realized.
+This model is represented in figure z.
+
+(((((((((((((((((((((((((((((((((FIGURE)))))))))))))))))))))))))))))))))
+
+
+
+
+
+
+
+After the approval of all the team members about the mechanical components that would have constituted the final robot, the mechanical 2D plans of all the single components have been produced to be then sent to the mechanical workshop and be manufactured.
+More complex parts have been printed with the further benefit of saving time having the available to be tested far earlier than the aluminum parts.
+ In the meantime the “holders” of the sensors have been printed together with the electronic parts’ boxes that have been conceived in order to guarantee their arrangement in the reserved space in the most proper way and allowing at the same time an easy access to them.
+In the mechanical conception of the robot, great importance has been given to the design of the elevator shown in Figure a.
+
+(((((((((((((((((((((((((((((((((FIGURE)))))))))))))))))))))))))))))))))
+
+
+A lot of effort has been expended in order to make the electronic area, and in particular the zone reserved to batteries, easily accessible.
+The storage compartment, indeed, can be detached in correspondence of the “adjustable height mechanism” and rotate around a pivoting system placed in correspondence of the end of the chassis.
+The pivoting system just described is shown in Figure x
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=0.5\textwidth]{PivotingSystem.JPG}
+ \caption{Pivoting system for the storage ramp opening.}
+\label{fig:PivotingSystem}
+\end{figure}
+
+This simple mechanism allows, as already said, to access to the electronics that’s arranged with the help of boxes which, as it can be seen in Figure y, make it possible to add and remove the batteries without having to remove any other component.
+
+(((((((((((((((((((((((((((((((((FIGURE)))))))))))))))))))))))))))))))))
+
+Another important feature, in terms of the mechanical conception of the robot, is the possibility to regulate the pointing direction of some sensors.
+Indeed, as it can be seen in Figure 1 and Figure 2, both the camera and the two front ultrasonic sensors are holded by means of holders that allow to change the pointing direction
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=0.4\textwidth]{PointingUS.JPG}
+ \caption{Close view of the system that allows to regulate the Ultrasonic sensors' direction.}
+\label{fig:PointingUS}
+\end{figure}
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=0.4\textwidth]{PointingCamera.JPG}
+ \caption{Close view of the system that allows to regulate the camera direction.}
+\label{fig:PointingCamera}
+\end{figure}
+
+This was done since it was difficult to define “a priori” the arrangement that would return the best feedback in term of detection.
+\section{Modules presentation}
+All the robot's main functions: actuations, processing and sensing, were performed by different modules. The reason for this separation was to have microcontrollers dedicated for one purpose, thus optimizing the calculation time and efficiency of the robot. In our robot, Four main modules were working together, and each of them had specific roles...

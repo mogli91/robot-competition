@@ -1,0 +1,238 @@
+%Stanford
+@article{forman2011self,
+  title={Self-encoded marker for optical prospective head motion correction in MRI},
+  author={Forman, Christoph and Aksoy, Murat and Hornegger, Joachim and Bammer, Roland},
+  journal={Medical image analysis},
+  volume={15},
+  number={5},
+  pages={708--719},
+  year={2011},
+  publisher={Elsevier}
+}
+
+%Leipzig
+@article{zaitsev2006magnetic,
+  title={Magnetic resonance imaging of freely moving objects: prospective real-time motion correction using an external optical motion tracking system},
+  author={Zaitsev, M and Dold, Christian and Sakas, Georgios and Hennig, J{\"u}rgen and Speck, O},
+  journal={Neuroimage},
+  volume={31},
+  number={3},
+  pages={1038--1050},
+  year={2006},
+  publisher={Elsevier}
+}
+
+% Hawaii
+@article{andrews2011prospective,
+  title={Prospective motion correction for magnetic resonance spectroscopy using single camera retro-grate reflector optical tracking},
+  author={Andrews-Shigaki, Brian C and Armstrong, Brian SR and Zaitsev, Maxim and Ernst, Thomas},
+  journal={Journal of Magnetic Resonance Imaging},
+  volume={33},
+  number={2},
+  pages={498--504},
+  year={2011},
+  publisher={Wiley Online Library}
+}
+
+%Julian
+@article{maclaren2012prospective,
+  title={Prospective motion correction in brain imaging: a review},
+  author={Maclaren, Julian and Herbst, Michael and Speck, Oliver and Zaitsev, Maxim},
+  journal={Magnetic Resonance in Medicine},
+  year={2012},
+  publisher={Wiley Online Library}
+}
+
+%Leipzig
+@article{schulz2012embedded,
+  title={An embedded optical tracking system for motion-corrected magnetic resonance imaging at 7T},
+  author={Schulz, Jessica and Siegert, Thomas and Reimer, Enrico and Labadie, Christian and Maclaren, Julian and Herbst, Michael and Zaitsev, Maxim and Turner, Robert},
+  journal={Magnetic Resonance Materials in Physics, Biology and Medicine},
+  volume={25},
+  number={6},
+  pages={443--453},
+  year={2012},
+  publisher={Springer}
+}
+
+%Siemens Erlangen
+@article{thesen2000prospective,
+  title={Prospective acquisition correction for head motion with image-based tracking for real-time fMRI},
+  author={Thesen, Stefan and Heid, Oliver and Mueller, Edgar and Schad, Lothar R},
+  journal={Magnetic Resonance in Medicine},
+  volume={44},
+  number={3},
+  pages={457--465},
+  year={2000},
+  publisher={Wiley Online Library}
+}
+
+%San Diego
+@article{white2010promo,
+  title={PROMO: Real-time prospective motion correction in MRI using image-based tracking},
+  author={White, Nathan and Roddey, Cooper and Shankaranarayanan, Ajit and Han, Eric and Rettmann, Dan and Santos, Juan and Kuperman, Josh and Dale, Anders},
+  journal={Magnetic Resonance in Medicine},
+  volume={63},
+  number={1},
+  pages={91--105},
+  year={2010},
+  publisher={Wiley Online Library}
+}
+
+%Stereo Vision Maryland
+@article{qin2009prospective,
+  title={Prospective head-movement correction for high-resolution MRI using an in-bore optical tracking system},
+  author={Qin, Lei and van Gelderen, Peter and Derbyshire, John Andrew and Jin, Fenghua and Lee, Jongho and de Zwart, Jacco A and Tao, Yang and Duyn, Jeff H},
+  journal={Magnetic Resonance in Medicine},
+  volume={62},
+  number={4},
+  pages={924--934},
+  year={2009},
+  publisher={Wiley Online Library}
+}
+
+%Kalman Filter
+@article{kalman1960new,
+  title={A new approach to linear filtering and prediction problems},
+  author={Kalman, Rudolph Emil and others},
+  journal={Journal of basic Engineering},
+  volume={82},
+  number={1},
+  pages={35--45},
+  year={1960}
+}
+
+%Kalman with Video
+@inproceedings{goddard1998pose,
+  title={Pose and motion estimation using dual quaternion-based extended Kalman filtering},
+  author={Goddard, James Samuel and Abidi, Mongi A},
+  booktitle={Photonics West'98 Electronic Imaging},
+  pages={189--200},
+  year={1998},
+  organization={International Society for Optics and Photonics}
+}
+
+%Computer Vision Book
+@book{hartley2000multiple,
+  title={Multiple view geometry in computer vision},
+  author={Hartley, Richard and Zisserman, Andrew},
+  volume={2},
+  year={2000},
+  publisher={Cambridge Univ Press}
+}
+
+%Fraunhofer Stereo Vision
+@incollection{hossbach2013head,
+  title={Head Motion Compensation for Arterial Spin Labeling Using Optical Motion Tracking},
+  author={Ho{\ss}bach, Martin and Gregori, Johannes and Wesarg, Stefan and G{\"u}nther, Matthias},
+  booktitle={Clinical Image-Based Procedures. From Planning to Intervention},
+  pages={1--8},
+  year={2013},
+  publisher={Springer}
+}
+
+@inproceedings{aksoy2008real,
+  title={A real time optical motion correction system using a single camera and 2D marker},
+  author={Aksoy, M and Newbould, R and Straka, M and Holdsworth, S and Skare, S and Santos, J and Bammer, R},
+  booktitle={Proceedings of the 16th Scientific Meeting, International Society for Magnetic Resonance in Medicine, Toronto, Canada},
+  pages={3120},
+  year={2008}
+}
+
+@book{bradski2008learning,
+  title={Learning OpenCV: Computer vision with the OpenCV library},
+  author={Bradski, Gary and Kaehler, Adrian},
+  year={2008},
+  publisher={O'Reilly Media, Inc.}
+}
+
+@book{vince2011quaternions,
+  title={Quaternions for computer graphics},
+  author={Vince, John},
+  year={2011},
+  publisher={Springer}
+}
+
+@article{hartley1997triangulation,
+  title={Triangulation},
+  author={Hartley, Richard I and Sturm, Peter},
+  journal={Computer vision and image understanding},
+  volume={68},
+  number={2},
+  pages={146--157},
+  year={1997},
+  publisher={Elsevier}
+}
+
+@article{umeyama1991least,
+  title={Least-squares estimation of transformation parameters between two point patterns},
+  author={Umeyama, Shinji},
+  journal={IEEE Transactions on pattern analysis and machine intelligence},
+  volume={13},
+  number={4},
+  pages={376--380},
+  year={1991},
+  publisher={IEEE Computer Society}
+}
+
+@article{duane1971close,
+  title={Close-range camera calibration},
+  author={Duane, C BROWN},
+  journal={Photogramm. Eng},
+  volume={37},
+  pages={855--866},
+  year={1971}
+}
+
+@article{brown1966decentering,
+  title={Decentering distortion of lenses},
+  author={Brown, Duane C},
+  journal={Photometric Engineering},
+  volume={32},
+  number={3},
+  pages={444--462},
+  year={1966}
+}
+
+@article{tsai1987versatile,
+  title={A versatile camera calibration technique for high-accuracy 3D machine vision metrology using off-the-shelf TV cameras and lenses},
+  author={Tsai, Roger Y},
+  journal={Robotics and Automation, IEEE Journal of},
+  volume={3},
+  number={4},
+  pages={323--344},
+  year={1987},
+  publisher={IEEE}
+}
+
+@article{zhang2000flexible,
+  title={A flexible new technique for camera calibration},
+  author={Zhang, Zhengyou},
+  journal={Pattern Analysis and Machine Intelligence, IEEE Transactions on},
+  volume={22},
+  number={11},
+  pages={1330--1334},
+  year={2000},
+  publisher={IEEE}
+}
+
+@article{longuet1981eightpoint,
+  title={A computer algorithm for reconstructing a scene from two projections},
+  author={Longuet-Higgins, H. C.},
+  journal={Nature},
+  volume={293},
+  number={1},
+  pages={377--385},
+  year={1981}
+}
+
+@article{suzuki1985topological,
+  title={Topological structural analysis of digitized binary images by border following},
+  author={Suzuki, Satoshi and others},
+  journal={Computer Vision, Graphics, and Image Processing},
+  volume={30},
+  number={1},
+  pages={32--46},
+  year={1985},
+  publisher={Elsevier}
+}

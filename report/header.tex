@@ -1,0 +1,77 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   Semester project, fall term 2014
+%   Author: Jakob Ehrl, born 01/24/91
+%   Study program: Computer science, MA 1
+%   
+%   Professor Dr. Francesco Mondada
+%   Assistant: Dr. Stefan Witwicki
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[english,rep]{lmedoc}
+
+%\usepackage[latin1]{inputenc}
+\usepackage{pdfpages}
+\usepackage{tabularx}
+\usepackage{subfigure}
+\usepackage{color}
+\usepackage{pgfplots}
+
+% algorithms
+\usepackage[]{algorithm}
+\usepackage[]{algpseudocode}
+
+% code listings
+\usepackage{listings}
+\usepackage{xcolor}
+
+% specific settings
+\hbadness=10000
+\pagenumbering{roman}
+\bibliographystyle{galpha1a}
+
+% for tikz plots:
+\pgfplotsset{
+	compat=1.8,
+	height=0.3\textheight,
+	width=0.5\textwidth-5pt,
+	legend columns={2},
+}
+\usepgfplotslibrary{external}
+\usetikzlibrary{calc}
+\tikzexternalize%activate externalization!
+\usepackage{wrapfig}
+
+\graphicspath{ {figures/} }
+
+\pgfplotscreateplotcyclelist{system-plots}{
+red,
+blue,
+orange,
+cyan
+}
+
+% for code listings
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{
+frame=tb,
+%language=scala,
+aboveskip=3mm,
+belowskip=3mm,
+showstringspaces=false,
+columns=flexible,
+basicstyle={\small\ttfamily},
+numbers=none,
+numberstyle=\tiny\color{gray},
+keywordstyle=\color{blue},
+commentstyle=\color{dkgreen},
+stringstyle=\color{mauve},
+breaklines=true,
+breakatwhitespace=true,
+tabsize=3,
+}
+

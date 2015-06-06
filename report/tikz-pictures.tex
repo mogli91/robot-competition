@@ -1,0 +1,74 @@
+\input{header.tex}
+
+\tikzsetexternalprefix{figures/fig_}
+\begin{document}
+    % arena with grid
+\tikzsetnextfilename{localization_grid}
+	\begin{tikzpicture}% coordinate system
+    \draw[thick,->] (-0.5,-0.5) -- (9,-0.5) node[anchor=north west] {$x$};
+    \draw[thick,->] (-0.5,-0.5) -- (-0.5,9) node[anchor=south east] {$y$};
+    % arena frame
+    \draw[brown,thick] (0,0) -- (8,0) -- (8,8) -- (0,8) -- cycle;
+    % tiles
+    \draw[step=1,gray,very thin] (0.1, 0.1) grid (7.9, 7.9);
+    % coordinate ticks
+    \foreach \x in {1,2,3,4,5,6,7}
+        \draw (\x,1pt) -- (\x,-1pt) node[anchor=north] {$\x$};
+    \foreach \y in {1,2,3,4,5,6,7}
+        \draw (1pt,\y) -- (-1pt,\y) node[anchor=east] {$\y$};
+    % beacons
+    \coordinate (b00) at (0,0);
+    \coordinate (b10) at (8,0);
+    \coordinate (b11) at (8,8);
+    \coordinate (b01) at (0,8);
+    \fill[blue] (b00) circle (0.25);
+    \fill[red] (b10) circle (0.25);
+    \fill[green] (b11) circle (0.25);
+    \fill[yellow] (b01) circle (0.25);
+    % sample point
+    \coordinate (s) at (2.4,3.7);
+    \fill[black] (s) circle (0.125) node[anchor=north east] {$\vec{s}$}; 
+    \draw[dashed] (s) circle (1.25);
+    % local coordinate system
+    \draw[thick,->] (s) -- ($ (s) + (2,0) $) node[anchor=north west] {$\hat{x}$};
+    \draw[thick,->] (s) -- ($ (s) + (0,2) $) node[anchor=south east] {$\hat{y}$};
+    % beacon projections
+    \draw (b00) -- (s);
+    \draw (b10) -- (s);
+    \draw (b11) -- (s);
+    \draw (b01) -- (s);
+    % neighbors
+    \fill[blue!60!white] (2,3) circle (0.05) node[anchor=north east] {$\vec{s_{00}}$};
+    \fill[blue!60!white] (3,3) circle (0.05) node[anchor=north west] {$\vec{s_{10}}$};
+    \fill[blue!60!white] (3,4) circle (0.05) node[anchor=south west] {$\vec{s_{11}}$};
+    \fill[blue!60!white] (2,4) circle (0.05) node[anchor=south east] {$\vec{s_{01}}$};
+	\end{tikzpicture}
+
+%\tikzsetnextfilename{localization_neighbors}
+    
+%	\begin{axis} [
+%		title=Rotation Accuracy,
+%		xlabel={$\theta/^{\circ}$},
+%		ylabel={$\bar{\epsilon}_{\theta}/^{\circ}$},
+%		cycle list name=system-plots,
+%		legend entries={$mono_l$, $mono_r$, $combined$, $stereo/20$},
+%	]
+%		\addplot table[
+%			x=travel,
+%			y=err_rot_mono1
+%		]{data/rotation_x.data};
+%		\addplot table[
+%			x=travel,
+%			y=err_rot_mono2
+%		]{data/rotation_x.data};
+%		\addplot table[
+%			x=travel,
+%			y=err_rot_mono_mono
+%		]{data/rotation_x.data};
+%		\addplot table[
+%			x = travel,
+%			y expr=\thisrow{err_rot_stereo}/20
+%		]{data/rotation_x.data};
+%	\end{axis}
+%	\end{tikzpicture}
+\end{document}
