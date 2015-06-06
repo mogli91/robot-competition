@@ -35,11 +35,12 @@ void Robot::setTailGate(int tailGateState) {
 }
 
 void Robot::setShovel(int shovelState) {
+	m_brain->setLiftPosition(shovelState);
 	//TODO : real angles
-	if (shovelState == UP)
-		m_brain->setLiftPosition(VAL_LIFT_HIGH);
-	else
-		m_brain->setLiftPosition(VAL_LIFT_LOW);
+//	if (shovelState == UP)
+//		m_brain->setLiftPosition(VAL_LIFT_HIGH);
+//	else
+//		m_brain->setLiftPosition(VAL_LIFT_LOW);
 }
 
 void Robot::setBrushSpeed(int speed) {
@@ -51,6 +52,9 @@ int Robot::getSensorValue(char sensorId) {
 }
 
 int Robot::getBrushCurrent() {
+	int val =  m_brain->getReading(SENSOR_BRUSH_CURRENT);
+
+	cout <<"\n\n" << val <<"\n\n" <<endl;
 	return m_brain->getReading(SENSOR_BRUSH_CURRENT);
 }
 

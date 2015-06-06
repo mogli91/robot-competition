@@ -46,6 +46,7 @@ private:
 	void search();
 	bool homeReached();
 	void emptyTailGate();
+	void liftBottle();
 
 
 	int m_currentState;

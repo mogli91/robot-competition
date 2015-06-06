@@ -2,7 +2,8 @@
  * Arduino micro 1 : the one with the sensors...
  * has 5 IR sensors, 
  * 4 Ultrasound sensors
- * controls the brush motor
+ * controls the 
+ motor
  * extra pins available for serial transfer
  */
  
@@ -52,6 +53,41 @@ int usn; //id of ultrasound to be read
 #define CLOCKWISE 1
 #define ANTICLOCKWISE 0
 
+#define STACKSIZE 10
+int stack[STACKSIZE];
+//int stackCounter;
+
+int stackInit()
+{
+  for(int i = 0; i < STACKSIZE; i++)
+  {
+      stack[i] = 0;
+  }
+  //stackCounter = 0;
+}
+
+//gives the average value of the stack
+int stackAvg()
+{
+    int sum = 0;
+    for(int i = 0; i < STACKSIZE; i++)
+    {
+      sum += stack[i];
+    }
+    
+    return  sum/STACKSIZE;
+}
+
+//stackarray function
+void stackAdd(int newdata)
+{
+    for(int i = STACKSIZE-1; i >= 1; i--)
+    {
+        stack[i] = stack[i-1];
+    }
+    stack[0] = newdata;
+}
+
 //-------------------------------------------------------------- communication  -----------------------------------------------------
 
 //#define READING_SIZE 5      // number of bytes per package from microcontroller -> odroid
@@ -88,6 +124,7 @@ void ir_init()
       ir_prev[i] = 80;
    }
 }
+
 
 void motor_setup(int cs, int pwm, int ina, int inb)
 {
@@ -127,6 +164,8 @@ void setup()                    // run once, when the sketch starts
     
     us_prev[0] = 140;
     us_prev[1] = 140;
+    
+    stackInit();
 }
 
 void loop()                       // run over and over again
@@ -177,62 +216,10 @@ void loop()                       // run over and over again
         ir_prev[i] = ir_new[i];
     }
     
-//    if ((t1 - tus) >= TUS)
-//    {
-//        switch(usn)
-//        {
-//          case(0): 
-//              print_value(SENSOR_US_L, measure_US(USL));
-//              usn++;
-//          break;
-//          case(1): 
-//              print_value(SENSOR_US_FRONT_L, measure_US(USFL));
-//              usn++;
-//          break;
-//          case(2): 
-//              print_value(SENSOR_US_FRONT_R, measure_US(USFR));
-//              usn++;
-//          break;
-//          case(3): 
-//              print_value(SENSOR_US_R, measure_US(USR));
-//              usn = 0;
-//          break;
-//        }
-//        
-//        tus = t1;
-//    }
-
-//              print_value(SENSOR_US_L, measure_US(USL));
-//              print_value(SENSOR_US_FRONT_L, measure_US(USFL));
-//              print_value(SENSOR_US_FRONT_R, measure_US(USFR));
-//              print_value(SENSOR_US_R, measure_US(USR));
+    stackAdd(measure_motor_current());
+    print_value(SENSOR_BRUSH_CURRENT, stackAvg());
     
-    
-    
-    int us_new[5] = {130,130};
-    //filtering
-//    us_new[0] = (0*us_prev[0] + 10*measure_US(USL_TRIG, USL_ECHO))/10;
-//    us_new[1] = (0*us_prev[1] + 10*measure_US(USR_TRIG, USR_ECHO))/10;
-    
-    for(int i = 0; i < 2; i++)
-    {
-        if(us_new[i] > 130)
-          us_new[i] = 130;
-    }
-    
-//    print_value(SENSOR_US_L, us_new[0]);
-//    print_value(SENSOR_US_R, us_new[1]);
-    
-    for(int i = 0; i < 2; i++)
-    {
-        us_prev[i] = us_new[i];
-    }
-    
-       //print_value(SENSOR_US_L, measure_US(USL_TRIG, USL_ECHO));    
-       //print_value(SENSOR_US_R, measure_US(USR_TRIG, USR_ECHO));
-    
-    
-    print_value(SENSOR_BRUSH_CURRENT, measure_motor_current());
+    print_value(SENSOR_DYMX_SPEED, measure_dymx_speed());
     
     // NOTE for each measurement that is to be sent, use print_value(char id, int val)
 //    motor_check();
@@ -241,24 +228,7 @@ void loop()                       // run over and over again
 int measure_US(int pin_trig, int pin_echo) //read US values on a pin and interpret as distance of x cm.
 {
     long duration, cm;
-
-    /*pinMode(pin, OUTPUT);
-    digitalWrite(pin, LOW );
-    delayMicroseconds(2);
-    //send a 10microsecond impulse to the trigger (it makes the sensor send a wave): I keep it high for 10microsec
-    digitalWrite( pin, HIGH );
-    delayMicroseconds( 10 );
-    digitalWrite( pin, LOW );
-     
-    pinMode(pin, INPUT);
-    int timeout = 90000;
-    duration = pulseIn( pin, HIGH, timeout );
-    if (duration  == 0) duration = timeout;
-     
-    cm = 0.034 * duration / 2;
-     
-    return (int)cm;*/
-    
+ 
     pinMode(pin_trig, OUTPUT);
     pinMode(pin_echo, INPUT);
     
@@ -310,6 +280,14 @@ void set_motor_speed(float speed) //speed from 0 V to 450 cV (WARNING VOLTAGE IS
     if(pwm >= 100)//4.5/7.2*255 because max voltage is 4.5
       pwm = 100;
     analogWrite(PWM_, pwm);
+}
+
+int measure_dymx_speed()
+{
+  int speed = Dynamixel.readSpeed(DYMX_ID);
+  if( speed > 999) speed = 999;
+  if(speed < 0) speed = 0;
+   return speed;
 }
 
 void set_motor_direction(bool clockwise)

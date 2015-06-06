@@ -33,22 +33,20 @@ void Simulation::loop(void)
 		m_robot->setBrushSpeed(VAL_BRUSH_FW);
 		if(bottleCaptured())
 		{
+			liftBottle();
 			m_bottlesCollected++;
-			m_robot->setShovel(VAL_LIFT_HIGH);
-			sleep(5);
-			m_robot->setShovel(VAL_LIFT_LOW);
 		}
 
-		/*if(m_bottlesCollected >= 4 || elapsed_secs > 60*8) //8 minutes or 4 bottles = go home
+		if(m_bottlesCollected >= 4 || elapsed_secs > 60*8) //8 minutes or 4 bottles = go home
 		{
-			goHome();				//go home using the compass
+			//goHome();				//go home using the compass
 		}
 		else
 		{
 			search();				//search for bottles in the arena
-		}*/
+		}
 
-		//moveWithVector();			//move in the direction of the vector
+		moveWithVector();			//move in the direction of the vector
 	}
 
 	//send instructions to the modules
@@ -56,9 +54,20 @@ void Simulation::loop(void)
     
 }
 
+void Simulation::liftBottle()
+{
+	m_robot->setShovel(VAL_LIFT_HIGH);
+	m_robot->setWheelSpeeds(VAL_WHEELS_STOP, VAL_WHEELS_STOP);
+
+	sleep(3);
+	m_robot->setShovel(VAL_LIFT_LOW);
+	m_robot->sendInstructions();
+	sleep(3);
+}
+
 bool Simulation::bottleCaptured()
 {
-	if(brushIsBlocked() || m_robot->getBrushCurrent() > 160)
+	if(brushIsBlocked() || m_robot->getBrushCurrent() > 220)
 	{
 		usleep(500000);
 		return true;
@@ -71,7 +80,7 @@ void Simulation::moveWithVector()
 	int wl, wr; //wheel speeds left and right
 	wl = m_displacementVector[Y] + m_displacementVector[X];
 	wr = m_displacementVector[Y] - m_displacementVector[X];
-
+/*
 	if(wl > VAL_WHEELS_FW)
 	{
 		wr -= wl-VAL_WHEELS_FW;
@@ -91,7 +100,15 @@ void Simulation::moveWithVector()
 		wl += VAL_WHEELS_BW - wl;
 		wr = VAL_WHEELS_BW;
 	}
-
+	*/
+	if(wr > VAL_WHEELS_FW)
+	{
+		wr = VAL_WHEELS_FW;
+	}
+	if(wr < VAL_WHEELS_BW)
+	{
+		wr = VAL_WHEELS_BW;
+	}
 	if(wl > VAL_WHEELS_FW)
 	{
 		wl = VAL_WHEELS_FW;
@@ -119,19 +136,19 @@ void Simulation::avoidObstaclesIR()
 {
 	int maxIRrange = 80;
 
-	m_displacementVector[X] += (maxIRrange - m_robot->getSensorValue(SENSOR_IR_L))*7/10;
-	m_displacementVector[Y] -= (maxIRrange - m_robot->getSensorValue(SENSOR_IR_L))*7/10;
+	m_displacementVector[X] -= (maxIRrange - m_robot->getSensorValue(SENSOR_IR_L))*2;//*7/10;
+	m_displacementVector[Y] -= (maxIRrange - m_robot->getSensorValue(SENSOR_IR_L))*2;//*7/10;
 
-	m_displacementVector[X] += (maxIRrange - m_robot->getSensorValue(SENSOR_IR_FRONT_L))*7/10;
-	m_displacementVector[Y] -= (maxIRrange - m_robot->getSensorValue(SENSOR_IR_FRONT_L))*7/10;
+	m_displacementVector[X] -= (maxIRrange - m_robot->getSensorValue(SENSOR_IR_FRONT_L))*2;//*7/10;
+	m_displacementVector[Y] -= (maxIRrange - m_robot->getSensorValue(SENSOR_IR_FRONT_L))*2;//*7/10;
 
-	m_displacementVector[X] -= (maxIRrange - m_robot->getSensorValue(SENSOR_IR_R))*7/10;
-	m_displacementVector[Y] -= (maxIRrange - m_robot->getSensorValue(SENSOR_IR_R))*7/10;
+	m_displacementVector[X] += (maxIRrange - m_robot->getSensorValue(SENSOR_IR_R))*2;//*7/10;
+	m_displacementVector[Y] -= (maxIRrange - m_robot->getSensorValue(SENSOR_IR_R))*2;//*7/10;
 
-	m_displacementVector[X] -= (maxIRrange - m_robot->getSensorValue(SENSOR_IR_FRONT_R))*7/10;
-	m_displacementVector[Y] -= (maxIRrange - m_robot->getSensorValue(SENSOR_IR_FRONT_R))*7/10;
+	m_displacementVector[X] += (maxIRrange - m_robot->getSensorValue(SENSOR_IR_FRONT_R))*2;//*7/10;
+	m_displacementVector[Y] -= (maxIRrange - m_robot->getSensorValue(SENSOR_IR_FRONT_R))*2;//*7/10;
 
-	m_displacementVector[Y] += (maxIRrange - m_robot->getSensorValue(SENSOR_IR_BACK));
+	m_displacementVector[Y] += (maxIRrange - m_robot->getSensorValue(SENSOR_IR_BACK))*2;
 
 }
 
@@ -154,7 +171,7 @@ void Simulation::homeDisplacement()
  //change direction of brush if overcurrent
 bool Simulation::brushIsBlocked()
 {
-	if(m_robot->getBrushCurrent() > 200) //300mA
+	if(m_robot->getBrushCurrent() > 400) //300mA
 	{
 		m_robot->setBrushSpeed(VAL_BRUSH_BW);
 		usleep(300000);

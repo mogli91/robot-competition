@@ -205,12 +205,12 @@ void* read_user_input(void* data) {
                 break;
         case 'x': // lift up
                 printf("lift down \n\r");
-                brain->setCommand(CMD_LIFT, 1);
+                brain->setCommand(CMD_LIFT, VAL_LIFT_LOW);
                 new_command = true;
                 break;
         case 'X': // lower lift
                 printf("lift up \n\r");
-                brain->setCommand(CMD_LIFT, 0);
+                brain->setCommand(CMD_LIFT, VAL_LIFT_HIGH);
                 new_command = true;
                 break;
         case 's': // toggle simulation
