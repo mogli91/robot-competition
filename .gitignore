@@ -1,0 +1,16 @@
+build/
+debug/
+release/
+*.DS_Store
+*.swp
+*~
+*.aux
+*.log
+*.synctex.gz*
+*.auxlock
+*.md5
+*.dpth
+report/rc00.pdf
+report/rc00.lof
+report/rc00.toc
+.metadata/
