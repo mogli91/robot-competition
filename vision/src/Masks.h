@@ -15,9 +15,11 @@ using namespace cv;
 class Mask {
 protected:
     cv::Rect m_roi;
+    int m_area;
     int m_blocksize;
     double m_mean[3];
     double m_compare[3];
+    double m_sum[3];
 public:
     
     enum TYPE {FAR, CLOSE_UPRIGHT, CLOSE_FLAT, CLOSE_45P, CLOSE_45N,
@@ -26,6 +28,7 @@ public:
     Mask(int blocksize, int type);
     
     double dist(double *a, double *b);
+    void computeSum(const cv::Mat &img_integral, cv::Rect roi, int *dst);
     cv::Rect getROI() {return m_roi;};
     
     virtual bool match(const cv::Mat &img_integral, cv::Point p, double threshold) = 0;
@@ -57,6 +60,18 @@ public:
     };
 };
 
+class BottleClose45P : public Mask {
+public:
+    BottleClose45P(int blocksize) : Mask(blocksize, CLOSE_45P){};
+    bool match(const cv::Mat &img_integral, cv::Point p, double threshold);
+};
+
+class BottleClose45N : public Mask {
+public:
+    BottleClose45N(int blocksize) : Mask(blocksize, CLOSE_45N){};
+    bool match(const cv::Mat &img_integral, cv::Point p, double threshold);
+};
+
 class BottleVeryCloseUpright : public Mask {
 public:
     BottleVeryCloseUpright(int blocksize) : Mask(blocksize, VERY_CLOSE_UPRIGHT){};
@@ -73,6 +88,17 @@ public:
     };
 };
 
+class BottleVeryClose45P : public Mask {
+public:
+    BottleVeryClose45P(int blocksize) : Mask(blocksize, VERY_CLOSE_45P){};
+    bool match(const cv::Mat &img_integral, cv::Point p, double threshold);
+};
+
+class BottleVeryClose45N : public Mask {
+public:
+    BottleVeryClose45N(int blocksize) : Mask(blocksize, VERY_CLOSE_45N){};
+    bool match(const cv::Mat &img_integral, cv::Point p, double threshold);
+};
 
 //class BottleCloseUpright : public Mask {
 //public:

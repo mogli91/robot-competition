@@ -105,9 +105,10 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
 }
 
 void RangeFinder::locateBottles() {
-//    BottleFar bottle = BottleFar(m_blocksize);
-    BottleCloseUpright bottle = BottleCloseUpright(m_blocksize);
+    BottleFar bottle = BottleFar(m_blocksize);
+//    BottleCloseUpright bottle = BottleCloseUpright(m_blocksize);
 //    BottleCloseFlat bottle = BottleCloseFlat(m_blocksize);
+//    BottleClose45P bottle = BottleClose45P(m_blocksize);
     double threshold = 30;
     Point p;
     
