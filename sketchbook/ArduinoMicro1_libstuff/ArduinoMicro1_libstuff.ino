@@ -151,10 +151,10 @@ void loop()                       // run over and over again
     ir_new[2] = ((10-filt_ir)*ir_prev[2] + filt_ir*IR_get_dist(IRFR))/10;
     ir_new[3] = ((10-filt_ir)*ir_prev[3] + filt_ir*IR_get_dist(IRR))/10;
     ir_new[4] = ((10-filt_ir)*ir_prev[4] + filt_ir*IR_get_dist(IRB))/10;
-//    ir_new[5] = ((10-filt_ir)*ir_prev[5] + filt_ir*IR_get_dist(IRBL))/10;
-//    ir_new[6] = ((10-filt_ir)*ir_prev[6] + filt_ir*IR_get_dist(IRFBL))/10;
-//    ir_new[7] = ((10-filt_ir)*ir_prev[7] + filt_ir*IR_get_dist(IRFBR))/10;
-//    ir_new[8] = ((10-filt_ir)*ir_prev[8] + filt_ir*IR_get_dist(IRBR))/10;
+    ir_new[5] = ((10-filt_ir)*ir_prev[5] + filt_ir*IR_get_dist(IRBL))/10;
+    ir_new[6] = ((10-filt_ir)*ir_prev[6] + filt_ir*IR_get_dist(IRFBL))/10;
+    ir_new[7] = ((10-filt_ir)*ir_prev[7] + filt_ir*IR_get_dist(IRFBR))/10;
+    ir_new[8] = ((10-filt_ir)*ir_prev[8] + filt_ir*IR_get_dist(IRBR))/10;
     
     for(int i = 0; i < 9; i++)
     {
@@ -232,7 +232,7 @@ void loop()                       // run over and over again
        //print_value(SENSOR_US_R, measure_US(USR_TRIG, USR_ECHO));
     
     
-    print_value(SENSOR_BRUSH_CURRENT, measure_motor_current());
+    //print_value(SENSOR_BRUSH_CURRENT, measure_motor_current());
     
     // NOTE for each measurement that is to be sent, use print_value(char id, int val)
 //    motor_check();
@@ -341,10 +341,12 @@ void motor_check()
    }
 }
 
-void dynamixel_move(int val)
+void dynamixel_move(bool up)
 {
-    if(val < 0 || val > 1023) return;
-    Dynamixel.moveSpeed(DYMX_ID, val, 100);
+    if(up)
+      Dynamixel.moveSpeed(DYMX_ID, 500, 100);
+    else
+      Dynamixel.moveSpeed(DYMX_ID, 900, 100);
 }
 
 //-------------------------------------------------------------- communication  -----------------------------------------------------
@@ -420,6 +422,7 @@ int act(char id, int val)
             handle_motor_command(val);    
             break;
         case CMD_LIFT:
+            // dynamixel (0 down 1 up)
             dynamixel_move(val);
             break;
         default:

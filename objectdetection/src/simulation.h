@@ -13,7 +13,7 @@
 #include "Robot.h"
 
 //Define the number of sensors for obstacle avoidance (IR)
-#define IR_SENSORS           5
+#define IR_SENSORS           9
 
 //Define the number of sensors for bottle detection and approaching (US): Phototaxis
 #define US_SENSORS         4
