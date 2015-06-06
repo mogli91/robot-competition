@@ -72,9 +72,9 @@ void Brain::updateReadings() {
     
     if (m_detector != NULL) {
         mutex = (pthread_mutex_t*) m_detector->getMutex();
-        pthread_mutex_lock(mutex);
+//        pthread_mutex_lock(mutex);
         m_detector->getMeasurement(m_vision);
-        pthread_mutex_unlock(mutex);
+//        pthread_mutex_unlock(mutex);
         for (vector<Point>::iterator it = m_vision.bottles.begin(); it != m_vision.bottles.end(); ++it) {
             printf("Bottle at: %d, %d\n\r", it->x, it->y);
         }
