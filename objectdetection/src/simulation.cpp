@@ -68,7 +68,7 @@ void Simulation::liftBottle()
 bool Simulation::bottleCaptured()
 {
 	//if(brushIsBlocked() || m_robot->getBrushCurrent() > 220)
-	if(m_robot->getSensorValue(SENSOR_IR_FRONT_BOTTOM_R) < 20)
+	if(m_robot->getSensorValue(SENSOR_IR_BRUSH) < 30)
 	{
 		//usleep(500000);
 		return true;

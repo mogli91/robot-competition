@@ -27,10 +27,10 @@
 //#define USFL 3 //front left
 //#define USFR 4 //front right
 //#define USR 5  //right
-#define IRBL      A5
-#define IRFBL     4 //A6
-#define IRFBR     6 //A7
-#define IRBR      8 //A8
+#define IRBRUSH      A5
+//#define IRFBL     4 //A6
+//#define IRFBR     6 //A7
+//#define IRBR      8 //A8
 
 int usn; //id of ultrasound to be read
 #define TUS 50// ultrasound refresh period in ms(each ultrasound will be refreshed five times per sec)
@@ -114,10 +114,11 @@ void ir_init()
    IR_setup(IRFR);
    IR_setup(IRR);
    IR_setup(IRB);
-   IR_setup(IRBL);
-   IR_setup(IRFBL);
-   IR_setup(IRFBR);
-   IR_setup(IRBR);
+   //IR_setup(IRBL);
+//   IR_setup(IRFBL);
+//   IR_setup(IRFBR);
+//   IR_setup(IRBR);
+    IR_setup(IRBRUSH);
    
    for(int i = 0; i < 9; i ++)
    {
@@ -189,13 +190,13 @@ void loop()                       // run over and over again
     ir_new[1] = ((10-filt_ir)*ir_prev[1] + filt_ir*IR_get_dist(IRFL))/10;
     ir_new[2] = ((10-filt_ir)*ir_prev[2] + filt_ir*IR_get_dist(IRFR))/10;
     ir_new[3] = ((10-filt_ir)*ir_prev[3] + filt_ir*IR_get_dist(IRR))/10;
-    //ir_new[4] = ((10-filt_ir)*ir_prev[4] + filt_ir*IR_get_dist(IRB))/10;
+    ir_new[4] = ((10-filt_ir)*ir_prev[4] + filt_ir*IR_get_dist(IRB))/10;
     //ir_new[5] = ((10-filt_ir)*ir_prev[5] + filt_ir*IR_get_dist(IRBL))/10;
     //ir_new[6] = ((10-filt_ir)*ir_prev[6] + filt_ir*IR_get_dist(IRFBL))/10;
-    ir_new[7] = ((10-filt_ir)*ir_prev[7] + filt_ir*IR_get_dist(IRFBR))/10;
+    ir_new[5] = ((10-filt_ir)*ir_prev[7] + filt_ir*IR_get_dist(IRBRUSH))/10;
     //ir_new[8] = ((10-filt_ir)*ir_prev[8] + filt_ir*IR_get_dist(IRBR))/10;
     
-    for(int i = 0; i < 9; i++)
+    for(int i = 0; i < 5; i++)
     {
         if(ir_new[i] > 80)
           ir_new[i] = 80;
@@ -208,7 +209,7 @@ void loop()                       // run over and over again
     print_value(SENSOR_IR_BACK, ir_new[4]);
 //    print_value(SENSOR_IR_BOTTOM_L , ir_new[5]);
 //    print_value(SENSOR_IR_FRONT_BOTTOM_L , ir_new[6]);
-    print_value(SENSOR_IR_FRONT_BOTTOM_R , ir_new[7]);
+    print_value(SENSOR_IR_BRUSH , ir_new[5]);
 //    print_value(SENSOR_IR_BOTTOM_R , ir_new[8]);
     
     for(int i = 0; i < 9; i++)

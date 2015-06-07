@@ -74,6 +74,8 @@
 #define SENSOR_ENCODER_L          'n'         /* on WTC       */
 #define SENSOR_ENCODER_R          'o'
 
-#define SENSOR_DYMX_SPEED          'p'  
+#define SENSOR_DYMX_SPEED          'p'
+
+#define SENSOR_IR_BRUSH            'q'
 
 #endif // DEFINES_H

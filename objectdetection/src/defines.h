@@ -87,6 +87,8 @@
 #define SENSOR_BOTTLE_DISTANCE    'x'
 #define SENSOR_BOTTLE_ANGLE       'y'
 
+#define SENSOR_IR_BRUSH            'q'
+
 // vision
 #define PI 3.14159265
 #define VISION_NUM_RAYS         16
