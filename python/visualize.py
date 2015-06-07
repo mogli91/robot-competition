@@ -158,7 +158,7 @@ if __name__ == '__main__':
             sensor_val[idx] = int(str_val)
             plt_raw_rect[idx].set_height(sensor_val[idx])
 
-            if display == 9:
+            if display == 10:
                 # redraw
                 fig.canvas.restore_region(background)
                 fig.canvas.blit(ax.bbox)
