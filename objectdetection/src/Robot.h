@@ -30,7 +30,7 @@ public:
 	void setBrushSpeed(int speed);
 
 	int getSensorValue(char sensorId);
-	int getBrushCurrent();
+//	int getBrushCurrent();
 
 	Pose getPose();
 

@@ -157,7 +157,7 @@ void Simulation::moveWithVector() {
 }
 void Simulation::approachBottlesCam() {
 	//TODO : real function
-	m_displacementVector[X] -= 150 * abs(m_robot->getBottleAngle());
+//	m_displacementVector[X] -= 150 * abs(m_robot->getBottleAngle());
 }
 void Simulation::avoidObstaclesCam() {
 	//TODO : real function
