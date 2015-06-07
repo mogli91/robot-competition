@@ -17,6 +17,7 @@ using namespace cv;
 
 struct VisionMeasure {
     vector<Point> bottles;
+    vector<int> rays;
 };
 
 class Detector {
@@ -49,13 +50,12 @@ private:
 	vector<BGPattern*> patterns;
     
     RangeFinder *m_rangeFinder = NULL;
-//    pthread_mutex_t *m_mutex;
     
     VisionMeasure m_measure;
 
 public:
 //	Detector(Mat &frame, int camnum = -1, float exposure = 0.05, int f_height = 240, int f_width = 320);
-    Detector(int camnum = -1, float exposure = 0.05, int f_height = 240, int f_width = 320, void *mutex = NULL);
+    Detector(int camnum = -1, float exposure = 0.05, int f_height = 240, int f_width = 320);
     Detector(const string &filename);
 	~Detector();
 	void detect();
@@ -63,7 +63,6 @@ public:
     Mat getFrame();
     Mat getMask();
     bool isReady();
-    void *getMutex();
     void getMeasurement(VisionMeasure &vm);
 
     

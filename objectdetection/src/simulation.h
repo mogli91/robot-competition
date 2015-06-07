@@ -31,6 +31,8 @@
 
 
 class Simulation {
+private:
+    vector<int> visionDistances;
 public:
 	Simulation(Brain* brain);
     ~Simulation(){};

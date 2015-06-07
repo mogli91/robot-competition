@@ -1,7 +1,7 @@
 #include "detector.h"
 
 //Detector::Detector(Mat &frame, int camnum, float exposure, int f_height, int f_width)
-Detector::Detector(int camnum, float exposure, int f_height, int f_width, void *mutex)
+Detector::Detector(int camnum, float exposure, int f_height, int f_width)
 {
     this->f_height = f_height;
 	this->f_width = f_width;
@@ -14,8 +14,6 @@ Detector::Detector(int camnum, float exposure, int f_height, int f_width, void *
     int blocksize = 20;
     int offset = 60;
     m_rangeFinder = new RangeFinder(f_height, f_width, blocksize, color_dist_th, offset);
-    
-//    m_mutex = (pthread_mutex_t*)mutex;
 
     
     /*
@@ -270,19 +268,14 @@ void Detector::findRanges(cv::Mat img) {
 //    imshow("ranges", mask * 255);
 }
 
-void *Detector::getMutex() {
-//    return m_mutex;
-    return NULL;
-}
-
 void Detector::computeMeasurement() {
-    
-//    pthread_mutex_lock(m_mutex);
     m_rangeFinder->getBottleCoordinates(m_measure.bottles);
-//    pthread_mutex_unlock(m_mutex);
+    m_rangeFinder->getRayHeights(m_measure.rays);
 }
 
 void Detector::getMeasurement(VisionMeasure &vm) {
     vm.bottles.clear();
     vm.bottles = m_measure.bottles;
+    vm.rays.clear();
+    vm.rays = m_measure.rays;
 }

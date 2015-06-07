@@ -6,6 +6,7 @@
 #include <ostream>
 #include <cmath>
 #include <vector>
+#include <tgmath.h>
 
 // locals
 #include "defines.h"
@@ -23,8 +24,13 @@ private:
     int m_offset;
     int m_step;
     double m_dist_th;
+    
     vector<Rect> m_rays;
     vector<Rect> m_bottles;
+    
+    // 3D measurements
+    vector<double> m_lateral_offset_cm_per_px;
+    double m_distance_cm_per_px;
     
     Mat m_mask;		// every pattern has its own mask image
     Mat m_integral;
@@ -54,7 +60,12 @@ public:
     
     void getBottleCoordinates(vector<Point> &dst);
     
+    void getRayHeights(vector<int> &dst);
+    
     cv::Mat getMask() {return m_mask;};
+    
+private:
+    void initScales();
     
 };
 #endif
