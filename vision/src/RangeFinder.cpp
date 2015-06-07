@@ -16,6 +16,22 @@ RangeFinder::RangeFinder(int height, int width, int blocksize, double th, int of
     
     m_integral = Mat::zeros(m_height, m_width, CV_32SC3);
     m_mask = Mat::zeros(m_height, m_width, CV_8UC1);
+    
+    initScales();
+}
+
+void RangeFinder::initScales() {
+    m_lateral_offset_cm_per_px = vector<double>(m_height);
+    
+    // scaling factors for 3d measurements
+    m_distance_cm_per_px = (VISION_DIST_TOP - VISION_DIST_BOTTOM) / (1.0 * m_height);
+    double cm_per_px_bottom = VISION_CM_BOTTOM / (1.0 * m_width);
+    double cm_per_px_top = VISION_CM_TOP / (1.0 * m_width);
+    double cm_per_px_at_row;
+    for (int i = 0; i < m_height; ++i) {
+        cm_per_px_at_row = cm_per_px_top + (cm_per_px_bottom - cm_per_px_top) / m_height * i;
+        m_lateral_offset_cm_per_px[i] = cm_per_px_at_row;
+    }
 }
 
 void RangeFinder::reset() {
@@ -104,49 +120,56 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
     
 }
 
-//    int i, j;
-//    double d = 0;
-//    double d_th = 20;
-//    Mat tmp;
-//    for (i = 0; i < frame.cols - blocksize; i += blocksize) {
-//        getMean(frame.rows - 1, i, frame.rows - blocksize - 1, i + blocksize, m_old);
-//        cout << m_old[0] << ", " << m_old[1] << ", " << m_old[2] << endl;
-//        for (j = blocksize * 3; j < frame.rows - blocksize; j += blocksize) {
-//            
-//            getMean(frame.rows - 1 - j, i, frame.rows - 1 - j - blocksize, i + blocksize, m);
-//            d = dist(m_old, m);
-//            cout << j << ", " << d << " -- " ;
-//            if (d > d_th) {
-//                break;
-//            } else {
-//                memcpy(m_old, m, 3 * sizeof(double));
-//            }
-//        }
-//        tmp = Mat(rollable, Rect(i, frame.rows - 1 - j, blocksize, j));
-//        tmp = Scalar(1);
-//        cout << endl;
-//    }
-//    
-//    imshow("rollable", rollable * 255);
-//    waitKey();
-//
-//}
-
 void RangeFinder::locateBottles() {
-    BottleFar bottle = BottleFar(m_blocksize);
+    int bs = m_blocksize;
+    BottleFar bottleFar = BottleFar(bs);
+    BottleCloseUpright bottleCU = BottleCloseUpright(bs);
+    BottleCloseFlat bottleCF = BottleCloseFlat(bs);
+    BottleClose45P bottleC45P = BottleClose45P(bs);
+    BottleClose45N bottleC45N = BottleClose45N(bs);
+    BottleVeryCloseUpright bottleVCU = BottleVeryCloseUpright(bs);
+    BottleVeryCloseFlat bottleVCF = BottleVeryCloseFlat(bs);
+    BottleVeryClose45P bottleVC45P = BottleVeryClose45P(bs);
+    BottleVeryClose45N bottleVC45N = BottleVeryClose45N(bs);
     double threshold = 30;
-    Rect roi;
+    Point p;
     
     m_bottles.clear();
     
     for (int r = 0; r < m_numRays; ++r) {
-        roi.x = m_rays[r].x;
-        roi.y = m_rays[r].y - m_blocksize;
-        roi.height = m_blocksize;
-        roi.width = m_blocksize;
-        if (bottle.match(m_integral, roi, threshold)) {
-            m_bottles.push_back(bottle.getROI());
+        p.x = m_rays[r].x;
+        p.y = m_rays[r].y - bs;
+        if (bottleFar.match(m_integral, p, threshold)) {
+            m_bottles.push_back(bottleFar.getROI());
         }
+        p.y = m_rays[r].y - bs;
+        if (bottleCU.match(m_integral, p, threshold)) {
+            m_bottles.push_back(bottleCU.getROI());
+        }
+        if (bottleCF.match(m_integral, p, threshold)) {
+            m_bottles.push_back(bottleCF.getROI());
+        }
+//        if (bottleC45P.match(m_integral, p, threshold)) {
+//            m_bottles.push_back(bottleC45P.getROI());
+//        }
+//        if (bottleC45N.match(m_integral, p, threshold)) {
+//            m_bottles.push_back(bottleC45N.getROI());
+//        }
+        
+        p.y = m_rays[r].y - 1.5 * bs;
+        if (bottleVCU.match(m_integral, p, threshold)) {
+            m_bottles.push_back(bottleVCU.getROI());
+        }
+        if (bottleVCF.match(m_integral, p, threshold)) {
+            m_bottles.push_back(bottleVCF.getROI());
+        }
+//        if (bottleVC45P.match(m_integral, p, threshold)) {
+//            m_bottles.push_back(bottleVC45P.getROI());
+//        }
+//        if (bottleVC45N.match(m_integral, p, threshold)) {
+//            m_bottles.push_back(bottleVC45N.getROI());
+//        }
+        
     }
 }
 
@@ -157,4 +180,40 @@ void RangeFinder::drawMask(Mat dst) {
         tmp = Scalar(1);
     }
     m_mask.copyTo(dst);
+}
+
+void RangeFinder::getBottleCoordinates(vector<Point> &dst) {
+    int x, y, angle, distance_cm;
+    double lateral_offset_cm;
+    dst.clear();
+    for (vector<Rect>::iterator it = m_bottles.begin(); it != m_bottles.end(); ++it) {
+        x = it->x + it->width / 2;  // want center of bottle
+        y = it->y + it->height;     // want closest point of bottle
+        
+        distance_cm = VISION_DIST_BOTTOM + m_distance_cm_per_px * (m_height - y);
+        lateral_offset_cm = m_lateral_offset_cm_per_px[x] * (x - m_width / 2.0);
+        angle = (atan2(lateral_offset_cm, distance_cm) * 180) / PI;
+        
+//        // TODO: proper x coordinate
+//        if (x < m_width / 3) {
+//            lateral_offset_cm = -1;
+//        } else if (x < 2 * m_width / 3) {
+//            lateral_offset_cm = 0;
+//        } else {
+//            lateral_offset_cm = 1;
+//        }
+        
+        dst.push_back(Point(angle, distance_cm));
+    }
+}
+
+void RangeFinder::getRayHeights(vector<int> &dst) {
+    int y, distance_cm;
+    dst.clear();
+    for (vector<Rect>::iterator it = m_rays.begin(); it != m_rays.end(); ++it) {
+        y = it->y + it->height;     // want closest point of bottle
+        
+        distance_cm = VISION_DIST_BOTTOM + m_distance_cm_per_px * (m_height - y);
+        dst.push_back(distance_cm);
+    }
 }
