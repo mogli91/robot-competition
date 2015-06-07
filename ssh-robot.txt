@@ -1,0 +1,44 @@
+0. getting started
+------------------------
+create Wifi Hotspot on your mobile phone.
+    the name must be Jakob
+    the password must be odroid12
+
+start odroid (or unplug and replug the wifi stick)
+-------------------------
+-------------------------
+
+1. to connect to the robot
+-------------------------
+- choose network Jakob
+- open a terminal 
+- enter ssh odroid@192.168.43.199
+
+2. to shutdown the robot from terminal
+-------------------------
+sudo shutdown -h now
+(restart is: sudo shutdown -r now)
+
+2. to copy files to the robot's src directory
+-------------------------
+- open another terminal
+- scp filename odroid@192.168.43.199:Robot/src
+
+for a whole folder (e.g. your current source folder)
+- navigate to objectdetection
+- scp -t src/ odroid@192.168.43.199:Robot
+
+3. building on the robot
+- ssh into robot, on robot:
+    cd Robot/build
+    make
+- if you added files:
+    cmake -D CMAKE_BUILD_TYPE=Release ../src
+    make
+
+4. running the program
+- ssh into robot
+    cd Robot/build
+    ./detect
+    (lists options... wtc is now on /dev/ttyS2)
+
