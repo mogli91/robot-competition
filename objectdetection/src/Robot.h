@@ -29,7 +29,7 @@ void setTailGate(int tailGateState);
 void setShovel(int shovelState);
 void setBrushSpeed(int speed);
 int getSensorValue(char sensorId);
-int getBrushCurrent();
+//int getBrushCurrent();
 int getBottleAngle();
 int getBottleDistance();
 Pose getPose();

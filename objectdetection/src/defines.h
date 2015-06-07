@@ -70,21 +70,16 @@
 #define SENSOR_IR_R               'd'
 #define SENSOR_IR_BACK            'e'
 
-#define SENSOR_IR_BOTTOM_L        'f'
-#define SENSOR_IR_FRONT_BOTTOM_L  'g'
-#define SENSOR_IR_FRONT_BOTTOM_R  'h'
-#define SENSOR_IR_BOTTOM_R        'i'
+#define SENSOR_IR_BACK_L          'f'
+#define SENSOR_IR_BACK_R          'g'
+#define SENSOR_IR_BRUSH           'h'
 
-#define SENSOR_BRUSH_CURRENT      'j'
+#define SENSOR_POSE_X             'i'         /* on ARDUINO 2 */
+#define SENSOR_POSE_Y             'j'
+#define SENSOR_POSE_ANGLE         'k'
 
-#define SENSOR_POSE_X             'k'         /* on ARDUINO 2 */
-#define SENSOR_POSE_Y             'l'
-#define SENSOR_POSE_ANGLE         'm'
-
-#define SENSOR_ENCODER_L          'n'         /* on WTC       */
-#define SENSOR_ENCODER_R          'o'
-
-#define SENSOR_IR_BRUSH           'q'
+#define SENSOR_ENCODER_L          'l'         /* on WTC       */
+#define SENSOR_ENCODER_R          'm'
 
 #define SENSOR_BOTTLE_DISTANCE    'x'
 #define SENSOR_BOTTLE_ANGLE       'y'

@@ -3,6 +3,15 @@
 
 #define DEBUG
 
+// command line options
+#define OPT_EXP         "exp"
+#define OPT_ARDUINO_1   "ard1"
+#define OPT_ARDUINO_2   "ard2"
+#define OPT_WTC         "wtc"
+#define OPT_NO_CAM      "no_cam"
+#define OPT_BAUDRATE    "br"
+#define OPT_IMAGE_LOG_TIME "img_interval"
+
 // device IDs
 #define ID_NONE -1
 #define ID_ARD1 0
@@ -38,6 +47,7 @@
 #define MSG_MAX          64 // there is no point in sending more bytes than arduino can receive
 
 // special values
+#define VAL_NONE         -1
 #define VAL_BRUSH_FW     0   // arduino code looks like this should be between 0 and 100
 #define VAL_BRUSH_STOP   500
 #define VAL_BRUSH_BW     999
@@ -51,7 +61,7 @@
 #define VAL_WHEELS_FW    510
 
 #define VAL_TAIL_OPEN    180 // degrees
-#define VAL_TAIL_CLOSE   70
+#define VAL_TAIL_CLOSE   50
 
 // sensor IDs
 #define SENSOR_IR_L               'a'         /* on ARDUINO 1 */
@@ -60,18 +70,24 @@
 #define SENSOR_IR_R               'd'
 #define SENSOR_IR_BACK            'e'
 
-#define SENSOR_IR_BOTTOM_L        'f'
-#define SENSOR_IR_FRONT_BOTTOM_L  'g'
-#define SENSOR_IR_FRONT_BOTTOM_R  'h'
-#define SENSOR_IR_BOTTOM_R        'i'
+#define SENSOR_IR_BACK_L          'f'
+#define SENSOR_IR_BACK_R          'g'
+#define SENSOR_IR_BRUSH           'h'
 
-#define SENSOR_BRUSH_CURRENT      'j'
+#define SENSOR_POSE_X             'i'         /* on ARDUINO 2 */
+#define SENSOR_POSE_Y             'j'
+#define SENSOR_POSE_ANGLE         'k'
 
-#define SENSOR_POSE_X             'k'         /* on ARDUINO 2 */
-#define SENSOR_POSE_Y             'l'
-#define SENSOR_POSE_ANGLE         'm'
+#define SENSOR_ENCODER_L          'l'         /* on WTC       */
+#define SENSOR_ENCODER_R          'm'
 
-#define SENSOR_ENCODER_L          'n'         /* on WTC       */
-#define SENSOR_ENCODER_R          'o'
+#define SENSOR_BOTTLE_DISTANCE    'x'
+#define SENSOR_BOTTLE_ANGLE       'y'
+
+// vision
+#define VISION_NUM_RAYS         16
+#define VISION_DIST_BOTTOM      10          // distance of an object if seen in last pixel row
+#define VISION_DIST_TOP         250         // distance of an object if seen in first pixel row
+
 
 #endif // DEFINES_H
