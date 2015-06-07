@@ -34,6 +34,8 @@
 enum POS{X,Y};
 
 class Simulation {
+private:
+    vector<int> visionDistances;
 public:
 	Simulation(Brain* brain);
     ~Simulation(){};

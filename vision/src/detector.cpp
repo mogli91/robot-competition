@@ -11,8 +11,8 @@ Detector::Detector(int camnum, float exposure, int f_height, int f_width)
     mask = Mat::zeros(f_height, f_width, CV_8UC1);
     
     double color_dist_th = 15;
-    int blocksize = 20;
-    int offset = 60;
+    int blocksize = f_width / VISION_NUM_RAYS;
+    int offset = 1.5 * blocksize;
     m_rangeFinder = new RangeFinder(f_height, f_width, blocksize, color_dist_th, offset);
 
     
@@ -74,8 +74,8 @@ Detector::Detector(const string &filename)
     mask = Mat::zeros(f_height, f_width, CV_8UC1);
     
     double color_dist_th = 15;
-    int blocksize = 20;
-    int offset = 60;
+    int blocksize = f_width / VISION_NUM_RAYS;
+    int offset = 1.5 * blocksize;
     m_rangeFinder = new RangeFinder(f_height, f_width, blocksize, color_dist_th, offset);
     
 }
@@ -123,8 +123,8 @@ void Detector::kMeansSegmentation(Mat img)
     cout << "\r" << 1.0 / elapsed_secs << " fps" << flush;
     
 //        imshow("tile", patterns[0]->getMask() * 255);
-    imshow("tile", bg_tile->getMask() * 255);
-    imshow("grass", bg_grass->getMask() * 255);
+//    imshow("tile", bg_tile->getMask() * 255);
+//    imshow("grass", bg_grass->getMask() * 255);
 //    imshow("wood", bg_wood->getMask() * 255);
 //    imshow("obstacle", bg_obstacle->getMask() * 255);
     
@@ -255,15 +255,30 @@ void Detector::normalize_px(uchar *src, double *dst)
 }
 
 void Detector::findRanges(cv::Mat img) {
-    clock_t t0_frame = clock();
-    double elapsed_secs = 1.0;
+//    clock_t t0_frame = clock();
+//    double elapsed_secs = 1.0;
     
     frame = img;
     m_rangeFinder->rollOut(img, mask);
     
-    elapsed_secs = double(clock() - t0_frame) / CLOCKS_PER_SEC;
-    cout << "\r" << 1.0 / elapsed_secs << " fps" << flush;
+    computeMeasurement();
+//    elapsed_secs = double(clock() - t0_frame) / CLOCKS_PER_SEC;
+//    cout << "\r" << 1.0 / elapsed_secs << " fps" << flush;
     
 //    imshow("ranges", mask * 255);
 }
 
+void Detector::computeMeasurement() {
+    m_rangeFinder->getBottleCoordinates(m_measure.bottles);
+    m_rangeFinder->getRayHeights(m_measure.rays);
+    Rect r = Rect(0,0, 0,0);
+    m_rangeFinder->findBeacon(r);
+}
+
+void Detector::getMeasurement(VisionMeasure &vm) {
+    vm.bottles.clear();
+    vm.bottles = m_measure.bottles;
+    vm.rays.clear();
+    vm.rays = m_measure.rays;
+    vm.beacon = m_measure.beacon;
+}

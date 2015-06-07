@@ -71,12 +71,9 @@ void Brain::updateReadings() {
 	}
     
     if (m_detector != NULL) {
-        mutex = (pthread_mutex_t*) m_detector->getMutex();
-//        pthread_mutex_lock(mutex);
         m_detector->getMeasurement(m_vision);
-//        pthread_mutex_unlock(mutex);
         for (vector<Point>::iterator it = m_vision.bottles.begin(); it != m_vision.bottles.end(); ++it) {
-            printf("Bottle at: %d, %d\n\r", it->x, it->y);
+            printf("Bottle at: %d degrees, %d cm\n\r", it->x, it->y);
         }
     }
 }
@@ -177,20 +174,11 @@ int Brain::getReading(char id)
     if (id < READING_ID_MIN || id > READING_ID_MAX) return -1;  // checks address in table
     int address = id - READING_ID_MIN;
     
-    // TODO figure out a way to send closest bottle only (now it's left-most)
-    if (address == SENSOR_BOTTLE_DISTANCE) {
-        if (m_vision.bottles.size()) {
-            return m_vision.bottles[0].y;
-        } else
-            return -1;
-        
-    } else if (address == SENSOR_BOTTLE_ANGLE) {
-        if (m_vision.bottles.size()) {
-            return m_vision.bottles[0].x;
-        } else
-            return 0;
-    } else
-        return m_readings[address];
+    return m_readings[address];
+}
+
+void Brain::getVisionData(VisionMeasure &vm) {
+    vm = m_vision;
 }
 
 int Brain::getNumPorts() {
