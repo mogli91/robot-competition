@@ -84,6 +84,8 @@
 #define SENSOR_ENCODER_L          'n'         /* on WTC       */
 #define SENSOR_ENCODER_R          'o'
 
+#define SENSOR_IR_BRUSH           'q'
+
 #define SENSOR_BOTTLE_DISTANCE    'x'
 #define SENSOR_BOTTLE_ANGLE       'y'
 
