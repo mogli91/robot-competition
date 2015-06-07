@@ -6,7 +6,7 @@
 #include <ostream>
 #include <cmath>
 #include <vector>
-#include <tgmath.h>
+#include <cmath>
 
 // locals
 #include "defines.h"
