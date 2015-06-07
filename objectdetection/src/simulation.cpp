@@ -125,13 +125,14 @@ void Simulation::moveWithVector() {
 	int wl, wr; //wheel speeds left and right
 
 	//never go backwards, turn instead.
-	if(m_displacementVector[Y] < 0)
+	if(m_displacementVector[Y] < VAL_WHEELS_STOP)
 	{
-		m_displacementVector[X] += m_displacementVector[Y];
-		m_displacementVector[Y] = 0;
+		//m_displacementVector[X] += m_displacementVector[Y];
+		m_displacementVector[Y] = VAL_WHEELS_STOP;
 	}
 	wl = m_displacementVector[Y] + m_displacementVector[X];
 	wr = m_displacementVector[Y] - m_displacementVector[X];
+/*
 	if (wl > VAL_WHEELS_FW) {
 		wr -= wl - VAL_WHEELS_FW;
 	}
@@ -145,22 +146,23 @@ void Simulation::moveWithVector() {
 	if (wr < VAL_WHEELS_BW) {
 		wl += VAL_WHEELS_BW - wl;
 		wr = VAL_WHEELS_BW;
-	}
-	/*if(wr > VAL_WHEELS_FW)
+	}*/
+
+	if(wr > VAL_WHEELS_FW)
 	 {
 	 wr = VAL_WHEELS_FW;
 	 }
 	 if(wr < VAL_WHEELS_BW)
 	 {
 	 wr = VAL_WHEELS_BW;
-	 }*/
+	 }
 	if (wl > VAL_WHEELS_FW) {
 		wl = VAL_WHEELS_FW;
 	}
 	if (wl < VAL_WHEELS_BW) {
 		wl = VAL_WHEELS_BW;
 	}
-	m_robot->setWheelSpeeds(wl, wr);
+	m_robot->setWheelSpeeds(wr, wl);
 }
 void Simulation::approachBottlesCam() {
 	//TODO : real function
@@ -179,11 +181,24 @@ void Simulation::displacement() {
 }
 void Simulation::homeDisplacement() {
 	//TODO : move in direction of a certain absolute angle;
-	float radAngle = ((float)m_robot->getPose().angle)*PI/180.0f;
-	float radDestAngle = 225.0f*PI/180.0f;
-	float deltaAngle = radDestAngle - radAngle;
-	m_displacementVector[X] = -sin(deltaAngle);
-	m_displacementVector[Y] = cos(deltaAngle);
+	int angle = m_robot->getPose().angle;
+	int destAngle = 225;
+/*
+	if(abs(angle - destAngle) > 40)
+	{
+		m_displacementVector[X] = VAL_WHEELS_FW*sign(destAngle - angle);
+		m_displacementVector[Y] = VAL_WHEELS_STOP;
+	}
+	else
+	{
+		m_displacementVector[X] = 0;
+		m_displacementVector[Y] = VAL_WHEELS_FW;
+	}*/
+	float deltaAngle = (((float)destAngle) - ((float)angle))*PI/180.0f;
+	m_displacementVector[X] = +VAL_WHEELS_FW*sin(deltaAngle);
+	m_displacementVector[Y] = VAL_WHEELS_FW*cos(deltaAngle);
+
+
 }
 //change direction of brush if overcurrent
 bool Simulation::brushIsBlocked() {
@@ -223,7 +238,7 @@ bool Simulation::homeReached() {
 }
 void Simulation::search() {
 	displacement(); //normal robot displacement if no collision detected
-	approachBottlesCam(); //move towards bottles viewed with cam
+	//approachBottlesCam(); //move towards bottles viewed with cam
 }
 // main function
 void Simulation::loop(void) {
@@ -259,7 +274,7 @@ void Simulation::loop(void) {
 			}
 		}
 
-		if (m_bottlesCollected >= 4 || elapsed_secs > 60 * 8) //8 minutes or 4 bottles = go home
+		if (m_bottlesCollected >= 4 || 1)//elapsed_secs > 60 * 8) //8 minutes or 4 bottles = go home
 		{
 			goHome(); //go home using the compass
 			//TODO STATE_GO_HOME
