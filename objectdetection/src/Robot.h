@@ -42,7 +42,7 @@ public:
 	Tile getTile(int x, int y);	//returns tile contents
 
 	//TODO : stuff with camera ? for example int getBottleDirection
-    void getVisionDistances(vector<int> &dst);
+    void getVisionData(VisionMeasure &vm);
 	void printMap();
 
 private:

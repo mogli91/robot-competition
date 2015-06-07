@@ -15,9 +15,16 @@
 using namespace std;
 using namespace cv;
 
+struct CornerBeacon {
+    enum COLOR {RED, GREEN, YELLOW, BLUE};
+    Point position;
+    int type;
+};
+
 struct VisionMeasure {
     vector<Point> bottles;
     vector<int> rays;
+    CornerBeacon beacon;
 };
 
 class Detector {

@@ -100,10 +100,8 @@ public:
     bool match(const cv::Mat &img_integral, cv::Point p, double threshold);
 };
 
-//class BottleCloseUpright : public Mask {
-//public:
-//    BottleCloseUpright(int blocksize);
-//    bool match(cv::Mat img_integral, cv::Point p, double threshold);
-//};
+class Beacon : public Mask {
+public: 
+};
 
 #endif // MASKS_H

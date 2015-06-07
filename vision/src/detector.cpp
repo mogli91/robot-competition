@@ -12,7 +12,7 @@ Detector::Detector(int camnum, float exposure, int f_height, int f_width)
     
     double color_dist_th = 15;
     int blocksize = f_width / VISION_NUM_RAYS;
-    int offset = 3 * blocksize;
+    int offset = 1.5 * blocksize;
     m_rangeFinder = new RangeFinder(f_height, f_width, blocksize, color_dist_th, offset);
 
     
@@ -75,7 +75,7 @@ Detector::Detector(const string &filename)
     
     double color_dist_th = 15;
     int blocksize = f_width / VISION_NUM_RAYS;
-    int offset = 3 * blocksize;
+    int offset = 1.5 * blocksize;
     m_rangeFinder = new RangeFinder(f_height, f_width, blocksize, color_dist_th, offset);
     
 }
@@ -271,13 +271,8 @@ void Detector::findRanges(cv::Mat img) {
 void Detector::computeMeasurement() {
     m_rangeFinder->getBottleCoordinates(m_measure.bottles);
     m_rangeFinder->getRayHeights(m_measure.rays);
-    
-    for (int i = 0; i < m_measure.bottles.size(); ++i) {
-        cout << "bottle at " << m_measure.bottles[i].x << " degrees and distance " << m_measure.bottles[i].y << endl;
-    }
-    for (int i = 0; i < m_measure.rays.size(); ++i) {
-        cout << "ray " << i << " " << m_measure.rays[i] << endl;
-    }
+    Rect r = Rect(0,0, 0,0);
+    m_rangeFinder->findBeacon(r);
 }
 
 void Detector::getMeasurement(VisionMeasure &vm) {
@@ -285,4 +280,5 @@ void Detector::getMeasurement(VisionMeasure &vm) {
     vm.bottles = m_measure.bottles;
     vm.rays.clear();
     vm.rays = m_measure.rays;
+    vm.beacon = m_measure.beacon;
 }

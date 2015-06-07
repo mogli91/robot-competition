@@ -91,14 +91,14 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
     for (int r = 0; r < m_numRays; ++r) {
         r_tmp = Rect(m_rays[r].x, m_rays[r].y, m_blocksize, m_blocksize);
         computeMean(r_tmp, mu_old);
-        cout << r << ": ";
+//        cout << r << ": ";
         // walk until we hit something (color change)
         int lower_bottom = m_rays[r].y;
         for (int d = lower_bottom; d >= m_step; d -= m_step) {
             r_tmp = Rect(r * m_blocksize, d - m_step, m_blocksize, m_blocksize);
             computeMean(r_tmp, mu_new);
             color_dist = dist(mu_new, mu_old);
-            cout << color_dist << ", ";
+//            cout << color_dist << ", ";
             if (color_dist < m_dist_th) {
                 m_rays[r].height += m_step; // make this ray longer by 1*blocksize
                 m_rays[r].y = d - m_step;
@@ -107,7 +107,7 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
                  break;
             }
         }
-        cout << endl;
+//        cout << endl;
     }
     
     locateBottles();
@@ -139,39 +139,51 @@ void RangeFinder::locateBottles() {
     for (int r = 0; r < m_numRays; ++r) {
         p.x = m_rays[r].x;
         p.y = m_rays[r].y - bs;
+        
+        // apply big mask only when we are close by
+        if (p.y > m_height * 0.6) {
+            if (bottleCU.match(m_integral, p, threshold)) {
+                m_bottles.push_back(bottleCU.getROI());
+            }
+            if (bottleCF.match(m_integral, p, threshold)) {
+                m_bottles.push_back(bottleCF.getROI());
+            }
+            
+        }
         if (bottleFar.match(m_integral, p, threshold)) {
             m_bottles.push_back(bottleFar.getROI());
         }
-//        p.y = m_rays[r].y - bs;
-//        if (bottleCU.match(m_integral, p, threshold)) {
-//            m_bottles.push_back(bottleCU.getROI());
-//        }
-//        if (bottleCF.match(m_integral, p, threshold)) {
-//            m_bottles.push_back(bottleCF.getROI());
-//        }
-////        if (bottleC45P.match(m_integral, p, threshold)) {
-////            m_bottles.push_back(bottleC45P.getROI());
-////        }
-////        if (bottleC45N.match(m_integral, p, threshold)) {
-////            m_bottles.push_back(bottleC45N.getROI());
-////        }
-//        
-//        p.y = m_rays[r].y - 1.5 * bs;
-//        if (bottleVCU.match(m_integral, p, threshold)) {
-//            m_bottles.push_back(bottleVCU.getROI());
-//        }
-//        if (bottleVCF.match(m_integral, p, threshold)) {
-//            m_bottles.push_back(bottleVCF.getROI());
-//        }
-//        if (bottleVC45P.match(m_integral, p, threshold)) {
-//            m_bottles.push_back(bottleVC45P.getROI());
-//        }
-//        if (bottleVC45N.match(m_integral, p, threshold)) {
-//            m_bottles.push_back(bottleVC45N.getROI());
-//        }
+        //        p.y = m_rays[r].y - bs;
+        //        if (bottleCU.match(m_integral, p, threshold)) {
+        //            m_bottles.push_back(bottleCU.getROI());
+        //        }
+        //        if (bottleCF.match(m_integral, p, threshold)) {
+        //            m_bottles.push_back(bottleCF.getROI());
+        //        }
+        ////        if (bottleC45P.match(m_integral, p, threshold)) {
+        ////            m_bottles.push_back(bottleC45P.getROI());
+        ////        }
+        ////        if (bottleC45N.match(m_integral, p, threshold)) {
+        ////            m_bottles.push_back(bottleC45N.getROI());
+        ////        }
+        //
+        //        p.y = m_rays[r].y - 1.5 * bs;
+        //        if (bottleVCU.match(m_integral, p, threshold)) {
+        //            m_bottles.push_back(bottleVCU.getROI());
+        //        }
+        //        if (bottleVCF.match(m_integral, p, threshold)) {
+        //            m_bottles.push_back(bottleVCF.getROI());
+        //        }
+        //        if (bottleVC45P.match(m_integral, p, threshold)) {
+        //            m_bottles.push_back(bottleVC45P.getROI());
+        //        }
+        //        if (bottleVC45N.match(m_integral, p, threshold)) {
+        //            m_bottles.push_back(bottleVC45N.getROI());
+        //        }
         
     }
 }
+
 
 void RangeFinder::drawMask(Mat dst) {
     Mat tmp;
@@ -183,6 +195,7 @@ void RangeFinder::drawMask(Mat dst) {
 }
 
 void RangeFinder::getBottleCoordinates(vector<Point> &dst) {
+    // TODO sort bottles by distance
     int x, y, angle, distance_cm;
     double lateral_offset_cm;
     dst.clear();
@@ -192,18 +205,9 @@ void RangeFinder::getBottleCoordinates(vector<Point> &dst) {
         
         distance_cm = VISION_DIST_BOTTOM + m_distance_cm_per_px * (m_height - y);
         lateral_offset_cm = m_lateral_offset_cm_per_px[x] * (x - m_width / 2.0);
-        angle = (atan2(lateral_offset_cm, distance_cm) * 180) / PI;
-        
-//        // TODO: proper x coordinate
-//        if (x < m_width / 3) {
-//            lateral_offset_cm = -1;
-//        } else if (x < 2 * m_width / 3) {
-//            lateral_offset_cm = 0;
-//        } else {
-//            lateral_offset_cm = 1;
-//        }
-        
-        dst.push_back(Point(angle, distance_cm));
+//        angle = (atan2(lateral_offset_cm, distance_cm) * 180) / PI;
+//        dst.push_back(Point(angle, distance_cm));
+        dst.push_back(Point(lateral_offset_cm, distance_cm));
     }
 }
 
@@ -217,10 +221,20 @@ void RangeFinder::getRayHeights(vector<int> &dst) {
         distance_cm = VISION_DIST_BOTTOM + m_distance_cm_per_px * (m_height - y);
         dst.push_back(distance_cm);
     }
-//    for (vector<Rect>::iterator it = m_rays.begin(); it != m_rays.end(); ++it) {
-//        y = it->y;
-//        
-//        distance_cm = VISION_DIST_BOTTOM + m_distance_cm_per_px * (m_height - y);
-//        dst.push_back(distance_cm);
+}
+
+int RangeFinder::findBeacon(cv::Rect &roi) {
+//    Beacon b = Beacon(m_blocksize/2);
+//    double blue[3] = {0, 255, 0};
+//    double color_th = 200;
+//    b.setColor(blue);
+//    
+//    Point p(0,0);
+//    
+//    if (b.match(m_integral, p, color_th)) {
+//        roi = b.getROI();
+//        return 1;
 //    }
+//    else
+    return 0;
 }

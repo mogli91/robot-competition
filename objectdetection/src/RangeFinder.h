@@ -62,6 +62,8 @@ public:
     
     void getRayHeights(vector<int> &dst);
     
+    int findBeacon(cv::Rect &roi);
+    
     cv::Mat getMask() {return m_mask;};
     
 private:

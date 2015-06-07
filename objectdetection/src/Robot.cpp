@@ -50,8 +50,8 @@ int Robot::getSensorValue(char sensorId) {
 	return m_brain->getReading(sensorId);
 }
 
-void Robot::getVisionDistances(vector<int> &dst) {
-    m_brain->getVisionDistances(dst);
+void Robot::getVisionData(VisionMeasure &vm) {
+    m_brain->getVisionData(vm);
 }
 
 int Robot::getBrushCurrent() {

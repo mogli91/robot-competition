@@ -31,7 +31,7 @@ public:
     void printInstructions();
     void printReadings();
     int getReading(char id);
-    void getVisionDistances(vector<int> &dst);
+    void getVisionData(VisionMeasure &vm);
     int getNumPorts();
     
     bool setCommand(char id, int val); // TODO make private

@@ -174,24 +174,11 @@ int Brain::getReading(char id)
     if (id < READING_ID_MIN || id > READING_ID_MAX) return -1;  // checks address in table
     int address = id - READING_ID_MIN;
     
-    // TODO figure out a way to send closest bottle only (now it's left-most)
-    if (address == SENSOR_BOTTLE_DISTANCE) {
-        if (m_vision.bottles.size()) {
-            return m_vision.bottles[0].y;
-        } else
-            return -1;
-        
-    } else if (address == SENSOR_BOTTLE_ANGLE) {
-        if (m_vision.bottles.size()) {
-            return m_vision.bottles[0].x;
-        } else
-            return 0;
-    } else
-        return m_readings[address];
+    return m_readings[address];
 }
 
-void Brain::getVisionDistances(vector<int> &dst) {
-    dst = m_vision.rays;
+void Brain::getVisionData(VisionMeasure &vm) {
+    vm = m_vision;
 }
 
 int Brain::getNumPorts() {
