@@ -19,14 +19,6 @@ void Robot::updateData() {
 	m_brain->updateReadings();
 }
 
-int Robot::getBottleAngle() {
-	return m_brain->getReading(SENSOR_BOTTLE_ANGLE);
-}
-
-int Robot::getBottleDistance() {
-	return m_brain->getReading(SENSOR_BOTTLE_DISTANCE);
-}
-
 void Robot::setWheelSpeeds(int left, int right) {
 	m_brain->setWheelSpeeds(left, right);
 }
@@ -54,12 +46,10 @@ void Robot::setBrushSpeed(int speed) {
 int Robot::getSensorValue(char sensorId) {
 	return m_brain->getReading(sensorId);
 }
+void Robot::getVisionData(VisionMeasure &vm) {
+    m_brain->getVisionData(vm);
+}
 
-/*int Robot::getBrushCurrent() {
-	int val = m_brain->getReading(SENSOR_BRUSH_CURRENT);
-	cout << "\n\n" << val << "\n\n" << endl;
-	return m_brain->getReading(SENSOR_BRUSH_CURRENT);
-}*/
 Pose Robot::getPose() {
 	Pose robotPose;
 	robotPose.x = m_brain->getReading(SENSOR_POSE_X);

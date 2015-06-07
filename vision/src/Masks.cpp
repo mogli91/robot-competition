@@ -55,7 +55,7 @@ Mask::Mask(int blocksize, int type) {
 
 double Mask::dist(double* a, double *b) {
     double dist = sqrt((a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1]) + (a[2] - b[2]) * (a[2] - b[2]));
-            std::cout << dist << std::endl;
+//            std::cout << dist << std::endl;
     return dist;
 }
 

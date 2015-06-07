@@ -25,19 +25,22 @@ public:
 	Robot(Brain* brain);
 	virtual ~Robot();
 	void updateData();
-	void sendInstructions(){if (m_brain != NULL) m_brain->sendInstructions();};
+    void sendInstructions(){if (m_brain != NULL) m_brain->sendInstructions();};
 	void setWheelSpeeds(int left, int right);
 	void setTailGate(int tailGateState);
 	void setShovel(int shovelState);
 	void setBrushSpeed(int speed);
+
 	int getSensorValue(char sensorId);
-	//int getBrushCurrent();
-	int getBottleAngle();
-	int getBottleDistance();
+//	int getBrushCurrent();
+
 	Pose getPose();
+
 	void changeTileState(int x, int y, Tile newTile); // adds values to the map
-	Tile getTile(int x, int y); //returns tile contents
+	Tile getTile(int x, int y);	//returns tile contents
+
 	//TODO : stuff with camera ? for example int getBottleDirection
+    void getVisionData(VisionMeasure &vm);
 	void printMap();
 
 private:

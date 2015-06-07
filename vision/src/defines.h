@@ -61,27 +61,39 @@
 #define VAL_WHEELS_FW    510
 
 #define VAL_TAIL_OPEN    180 // degrees
-#define VAL_TAIL_CLOSE   70
+#define VAL_TAIL_CLOSE   50
 
 // sensor IDs
-#define SENSOR_IR_L             'a'         /* on ARDUINO 1 */
-#define SENSOR_IR_FRONT_L       'b'
-#define SENSOR_IR_FRONT_R       'c'
-#define SENSOR_IR_R             'd'
-#define SENSOR_IR_BACK          'e'
+#define SENSOR_IR_L               'a'         /* on ARDUINO 1 */
+#define SENSOR_IR_FRONT_L         'b'
+#define SENSOR_IR_FRONT_R         'c'
+#define SENSOR_IR_R               'd'
+#define SENSOR_IR_BACK            'e'
 
-#define SENSOR_US_L             'f'
-#define SENSOR_US_FRONT_L       'g'
-#define SENSOR_US_FRONT_R       'h'
-#define SENSOR_US_R             'i'
+#define SENSOR_IR_BOTTOM_L        'f'
+#define SENSOR_IR_FRONT_BOTTOM_L  'g'
+#define SENSOR_IR_FRONT_BOTTOM_R  'h'
+#define SENSOR_IR_BOTTOM_R        'i'
 
-#define SENSOR_BRUSH_CURRENT    'j'
+#define SENSOR_BRUSH_CURRENT      'j'
 
-#define SENSOR_POSE_X           'k'         /* on ARDUINO 2 */
-#define SENSOR_POSE_Y           'l'
-#define SENSOR_POSE_ANGLE       'm'
+#define SENSOR_POSE_X             'k'         /* on ARDUINO 2 */
+#define SENSOR_POSE_Y             'l'
+#define SENSOR_POSE_ANGLE         'm'
 
-#define SENSOR_ENCODER_L        'n'         /* on WTC       */
-#define SENSOR_ENCODER_R        'o'
+#define SENSOR_ENCODER_L          'n'         /* on WTC       */
+#define SENSOR_ENCODER_R          'o'
+
+#define SENSOR_BOTTLE_DISTANCE    'x'
+#define SENSOR_BOTTLE_ANGLE       'y'
+
+// vision
+#define PI 3.14159265
+#define VISION_NUM_RAYS         16
+#define VISION_DIST_BOTTOM      10          // distance of an object if seen in last pixel row
+#define VISION_DIST_TOP         250         // distance of an object if seen in first pixel row
+#define VISION_CM_TOP           200         // 200 cm visible at top pixel line
+#define VISION_CM_BOTTOM         80         // 80 cm visible at bottom pixel line
+
 
 #endif // DEFINES_H

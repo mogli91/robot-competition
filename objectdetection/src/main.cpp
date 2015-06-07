@@ -80,15 +80,11 @@ void sendInstruction(char* cmd, int len);
  */
 
 void restore_coocked_mode(void* dummy) {
-#ifdef DEBUG
 	printf("restore_coocked_mode: before 'stty -raw echo'\n\r");
 	fflush(stdout);
-#endif /* DEBUG */
 	system("stty -raw echo");
-#ifdef DEBUG
 	printf("restore_coocked_mode: after 'stty -raw echo'\n");
 	fflush(stdout);
-#endif /* DEBUG */
 }
 
 /*
@@ -105,11 +101,6 @@ void* read_user_input(void* data) {
     
     if (!brain->getNumPorts()) {
         cout << "No serial connection for testing!!" << endl;
-//        /* mark that there was a cancel request by the user */
-//        cancel_operation = 1;
-//        /* signify that we are done */
-//        pthread_cond_signal(&action_cond);
-//        pthread_exit(NULL);
     }
     
 	int c;
@@ -137,10 +128,8 @@ void* read_user_input(void* data) {
         brain->printReadings();
         switch (c) {
         case 'e':
-#ifdef DEBUG
             printf("\n\ngot a 'e'\n\n\r");
             fflush(stdout);
-#endif /* DEBUG */
             /* mark that there was a cancel request by the user */
             cancel_operation = 1;
             /* signify that we are done */
@@ -282,16 +271,6 @@ void* communication_loop(void *data) {
 }
 
 int main(int argc, char** args) {
-    
-//    char s[10] = {'\0'};
-//    printf("%s\n", s);
-//    sprintf(s, "%d", 10);
-//    printf("%s\n", s);
-//    sprintf(s, "%03d", 1000);
-//    printf("%s\n", s);
-//    printf("%d\n", atoi(s));
-//    
-//    return 0;
 
 	char *port_ard1 = 0;
 	char *port_ard2 = 0;
@@ -352,7 +331,7 @@ int main(int argc, char** args) {
     if(video) {
         cout << "trying to connect to camera " << camnum << endl;
         /* ----- create needed objects ---- */
-        detector = new Detector(camnum, exposure, 240, 320, &detector_mutex);
+        detector = new Detector(camnum, exposure, 240, 320);
 
         // threading stuff
         if (detector->isReady()) {
@@ -427,7 +406,6 @@ int main(int argc, char** args) {
 	/* spawn the user-reading thread */
 	pthread_create(&thread_user_input, NULL, read_user_input, brain);
 
-//	if (camera_loop_running) namedWindow("preview");
 	Mat cframe;
     int pic_count = 0;
     string folder_pic = "pics";
