@@ -123,6 +123,13 @@ bool Simulation::bottleCaptured() {
 }
 void Simulation::moveWithVector() {
 	int wl, wr; //wheel speeds left and right
+
+	//never go backwards, turn instead.
+	if(m_displacementVector[Y] < 0)
+	{
+		m_displacementVector[X] += m_displacementVector[Y];
+		m_displacementVector[Y] = 0;
+	}
 	wl = m_displacementVector[Y] + m_displacementVector[X];
 	wr = m_displacementVector[Y] - m_displacementVector[X];
 	if (wl > VAL_WHEELS_FW) {
