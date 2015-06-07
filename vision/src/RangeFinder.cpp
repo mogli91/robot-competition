@@ -105,10 +105,16 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
 }
 
 void RangeFinder::locateBottles() {
-    BottleFar bottle = BottleFar(m_blocksize);
-//    BottleCloseUpright bottle = BottleCloseUpright(m_blocksize);
-//    BottleCloseFlat bottle = BottleCloseFlat(m_blocksize);
-//    BottleClose45P bottle = BottleClose45P(m_blocksize);
+    int bs = m_blocksize;
+    BottleFar bottleFar = BottleFar(bs);
+    BottleCloseUpright bottleCU = BottleCloseUpright(bs);
+    BottleCloseFlat bottleCF = BottleCloseFlat(bs);
+    BottleClose45P bottleC45P = BottleClose45P(bs);
+    BottleClose45N bottleC45N = BottleClose45N(bs);
+    BottleVeryCloseUpright bottleVCU = BottleVeryCloseUpright(bs);
+    BottleVeryCloseFlat bottleVCF = BottleVeryCloseFlat(bs);
+    BottleVeryClose45P bottleVC45P = BottleVeryClose45P(bs);
+    BottleVeryClose45N bottleVC45N = BottleVeryClose45N(bs);
     double threshold = 30;
     Point p;
     
@@ -116,10 +122,38 @@ void RangeFinder::locateBottles() {
     
     for (int r = 0; r < m_numRays; ++r) {
         p.x = m_rays[r].x;
-        p.y = m_rays[r].y - m_blocksize;
-        if (bottle.match(m_integral, p, threshold)) {
-            m_bottles.push_back(bottle.getROI());
+        p.y = m_rays[r].y - bs;
+        if (bottleFar.match(m_integral, p, threshold)) {
+            m_bottles.push_back(bottleFar.getROI());
         }
+        p.y = m_rays[r].y - bs;
+        if (bottleCU.match(m_integral, p, threshold)) {
+            m_bottles.push_back(bottleCU.getROI());
+        }
+        if (bottleCF.match(m_integral, p, threshold)) {
+            m_bottles.push_back(bottleCF.getROI());
+        }
+//        if (bottleC45P.match(m_integral, p, threshold)) {
+//            m_bottles.push_back(bottleC45P.getROI());
+//        }
+//        if (bottleC45N.match(m_integral, p, threshold)) {
+//            m_bottles.push_back(bottleC45N.getROI());
+//        }
+        
+        p.y = m_rays[r].y - 1.5 * bs;
+        if (bottleVCU.match(m_integral, p, threshold)) {
+            m_bottles.push_back(bottleVCU.getROI());
+        }
+        if (bottleVCF.match(m_integral, p, threshold)) {
+            m_bottles.push_back(bottleVCF.getROI());
+        }
+//        if (bottleVC45P.match(m_integral, p, threshold)) {
+//            m_bottles.push_back(bottleVC45P.getROI());
+//        }
+//        if (bottleVC45N.match(m_integral, p, threshold)) {
+//            m_bottles.push_back(bottleVC45N.getROI());
+//        }
+        
     }
 }
 
