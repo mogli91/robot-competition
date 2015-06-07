@@ -624,7 +624,7 @@ bool Beacon::match(const cv::Mat &img_integral, cv::Point p, double threshold) {
     m_roi.x = p.x;
     m_roi.y = p.y;
     m_roi.width = m_blocksize;
-    m_roi.height = m_blocksize;
+    m_roi.height = m_blocksize * 2;
     
     double mu_new[3] = {0.0, 0.0, 0.0};
     double mu_old[3] = {0.0, 0.0, 0.0};
@@ -660,16 +660,16 @@ bool Beacon::match(const cv::Mat &img_integral, cv::Point p, double threshold) {
     color_dist = dist(mu_new, m_color[m_corner]);
     
     // walk down the rows in the maximal column
-    for (m_roi.y += m_blocksize/ 2; m_roi.y < img_integral.rows; m_roi.y += m_blocksize/2) {
+    for (m_roi.y += m_blocksize/ 2; m_roi.y + m_roi.height < img_integral.rows; m_roi.y += m_blocksize/2) {
         computeMeanInnerRect(img_integral, m_roi, mu_new);
         
         if (color_dist > threshold) {
-//            std::cout << (m_blocksize / 2) << std::endl;
-            m_roi.height =  m_roi.y - (m_blocksize / 2);
-            m_roi.y = p.y;
             break;
         }
     }
+    
+    m_roi.height =  m_roi.y;
+    m_roi.y = p.y;
     
     return true;
     

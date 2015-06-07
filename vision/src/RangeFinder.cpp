@@ -243,7 +243,7 @@ void RangeFinder::getRayHeights(vector<int> &dst) {
 
 int RangeFinder::findBeacon(cv::Rect &roi) {
     Beacon b = Beacon(m_blocksize/2);
-    double color_th = 200;
+    double color_th = 300;
     
     Point p(m_blocksize/2,0);
     

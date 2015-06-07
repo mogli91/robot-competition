@@ -271,8 +271,7 @@ void Detector::findRanges(cv::Mat img) {
 void Detector::computeMeasurement() {
     m_rangeFinder->getBottleCoordinates(m_measure.bottles);
     m_rangeFinder->getRayHeights(m_measure.rays);
-    Rect r = Rect(0,0, 0,0);
-    m_rangeFinder->findBeacon(r);
+    // TODO get beacon coordinates
 }
 
 void Detector::getMeasurement(VisionMeasure &vm) {
