@@ -29,8 +29,10 @@ int r_weight_IR[IR_SENSORS] = { -4, -7, 7, 5, 0 };     //{ -5, -8, 8, 5, 0 };
         |______________|
  */
 //Phototaxis
-int l_weight_US[US_SENSORS] = { -10, -2, 2, 10 };
-int r_weight_US[US_SENSORS] = { 10, 2, -2, -10 };
+//int l_weight_US[US_SENSORS] = { -10, -5, 5, 10 };
+//int r_weight_US[US_SENSORS] = { 10, 5, -5, -10 };
+int l_weight_US[US_SENSORS] = { 0, 0, -5, 5 };
+int r_weight_US[US_SENSORS] = { 0, 0, 5, -5 };
 
 Simulation::Simulation(Brain* brain)
 {
@@ -58,7 +60,7 @@ void Simulation::braitenberg_avoidance() {
     
 	m_robot->setWheelSpeeds(msr,msl);
 }
-/*
+
 //Function for the phototaxis
 void Simulation::braitenberg_phototaxis() {
 
@@ -68,8 +70,8 @@ void Simulation::braitenberg_phototaxis() {
 
 	for (sensor_us = 0; sensor_us < US_SENSORS; sensor_us++) {
 
-		msr += (80-m_robot->getSensorValue(sensor_us + SENSOR_US_L)) * r_weight_US[sensor_us]; // motor speed right
-		msl += (80-m_robot->getSensorValue(sensor_us + SENSOR_US_L)) * l_weight_US[sensor_us]; // motor speed left
+		msr += (80-m_robot->getSensorValue(sensor_us + SENSOR_IR_BOTTOM_L)) * r_weight_US[sensor_us]; // motor speed right
+		msl += (80-m_robot->getSensorValue(sensor_us + SENSOR_IR_BOTTOM_L)) * l_weight_US[sensor_us]; // motor speed left
 	}
 	if (msl>VAL_WHEELS_FW )  {msl=VAL_WHEELS_FW ;}
 	if (msl<VAL_WHEELS_BW)   {msl=VAL_WHEELS_BW;}
@@ -78,7 +80,7 @@ void Simulation::braitenberg_phototaxis() {
 	    
 	m_robot->setWheelSpeeds(msl,msr);
 }
-*/
+
 // main function
 void Simulation::loop(void) {
 
@@ -105,7 +107,8 @@ void Simulation::loop(void) {
 				else
 				{
 					//follow_path();
-					m_robot->setWheelSpeeds(500, 500);
+					//m_robot->setWheelSpeeds(500, 500);
+					braitenberg_phototaxis();
 				}
 				/*else
 				{

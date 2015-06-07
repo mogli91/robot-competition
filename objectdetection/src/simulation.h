@@ -39,7 +39,7 @@ public:
 	//Function for the obstacle avoidance
 	void braitenberg_avoidance ();
 	//Function for the phototaxis
-//	void braitenberg_phototaxis ();
+	void braitenberg_phototaxis ();
 	//Method for the change of the robot's state
 	void change_state(int newState);
 	//mycurrentstate should be a private attribute of the class robot and all this simulation
