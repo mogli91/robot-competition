@@ -106,17 +106,18 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
 
 void RangeFinder::locateBottles() {
     BottleFar bottle = BottleFar(m_blocksize);
+//    BottleCloseUpright bottle = BottleCloseUpright(m_blocksize);
+//    BottleCloseFlat bottle = BottleCloseFlat(m_blocksize);
+//    BottleClose45P bottle = BottleClose45P(m_blocksize);
     double threshold = 30;
-    Rect roi;
+    Point p;
     
     m_bottles.clear();
     
     for (int r = 0; r < m_numRays; ++r) {
-        roi.x = m_rays[r].x;
-        roi.y = m_rays[r].y - m_blocksize;
-        roi.height = m_blocksize;
-        roi.width = m_blocksize;
-        if (bottle.match(m_integral, roi, threshold)) {
+        p.x = m_rays[r].x;
+        p.y = m_rays[r].y - m_blocksize;
+        if (bottle.match(m_integral, p, threshold)) {
             m_bottles.push_back(bottle.getROI());
         }
     }

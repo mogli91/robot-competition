@@ -104,47 +104,20 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
     
 }
 
-//    int i, j;
-//    double d = 0;
-//    double d_th = 20;
-//    Mat tmp;
-//    for (i = 0; i < frame.cols - blocksize; i += blocksize) {
-//        getMean(frame.rows - 1, i, frame.rows - blocksize - 1, i + blocksize, m_old);
-//        cout << m_old[0] << ", " << m_old[1] << ", " << m_old[2] << endl;
-//        for (j = blocksize * 3; j < frame.rows - blocksize; j += blocksize) {
-//            
-//            getMean(frame.rows - 1 - j, i, frame.rows - 1 - j - blocksize, i + blocksize, m);
-//            d = dist(m_old, m);
-//            cout << j << ", " << d << " -- " ;
-//            if (d > d_th) {
-//                break;
-//            } else {
-//                memcpy(m_old, m, 3 * sizeof(double));
-//            }
-//        }
-//        tmp = Mat(rollable, Rect(i, frame.rows - 1 - j, blocksize, j));
-//        tmp = Scalar(1);
-//        cout << endl;
-//    }
-//    
-//    imshow("rollable", rollable * 255);
-//    waitKey();
-//
-//}
-
 void RangeFinder::locateBottles() {
     BottleFar bottle = BottleFar(m_blocksize);
+//    BottleCloseUpright bottle = BottleCloseUpright(m_blocksize);
+//    BottleCloseFlat bottle = BottleCloseFlat(m_blocksize);
+//    BottleClose45P bottle = BottleClose45P(m_blocksize);
     double threshold = 30;
-    Rect roi;
+    Point p;
     
     m_bottles.clear();
     
     for (int r = 0; r < m_numRays; ++r) {
-        roi.x = m_rays[r].x;
-        roi.y = m_rays[r].y - m_blocksize;
-        roi.height = m_blocksize;
-        roi.width = m_blocksize;
-        if (bottle.match(m_integral, roi, threshold)) {
+        p.x = m_rays[r].x;
+        p.y = m_rays[r].y - m_blocksize;
+        if (bottle.match(m_integral, p, threshold)) {
             m_bottles.push_back(bottle.getROI());
         }
     }
@@ -157,4 +130,26 @@ void RangeFinder::drawMask(Mat dst) {
         tmp = Scalar(1);
     }
     m_mask.copyTo(dst);
+}
+
+void RangeFinder::getBottleCoordinates(vector<Point> &dst) {
+//    int x, y, x_world, y_world;
+//    dst.clear();
+//    for (vector<Rect>::iterator it = m_bottles.begin(); it != m_bottles.end(); ++it) {
+//        x = it->x + it->width / 2;  // want center of bottle
+//        y = it->y + it->height;     // want closest point of bottle
+//        
+//        y_world = VISION_DIST_BOTTOM + (m_height - y - 1) * m_height / (VISION_DIST_TOP - VISION_DIST_BOTTOM);
+//        
+//        // TODO: proper x coordinate
+//        if (x < m_width / 3) {
+//            x_world = -1;
+//        } else if (x < 2 * m_width / 3) {
+//            x_world = 0;
+//        } else {
+//            x_world = 1;
+//        }
+//        
+//        dst.push_back(Point(x_world, y_world));
+//    }
 }

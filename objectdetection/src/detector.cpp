@@ -15,7 +15,7 @@ Detector::Detector(int camnum, float exposure, int f_height, int f_width, void *
     int offset = 60;
     m_rangeFinder = new RangeFinder(f_height, f_width, blocksize, color_dist_th, offset);
     
-    m_mutex = mutex;
+//    m_mutex = (pthread_mutex_t*)mutex;
 
     
     /*
@@ -125,8 +125,8 @@ void Detector::kMeansSegmentation(Mat img)
     cout << "\r" << 1.0 / elapsed_secs << " fps" << flush;
     
 //        imshow("tile", patterns[0]->getMask() * 255);
-    imshow("tile", bg_tile->getMask() * 255);
-    imshow("grass", bg_grass->getMask() * 255);
+//    imshow("tile", bg_tile->getMask() * 255);
+//    imshow("grass", bg_grass->getMask() * 255);
 //    imshow("wood", bg_wood->getMask() * 255);
 //    imshow("obstacle", bg_obstacle->getMask() * 255);
     
@@ -271,11 +271,15 @@ void Detector::findRanges(cv::Mat img) {
 }
 
 void *Detector::getMutex() {
-    return m_mutex;
+//    return m_mutex;
+    return NULL;
 }
 
 void Detector::computeMeasurement() {
+    
+//    pthread_mutex_lock(m_mutex);
     m_rangeFinder->getBottleCoordinates(m_measure.bottles);
+//    pthread_mutex_unlock(m_mutex);
 }
 
 void Detector::getMeasurement(VisionMeasure &vm) {
