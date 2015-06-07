@@ -92,8 +92,12 @@ void loop() {
   int angle_deg_raw = compass_read();
   int local_angle_deg = transformAngleWorld2Local(angle_deg_raw);
 
-  print_value('b', local_angle_deg);
+  // angular offset to rotate coordinate system
+  pose.offset = degree2Offset(local_angle_deg);// + pose.delta_old; // TODO intelligent weighting
   
+  print_value(SENSOR_POSE_ANGLE, local_angle_deg);
+
+  delay(100);
 }
 
 // --------------------------------------------------------- CAMERA --------------------------------------------------------
