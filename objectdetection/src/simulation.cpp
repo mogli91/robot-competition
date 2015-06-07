@@ -19,8 +19,8 @@
 //Obstacle avoidance
 //int l_weight_IR[IR_SENSORS] = { 5, 8, -8, -5, 0 };     //{ 5, 8, -8, -5, 0 }
 //int r_weight_IR[IR_SENSORS] = { -4, -7, 7, 5, 0 };     //{ -5, -8, 8, 5, 0 };
-int l_weight_IR[IR_SENSORS] = { 3, 5, -5, -3, 0 }; //for the power of 2 law
-int r_weight_IR[IR_SENSORS] = { -2, -4, 4, 3, 0 }; //for the power of 2 law
+int l_weight_IR[IR_SENSORS] = { 3, 5, -5, -3, 0, 1,-1}; //for the power of 2 law
+int r_weight_IR[IR_SENSORS] = { -2, -4, 4, 3, 0, -1, 1}; //for the power of 2 law
 /*
  1                2
  US______________US
@@ -115,7 +115,7 @@ void Simulation::liftBottle() {
 }
 bool Simulation::bottleCaptured() {
 	//if(brushIsBlocked() || m_robot->getBrushCurrent() > 220)
-	if (m_robot->getSensorValue(SENSOR_IR_BRUSH) < 30) {
+	if (m_robot->getSensorValue(SENSOR_IR_BRUSH) < 20) {
 		//usleep(500000);
 		return true;
 	}
