@@ -16,6 +16,22 @@ RangeFinder::RangeFinder(int height, int width, int blocksize, double th, int of
     
     m_integral = Mat::zeros(m_height, m_width, CV_32SC3);
     m_mask = Mat::zeros(m_height, m_width, CV_8UC1);
+    
+    initScales();
+}
+
+void RangeFinder::initScales() {
+    m_lateral_offset_cm_per_px = vector<double>(m_height);
+    
+    // scaling factors for 3d measurements
+    m_distance_cm_per_px = (VISION_DIST_TOP - VISION_DIST_BOTTOM) / (1.0 * m_height);
+    double cm_per_px_bottom = VISION_CM_BOTTOM / (1.0 * m_width);
+    double cm_per_px_top = VISION_CM_TOP / (1.0 * m_width);
+    double cm_per_px_at_row;
+    for (int i = 0; i < m_height; ++i) {
+        cm_per_px_at_row = cm_per_px_top + (cm_per_px_bottom - cm_per_px_top) / m_height * i;
+        m_lateral_offset_cm_per_px[i] = cm_per_px_at_row;
+    }
 }
 
 void RangeFinder::reset() {
@@ -167,23 +183,37 @@ void RangeFinder::drawMask(Mat dst) {
 }
 
 void RangeFinder::getBottleCoordinates(vector<Point> &dst) {
-//    int x, y, x_world, y_world;
-//    dst.clear();
-//    for (vector<Rect>::iterator it = m_bottles.begin(); it != m_bottles.end(); ++it) {
-//        x = it->x + it->width / 2;  // want center of bottle
-//        y = it->y + it->height;     // want closest point of bottle
-//        
-//        y_world = VISION_DIST_BOTTOM + (m_height - y - 1) * m_height / (VISION_DIST_TOP - VISION_DIST_BOTTOM);
-//        
+    int x, y, angle, distance_cm;
+    double lateral_offset_cm;
+    dst.clear();
+    for (vector<Rect>::iterator it = m_bottles.begin(); it != m_bottles.end(); ++it) {
+        x = it->x + it->width / 2;  // want center of bottle
+        y = it->y + it->height;     // want closest point of bottle
+        
+        distance_cm = VISION_DIST_BOTTOM + m_distance_cm_per_px * (m_height - y);
+        lateral_offset_cm = m_lateral_offset_cm_per_px[x] * (x - m_width / 2.0);
+        angle = (atan2(lateral_offset_cm, distance_cm) * 180) / PI;
+        
 //        // TODO: proper x coordinate
 //        if (x < m_width / 3) {
-//            x_world = -1;
+//            lateral_offset_cm = -1;
 //        } else if (x < 2 * m_width / 3) {
-//            x_world = 0;
+//            lateral_offset_cm = 0;
 //        } else {
-//            x_world = 1;
+//            lateral_offset_cm = 1;
 //        }
-//        
-//        dst.push_back(Point(x_world, y_world));
-//    }
+        
+        dst.push_back(Point(angle, distance_cm));
+    }
+}
+
+void RangeFinder::getRayHeights(vector<int> &dst) {
+    int y, distance_cm;
+    dst.clear();
+    for (vector<Rect>::iterator it = m_rays.begin(); it != m_rays.end(); ++it) {
+        y = it->y + it->height;     // want closest point of bottle
+        
+        distance_cm = VISION_DIST_BOTTOM + m_distance_cm_per_px * (m_height - y);
+        dst.push_back(distance_cm);
+    }
 }
