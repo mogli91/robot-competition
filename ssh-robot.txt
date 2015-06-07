@@ -13,6 +13,7 @@ start odroid (or unplug and replug the wifi stick)
 - choose network Jakob
 - open a terminal 
 - enter ssh odroid@192.168.43.199
+- password : odroid
 
 2. to shutdown the robot from terminal
 -------------------------
@@ -26,7 +27,7 @@ sudo shutdown -h now
 
 for a whole folder (e.g. your current source folder)
 - navigate to objectdetection
-- scp -t src/ odroid@192.168.43.199:Robot
+- scp -r src/ odroid@192.168.43.199:Robot
 
 3. building on the robot
 - ssh into robot, on robot:
