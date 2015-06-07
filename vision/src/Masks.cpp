@@ -47,6 +47,9 @@ Mask::Mask(int blocksize, int type) {
             m_roi.width = m_blocksize * 2;
             m_area =  m_blocksize * m_blocksize * 5/ 2;
             break;
+        case BEACON:
+            m_roi.width = m_blocksize;
+            m_roi.height = 2 * m_blocksize;
         default:
             break;
     }
@@ -606,4 +609,68 @@ bool BottleVeryClose45N::match(const cv::Mat &img_integral, cv::Point p, double 
     }
     
     return true;
+}
+
+// ----------------------------------- BEACON ------------------------------------------
+
+bool Beacon::match(const cv::Mat &img_integral, cv::Point p, double threshold) {
+    if  ((p.x - m_blocksize / 2) < 0
+        || (p.y + m_roi.height + m_blocksize / 2) >= img_integral.rows
+        || (p.x + m_roi.width + m_blocksize / 2) >= img_integral.cols) {
+        
+        return false;
+    }
+    
+    m_roi.x = p.x;
+    m_roi.y = p.y;
+    m_roi.width = m_blocksize;
+    m_roi.height = m_blocksize;
+    
+    double mu_new[3] = {0.0, 0.0, 0.0};
+    double mu_old[3] = {0.0, 0.0, 0.0};
+    double color_dist;
+    double color_dist_min = INFINITY;
+    Rect r_tmp, r_max;
+    
+    
+    // find maximal response in given row
+    for (m_roi.x = p.x; m_roi.x < (img_integral.cols - m_roi.width - m_blocksize/2); m_roi.x += m_blocksize/2) {
+        for (int i = 0; i < 4; ++i) {
+            computeMeanInnerRect(img_integral, m_roi, mu_new);
+            color_dist = dist(mu_new, m_color[i]);
+            std::cout << color_dist << " ";
+            if (color_dist < threshold) {
+                if (color_dist < color_dist_min) {
+                    color_dist_min = color_dist;
+                    memcpy(mu_old, mu_new, 3 * sizeof(double));
+                    r_max = m_roi;
+                    m_corner = i > 0 ? i - 1 : i;
+                }
+            }
+        }
+        std::cout << std::endl;
+    }
+    
+    if (!(color_dist_min < threshold)) {
+        return false;
+    }
+    
+    m_roi.x = r_max.x;
+    m_roi.y = r_max.y;
+    color_dist = dist(mu_new, m_color[m_corner]);
+    
+    // walk down the rows in the maximal column
+    for (m_roi.y += m_blocksize/ 2; m_roi.y < img_integral.rows; m_roi.y += m_blocksize/2) {
+        computeMeanInnerRect(img_integral, m_roi, mu_new);
+        
+        if (color_dist > threshold) {
+//            std::cout << (m_blocksize / 2) << std::endl;
+            m_roi.height =  m_roi.y - (m_blocksize / 2);
+            m_roi.y = p.y;
+            break;
+        }
+    }
+    
+    return true;
+    
 }

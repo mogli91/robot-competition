@@ -23,7 +23,7 @@ protected:
 public:
     
     enum TYPE {FAR, CLOSE_UPRIGHT, CLOSE_FLAT, CLOSE_45P, CLOSE_45N,
-        VERY_CLOSE_UPRIGHT, VERY_CLOSE_FLAT, VERY_CLOSE_45P, VERY_CLOSE_45N};
+        VERY_CLOSE_UPRIGHT, VERY_CLOSE_FLAT, VERY_CLOSE_45P, VERY_CLOSE_45N, BEACON};
     
     Mask(int blocksize, int type);
     
@@ -101,7 +101,25 @@ public:
 };
 
 class Beacon : public Mask {
-public: 
+private:
+    double *m_color[4];
+    double m_red[3] = {0, 0, 255};
+    double m_blue[3] = {255, 102, 153};
+    double m_green[3] = {255, 0, 0};
+    double m_yellow[3] = {255, 255, 0};
+    int m_corner;
+public:
+    enum CORNER {RED, BLUE, GREEN, YELLOW, NONE};
+    Beacon(int blocksize) : Mask(blocksize, BEACON){
+        m_color[RED] = m_red;
+        m_color[BLUE] = m_blue;
+        m_color[GREEN] = m_green;
+        m_color[YELLOW] = m_yellow;
+        m_corner = NONE;
+    };
+    bool match(const cv::Mat &img_integral, cv::Point p, double threshold);
+//    void setColor(double *color) { memcpy(m_color, color, sizeof(double)); };
+    int getCorner() {return m_corner;};
 };
 
 #endif // MASKS_H

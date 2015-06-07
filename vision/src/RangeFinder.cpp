@@ -115,6 +115,24 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
     for (int b = 0; b < m_bottles.size(); ++b) {
         rectangle(src, m_bottles[b], Scalar(0, 255, 0));
     }
+    Rect tmp;
+    int beacon = findBeacon(tmp);
+    switch (beacon) {
+        case Beacon::BLUE:
+            rectangle(src, tmp, Scalar(255, 0, 0));
+            break;
+        case Beacon::GREEN:
+            rectangle(src, tmp, Scalar(0, 255, 0));
+            break;
+        case Beacon::RED:
+            rectangle(src, tmp, Scalar(0, 0, 255));
+            break;
+        case Beacon::YELLOW:
+            rectangle(src, tmp, Scalar(0, 255, 255));
+            break;
+        default:
+            break;
+    }
     
     drawMask(dst);
     
@@ -224,17 +242,15 @@ void RangeFinder::getRayHeights(vector<int> &dst) {
 }
 
 int RangeFinder::findBeacon(cv::Rect &roi) {
-//    Beacon b = Beacon(m_blocksize/2);
-//    double blue[3] = {0, 255, 0};
-//    double color_th = 200;
-//    b.setColor(blue);
-//    
-//    Point p(0,0);
-//    
-//    if (b.match(m_integral, p, color_th)) {
-//        roi = b.getROI();
-//        return 1;
-//    }
-//    else
-    return 0;
+    Beacon b = Beacon(m_blocksize/2);
+    double color_th = 200;
+    
+    Point p(m_blocksize/2,0);
+    
+    if (b.match(m_integral, p, color_th)) {
+        roi = b.getROI();
+        return b.getCorner();
+    }
+    else
+        return Beacon::NONE;
 }
