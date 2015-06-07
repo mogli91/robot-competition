@@ -12,12 +12,14 @@
 enum Wheels{LEFT, RIGHT};
 enum ServoState{UP, DOWN};
 enum Sensor{IRL, IRFL, IRFR, IRR, IRB, USL, USFL, USFR, USR};
+
 struct Pose
 {
-int x;
-int y;
-int angle;
+	int x;
+	int y;
+	int angle;
 };
+
 class Robot {
 public:
 	Robot(Brain* brain);
@@ -42,7 +44,7 @@ public:
 	void printMap();
 
 private:
-Brain* m_brain;
-Map* m_map;
+	Brain* m_brain;
+	Map* m_map;
 };
 #endif /* ROBOT_H_ */
