@@ -210,10 +210,17 @@ void RangeFinder::getBottleCoordinates(vector<Point> &dst) {
 void RangeFinder::getRayHeights(vector<int> &dst) {
     int y, distance_cm;
     dst.clear();
-    for (vector<Rect>::iterator it = m_rays.begin(); it != m_rays.end(); ++it) {
-        y = it->y;
+    int unused = 3;
+    for (int i = 0 + unused; i < m_numRays - unused; ++i) {
+        y = m_rays[i].y;
         
         distance_cm = VISION_DIST_BOTTOM + m_distance_cm_per_px * (m_height - y);
         dst.push_back(distance_cm);
     }
+//    for (vector<Rect>::iterator it = m_rays.begin(); it != m_rays.end(); ++it) {
+//        y = it->y;
+//        
+//        distance_cm = VISION_DIST_BOTTOM + m_distance_cm_per_px * (m_height - y);
+//        dst.push_back(distance_cm);
+//    }
 }

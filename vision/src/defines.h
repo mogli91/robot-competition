@@ -90,7 +90,6 @@
 // vision
 #define PI 3.14159265
 #define VISION_NUM_RAYS         16
-#define VISION_NUM_VIRTUAL_RAYS 9
 #define VISION_DIST_BOTTOM      10          // distance of an object if seen in last pixel row
 #define VISION_DIST_TOP         250         // distance of an object if seen in first pixel row
 #define VISION_CM_TOP           200         // 200 cm visible at top pixel line
