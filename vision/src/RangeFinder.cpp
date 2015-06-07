@@ -142,27 +142,27 @@ void RangeFinder::locateBottles() {
         if (bottleFar.match(m_integral, p, threshold)) {
             m_bottles.push_back(bottleFar.getROI());
         }
-        p.y = m_rays[r].y - bs;
-        if (bottleCU.match(m_integral, p, threshold)) {
-            m_bottles.push_back(bottleCU.getROI());
-        }
-        if (bottleCF.match(m_integral, p, threshold)) {
-            m_bottles.push_back(bottleCF.getROI());
-        }
-//        if (bottleC45P.match(m_integral, p, threshold)) {
-//            m_bottles.push_back(bottleC45P.getROI());
+//        p.y = m_rays[r].y - bs;
+//        if (bottleCU.match(m_integral, p, threshold)) {
+//            m_bottles.push_back(bottleCU.getROI());
 //        }
-//        if (bottleC45N.match(m_integral, p, threshold)) {
-//            m_bottles.push_back(bottleC45N.getROI());
+//        if (bottleCF.match(m_integral, p, threshold)) {
+//            m_bottles.push_back(bottleCF.getROI());
 //        }
-        
-        p.y = m_rays[r].y - 1.5 * bs;
-        if (bottleVCU.match(m_integral, p, threshold)) {
-            m_bottles.push_back(bottleVCU.getROI());
-        }
-        if (bottleVCF.match(m_integral, p, threshold)) {
-            m_bottles.push_back(bottleVCF.getROI());
-        }
+////        if (bottleC45P.match(m_integral, p, threshold)) {
+////            m_bottles.push_back(bottleC45P.getROI());
+////        }
+////        if (bottleC45N.match(m_integral, p, threshold)) {
+////            m_bottles.push_back(bottleC45N.getROI());
+////        }
+//        
+//        p.y = m_rays[r].y - 1.5 * bs;
+//        if (bottleVCU.match(m_integral, p, threshold)) {
+//            m_bottles.push_back(bottleVCU.getROI());
+//        }
+//        if (bottleVCF.match(m_integral, p, threshold)) {
+//            m_bottles.push_back(bottleVCF.getROI());
+//        }
 //        if (bottleVC45P.match(m_integral, p, threshold)) {
 //            m_bottles.push_back(bottleVC45P.getROI());
 //        }
@@ -211,7 +211,7 @@ void RangeFinder::getRayHeights(vector<int> &dst) {
     int y, distance_cm;
     dst.clear();
     for (vector<Rect>::iterator it = m_rays.begin(); it != m_rays.end(); ++it) {
-        y = it->y + it->height;     // want closest point of bottle
+        y = it->y;
         
         distance_cm = VISION_DIST_BOTTOM + m_distance_cm_per_px * (m_height - y);
         dst.push_back(distance_cm);

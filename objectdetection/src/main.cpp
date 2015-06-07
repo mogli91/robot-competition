@@ -331,7 +331,7 @@ int main(int argc, char** args) {
     if(video) {
         cout << "trying to connect to camera " << camnum << endl;
         /* ----- create needed objects ---- */
-        detector = new Detector(camnum, exposure, 240, 320, &detector_mutex);
+        detector = new Detector(camnum, exposure, 240, 320);
 
         // threading stuff
         if (detector->isReady()) {

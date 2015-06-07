@@ -11,8 +11,8 @@ Detector::Detector(int camnum, float exposure, int f_height, int f_width)
     mask = Mat::zeros(f_height, f_width, CV_8UC1);
     
     double color_dist_th = 15;
-    int blocksize = 20;
-    int offset = 60;
+    int blocksize = f_width / VISION_NUM_RAYS;
+    int offset = 1.5 * blocksize;
     m_rangeFinder = new RangeFinder(f_height, f_width, blocksize, color_dist_th, offset);
 
     
@@ -74,8 +74,8 @@ Detector::Detector(const string &filename)
     mask = Mat::zeros(f_height, f_width, CV_8UC1);
     
     double color_dist_th = 15;
-    int blocksize = 20;
-    int offset = 60;
+    int blocksize = f_width / VISION_NUM_RAYS;
+    int offset = 1.5 * blocksize;
     m_rangeFinder = new RangeFinder(f_height, f_width, blocksize, color_dist_th, offset);
     
 }
