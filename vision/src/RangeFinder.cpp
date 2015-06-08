@@ -297,8 +297,8 @@ void RangeFinder::getRays(vector<Point> &dst) {
     }
 }
 void RangeFinder::getBeacon(Point &dst) {
-    dst.x = m_beacon.x - m_width/2;
-    dst.y = m_height - m_beacon.y;
+    dst.x = m_beacon.x;
+    dst.y = m_beacon.y;
 }
 
 double RangeFinder::fitTerrainLine(Vec4f &line) {
