@@ -738,7 +738,7 @@ bool Beacon::matchGray(const cv::Mat &img_integral, cv::Point p, double threshol
         for (m_roi.y += m_blocksize; m_roi.y + m_roi.height < img_integral.rows; m_roi.y += m_blocksize) {
             computeMeanInnerRect(img_integral, m_roi, mean_left);
             color_dist = dist(mean_center, mean_left);
-            if (color_dist > 30) {
+            if (color_dist > threshold) {
                 break;
             }
         }

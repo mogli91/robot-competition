@@ -117,28 +117,10 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
     }
     Rect tmp;
     int beacon = findBeacon(tmp);
-    switch (beacon) {
-        case Beacon::BLUE:
-            rectangle(src, tmp, Scalar(255, 0, 0));
-            break;
-        case Beacon::GREEN:
-            rectangle(src, tmp, Scalar(0, 255, 0));
-            break;
-        case Beacon::RED:
-            rectangle(src, tmp, Scalar(0, 0, 255));
-            break;
-        case Beacon::YELLOW:
-            rectangle(src, tmp, Scalar(0, 255, 255));
-            break;
-        default:
-            break;
-    }
-    m_beacon.type = beacon;
-    if (beacon != Beacon::NONE) {
-        m_beacon.position = getWorldCoordinates(Point(tmp.x + tmp.width/2, tmp.y + tmp.height));
-    } else {
-        m_beacon.position = Point(-1,-1);
-    }
+    if(beacon)
+        rectangle(src, tmp, Scalar(255, 255, 255));
+    m_beacon.x = tmp.x + tmp.width/2;
+    m_beacon.y = tmp.y + tmp.height;
     
     drawMask(dst);
     
@@ -243,13 +225,9 @@ void RangeFinder::getRayHeights(vector<int> &dst) {
     }
 }
 
-void RangeFinder::getBeacon(CornerBeacon &dst) {
-    dst = m_beacon;
-}
-
 int RangeFinder::findBeacon(cv::Rect &roi) {
     Beacon b = Beacon(m_blocksize/2);
-    double color_th = 300;
+//    double color_th = 300;
     double gray_th = 30;
     
     Point p(m_blocksize/2,0);
@@ -257,10 +235,10 @@ int RangeFinder::findBeacon(cv::Rect &roi) {
     if (b.matchGray(m_integral, p, gray_th)) {
 //    if (b.matchGray(m_integral, p, color_th)) {
         roi = b.getROI();
-        return b.getCorner();
+        return 1;
     }
     else
-        return Beacon::NONE;
+        return 0;
 }
 
 Point RangeFinder::getWorldCoordinates(const cv:: Point &p_img) {
@@ -271,4 +249,26 @@ Point RangeFinder::getWorldCoordinates(const cv:: Point &p_img) {
     lateral_offset_cm = m_lateral_offset_cm_per_px[p_img.y] * (p_img.x - m_width / 2.0);
     
     return Point(lateral_offset_cm, distance_cm);
+}
+
+// in px coordinates
+void RangeFinder::getBottles(vector<Point> &dst) {
+    dst.clear();
+    Rect tmp;
+    for (int i = 0; i < m_bottles.size(); ++i) {
+        tmp = m_bottles[i];
+        dst.push_back(Point((tmp.x + tmp.width/2) - m_width, m_height - (tmp.y + tmp.height)));
+    }
+}
+void RangeFinder::getRays(vector<Point> &dst) {
+    dst.clear();
+    Rect tmp;
+    for (int i = 0; i < m_rays.size(); ++i) {
+        tmp = m_rays[i];
+        dst.push_back(Point((tmp.x + tmp.width/2) - m_width, m_height - (tmp.y + tmp.height)));
+    }
+}
+void RangeFinder::getBeacon(Point &dst) {
+    dst.x = m_beacon.x - m_width/2;
+    dst.y = m_height - m_beacon.y;
 }

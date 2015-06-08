@@ -40,7 +40,7 @@ private:
     Mat m_mask;		// every pattern has its own mask image
     Mat m_integral;
     
-    CornerBeacon m_beacon;
+    Point m_beacon;
     
 public:
     // default constructor
@@ -65,11 +65,18 @@ public:
     
     void locateBottles();
     
+    // in world coordinates
+    
     void getBottleCoordinates(vector<Point> &dst);
     
     void getRayHeights(vector<int> &dst);
     
-    void getBeacon(CornerBeacon &dst);
+    // in px coordinates
+    void getBottles(vector<Point> &dst);
+    void getRays(vector<Point> &dst);
+    void getBeacon(Point &dst);
+    
+    
     
     int findBeacon(cv::Rect &roi);
     
