@@ -20,6 +20,13 @@ struct CornerBeacon {
     int type;
 };
 
+struct RegressionLine {
+    float delta_x;
+    float delta_y;
+    int intercept;
+    float error;
+};
+
 class RangeFinder {
 private:
     int m_height;
@@ -78,6 +85,7 @@ public:
     void getRays(vector<Point> &dst);
     void getBeacon(Point &dst);
     void getLineParameters(float &dx, float &dy, int &intercept, float &error);
+    void getLineParameters(RegressionLine &line);
     
     double fitTerrainLine(Vec4f &v);
     

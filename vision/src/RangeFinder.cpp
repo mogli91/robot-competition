@@ -336,6 +336,23 @@ void RangeFinder::getLineParameters(float &dx, float &dy, int &intercept, float 
     dx = m_line[0];
     dy = - m_line[1];
     
+    std::cout << (dx - m_line[0]) << std::endl;
+    
     intercept = m_height - (y0 + (x - x0) * slope);
     error = m_error;
+}
+
+void RangeFinder::getLineParameters(RegressionLine &line) {
+    float slope = m_line[1] / m_line[0];
+    float x0 = m_line[2];
+    float y0 = m_line[3];
+    float x = m_width / 2;
+    
+    line.delta_x = m_line[0];
+    line.delta_y = - m_line[1];
+    
+    std::cout << (line.delta_x - m_line[0]) << std::endl;
+    
+    line.intercept = m_height - (y0 + (x - x0) * slope);
+    line.error = m_error;
 }
