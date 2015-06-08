@@ -27,6 +27,8 @@ int main(int argc, char** args) {
         return -1;
     }
     cout << "loading image " << args[1] << endl;
+    
+    int wait;
 
     Detector *detector;
     Mat image;
@@ -34,9 +36,11 @@ int main(int argc, char** args) {
     if (0 == strcmp(args[1], "cam")) {
         detector = new Detector(-1, 0.2, 480, 640);
         image = Mat::zeros(240, 320, CV_8UC3);
+        wait = 1;
     } else {
         image = cv::imread(args[1]);
         detector = new Detector(args[1]);
+        wait = 0;
     }
 
     
@@ -100,7 +104,7 @@ int main(int argc, char** args) {
 //        imshow("v", v);
 //        imshow("gray", gray);
 //        imshow("th", canny);
-        char c = (char) waitKey(1);
+        char c = (char) waitKey(wait);
         if (c == ' ') {
             break;
         }

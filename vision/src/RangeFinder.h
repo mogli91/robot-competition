@@ -41,6 +41,8 @@ private:
     Mat m_integral;
     
     Point m_beacon;
+    Vec4f m_line;
+    double m_error;
     
 public:
     // default constructor
@@ -75,8 +77,9 @@ public:
     void getBottles(vector<Point> &dst);
     void getRays(vector<Point> &dst);
     void getBeacon(Point &dst);
+    void getLineParameters(int &dx, int &dy, int &intercept, float &error);
     
-    void fitTerrainLine(Vec4f &v);
+    double fitTerrainLine(Vec4f &v);
     
     
     int findBeacon(cv::Rect &roi);

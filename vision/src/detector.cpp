@@ -270,6 +270,8 @@ void Detector::computeMeasurement() {
     m_rangeFinder->getBeacon(m_measure.beacon);
     m_rangeFinder->getBottles(m_measure.bottles);
     m_rangeFinder->getRays(m_measure.rays);
+    m_rangeFinder->getLineParameters(m_measure.line.delta_x, m_measure.line.delta_x, m_measure.line.intercept, m_measure.line.error);
+    
 //    m_rangeFinder->getBottleCoordinates(m_measure.bottles);
 //    m_rangeFinder->getRayHeights(m_measure.rays);
 //    m_rangeFinder->getBeacon(m_measure.beacon);
