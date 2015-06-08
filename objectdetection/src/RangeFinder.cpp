@@ -122,6 +122,12 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
     m_beacon.x = tmp.x + tmp.width/2;
     m_beacon.y = tmp.y + tmp.height;
     
+    
+    m_error = fitTerrainLine(m_line);
+    line(src, Point(m_line[2] - m_line[0]*1000,m_line[3] - m_line[1]*1000),Point(m_line[2] + m_line[0]*1000, m_line[3]+m_line[1]*1000), Scalar(255,255,0));
+    
+    std::cout << "error " << m_error << std::endl;
+    
     drawMask(dst);
     
 }
@@ -272,4 +278,47 @@ void RangeFinder::getRays(vector<Point> &dst) {
 void RangeFinder::getBeacon(Point &dst) {
     dst.x = m_beacon.x - m_width/2;
     dst.y = m_height - m_beacon.y;
+}
+
+double RangeFinder::fitTerrainLine(Vec4f &line) {
+    vector<Point> pts;
+    Rect tmp;
+    for (int i = 3; i < m_rays.size() - 3; ++i) {
+        tmp = m_rays[i];
+        pts.push_back(Point2f(tmp.x + tmp.width/2, m_height - tmp.height));
+    }
+    
+    fitLine(pts, line, CV_DIST_L1, 0, 0.01, 0.01);
+    
+    if (line[0] == 0) {
+        return -1;
+    }
+    float slope = line[1] / line[0];
+    float x0 = line[2];
+    float y0 = line[3];
+    
+    float x, y; // = y0 - (x0-xb)*vy/vx;//=y0 - x0/vx*vy;// = y0 - a*vy //
+    
+    float sum = 0;
+    for(uint i = 0; i < pts.size(); i++)
+    {
+        x = pts[i].x;
+        y = y0 + (x - x0) * slope;
+//        sum += abs(pts[i].y - y);
+        sum += (pts[i].y - y) * (pts[i].y - y);
+    }
+    return sum/m_numRays;
+}
+
+void RangeFinder::getLineParameters(int &dx, int &dy, int &intercept, float &error) {
+    float slope = m_line[1] / m_line[0];
+    float x0 = m_line[2];
+    float y0 = m_line[3];
+    float x = m_width / 2;
+    
+    dx = m_line[0];
+    dy = - m_line[1];
+    
+    intercept = m_height - (y0 + (x - x0) * slope);
+    error = m_error;
 }
