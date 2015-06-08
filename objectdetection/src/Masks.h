@@ -118,6 +118,7 @@ public:
         m_corner = NONE;
     };
     bool match(const cv::Mat &img_integral, cv::Point p, double threshold);
+    bool matchGray(const cv::Mat &img_integral, cv::Point p, double threshold);
 //    void setColor(double *color) { memcpy(m_color, color, sizeof(double)); };
     int getCorner() {return m_corner;};
 };

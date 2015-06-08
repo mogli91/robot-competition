@@ -250,10 +250,12 @@ void RangeFinder::getBeacon(CornerBeacon &dst) {
 int RangeFinder::findBeacon(cv::Rect &roi) {
     Beacon b = Beacon(m_blocksize/2);
     double color_th = 300;
+    double gray_th = 30;
     
     Point p(m_blocksize/2,0);
     
-    if (b.match(m_integral, p, color_th)) {
+    if (b.matchGray(m_integral, p, gray_th)) {
+//    if (b.matchGray(m_integral, p, color_th)) {
         roi = b.getROI();
         return b.getCorner();
     }

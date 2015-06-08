@@ -674,3 +674,83 @@ bool Beacon::match(const cv::Mat &img_integral, cv::Point p, double threshold) {
     return true;
     
 }
+
+bool Beacon::matchGray(const cv::Mat &img_integral, cv::Point p, double threshold) {
+    int side_width = m_blocksize / 2;
+    
+    if  ((p.x - side_width) < 0
+         || (p.y + m_roi.height + side_width) >= img_integral.rows
+         || (p.x + m_roi.width + side_width) >= img_integral.cols) {
+        
+        return false;
+    }
+    
+    
+    Rect left(p.x - side_width, p.y, side_width, m_blocksize * 2);
+    Rect right(p.x + m_roi.width + side_width, p.y, side_width, m_blocksize * 2);
+    
+    int col_max = -1;
+    long response_max = -1;
+    double response[3];
+    
+    m_roi.x = p.x;
+    m_roi.y = p.y;
+    m_roi.width = m_blocksize;
+    m_roi.height = m_blocksize * 2;
+    
+    double mean_left[3] = {0.0, 0.0, 0.0};
+    double mean_center[3] = {0.0, 0.0, 0.0};
+    double mean_right[3] = {0.0, 0.0, 0.0};
+    
+    for (int col = p.x; col < (img_integral.rows - side_width); ++col) {
+        left.x = col - side_width;
+        m_roi.x = col;
+        right.x = col + m_roi.width;
+        computeMeanInnerRect(img_integral, left, mean_left);
+        computeMeanInnerRect(img_integral, m_roi, mean_center);
+        computeMeanInnerRect(img_integral, right, mean_right);
+        
+        for (int i = 0; i < 3; ++i) {
+            response[i] = (- mean_left[i] + 2* mean_center[i] - mean_right[i]) / 3;
+//            std::cout << response[i] << std::endl;
+            if (response[i] > threshold && response[i] > response_max) {
+                response_max = response[i];
+                col_max = col;
+            }
+        }
+        
+        
+    }
+//    
+    
+    
+//    m_roi.height =  m_roi.y;
+//    m_roi.y = p.y;
+    
+    double color_dist;
+    
+    if (response_max > threshold) {
+        m_roi.x = col_max;
+        
+        computeMeanInnerRect(img_integral, m_roi, mean_center);
+        
+        // walk down the rows in the maximal column
+        for (m_roi.y += m_blocksize; m_roi.y + m_roi.height < img_integral.rows; m_roi.y += m_blocksize) {
+            computeMeanInnerRect(img_integral, m_roi, mean_left);
+            color_dist = dist(mean_center, mean_left);
+            if (color_dist > 30) {
+                break;
+            }
+        }
+        
+        m_roi.height = m_roi.y;
+        m_roi.y = 0;
+        m_corner = YELLOW;
+        
+        return true;
+    }
+    else
+        return false;
+    
+}
+
