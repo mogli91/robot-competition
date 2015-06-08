@@ -78,6 +78,7 @@ void Brain::updateReadings() {
         if (m_vision.beacon.y != -1) {
             printf("Beacon at: x = %d, y = %d\n\r", m_vision.beacon.x, m_vision.beacon.y);
         }
+        
     }
 }
 
