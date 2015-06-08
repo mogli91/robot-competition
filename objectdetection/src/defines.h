@@ -9,6 +9,7 @@
 #define OPT_ARDUINO_2   "ard2"
 #define OPT_WTC         "wtc"
 #define OPT_NO_CAM      "no_cam"
+#define OPT_NO_DISPLAY      "no_disp"
 #define OPT_BAUDRATE    "br"
 #define OPT_IMAGE_LOG_TIME "img_interval"
 
