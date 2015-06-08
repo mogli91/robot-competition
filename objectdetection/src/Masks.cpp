@@ -638,7 +638,7 @@ bool Beacon::match(const cv::Mat &img_integral, cv::Point p, double threshold) {
         for (int i = 0; i < 4; ++i) {
             computeMeanInnerRect(img_integral, m_roi, mu_new);
             color_dist = dist(mu_new, m_color[i]);
-            std::cout << color_dist << " ";
+//            std::cout << color_dist << " ";
             if (color_dist < threshold) {
                 if (color_dist < color_dist_min) {
                     color_dist_min = color_dist;
@@ -648,7 +648,7 @@ bool Beacon::match(const cv::Mat &img_integral, cv::Point p, double threshold) {
                 }
             }
         }
-        std::cout << std::endl;
+//        std::cout << std::endl;
     }
     
     if (!(color_dist_min < threshold)) {

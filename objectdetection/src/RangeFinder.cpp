@@ -266,7 +266,7 @@ Point RangeFinder::getWorldCoordinates(const cv:: Point &p_img) {
     int lateral_offset_cm;
     
     distance_cm = VISION_DIST_BOTTOM + m_distance_cm_per_px * (m_height - p_img.y);
-    lateral_offset_cm = m_lateral_offset_cm_per_px[p_img.x] * (p_img.x - m_width / 2.0);
+    lateral_offset_cm = m_lateral_offset_cm_per_px[p_img.y] * (p_img.x - m_width / 2.0);
     
     return Point(lateral_offset_cm, distance_cm);
 }
