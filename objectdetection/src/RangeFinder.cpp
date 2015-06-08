@@ -126,7 +126,7 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
     m_error = fitTerrainLine(m_line);
     line(src, Point(m_line[2] - m_line[0]*1000,m_line[3] - m_line[1]*1000),Point(m_line[2] + m_line[0]*1000, m_line[3]+m_line[1]*1000), Scalar(255,255,0));
     
-    std::cout << "error " << m_error << std::endl;
+//    std::cout << "error " << m_error << std::endl;
     
     drawMask(dst);
     
@@ -310,7 +310,7 @@ double RangeFinder::fitTerrainLine(Vec4f &line) {
     return sum/m_numRays;
 }
 
-void RangeFinder::getLineParameters(int &dx, int &dy, int &intercept, float &error) {
+void RangeFinder::getLineParameters(float &dx, float &dy, int &intercept, float &error) {
     float slope = m_line[1] / m_line[0];
     float x0 = m_line[2];
     float y0 = m_line[3];
