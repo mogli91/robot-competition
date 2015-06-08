@@ -15,11 +15,6 @@
 using namespace std;
 using namespace cv;
 
-struct CornerBeacon {
-    Point position;
-    int type;
-};
-
 struct VisionMeasure {
     vector<Point> bottles;
     vector<int> rays;

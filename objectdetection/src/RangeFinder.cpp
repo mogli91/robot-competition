@@ -133,6 +133,12 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
         default:
             break;
     }
+    m_beacon.type = beacon;
+    if (beacon != Beacon::NONE) {
+        m_beacon.position = getWorldCoordinates(Point(tmp.x + tmp.width/2, tmp.y + tmp.height));
+    } else {
+        m_beacon.position = Point(-1,-1);
+    }
     
     drawMask(dst);
     
@@ -214,18 +220,14 @@ void RangeFinder::drawMask(Mat dst) {
 
 void RangeFinder::getBottleCoordinates(vector<Point> &dst) {
     // TODO sort bottles by distance
-    int x, y, angle, distance_cm;
-    double lateral_offset_cm;
+    int x, y;
     dst.clear();
     for (vector<Rect>::iterator it = m_bottles.begin(); it != m_bottles.end(); ++it) {
         x = it->x + it->width / 2;  // want center of bottle
         y = it->y + it->height;     // want closest point of bottle
         
-        distance_cm = VISION_DIST_BOTTOM + m_distance_cm_per_px * (m_height - y);
-        lateral_offset_cm = m_lateral_offset_cm_per_px[x] * (x - m_width / 2.0);
 //        angle = (atan2(lateral_offset_cm, distance_cm) * 180) / PI;
-//        dst.push_back(Point(angle, distance_cm));
-        dst.push_back(Point(lateral_offset_cm, distance_cm));
+        dst.push_back(getWorldCoordinates(Point(x, y)));
     }
 }
 
@@ -241,6 +243,10 @@ void RangeFinder::getRayHeights(vector<int> &dst) {
     }
 }
 
+void RangeFinder::getBeacon(CornerBeacon &dst) {
+    dst = m_beacon;
+}
+
 int RangeFinder::findBeacon(cv::Rect &roi) {
     Beacon b = Beacon(m_blocksize/2);
     double color_th = 300;
@@ -253,4 +259,14 @@ int RangeFinder::findBeacon(cv::Rect &roi) {
     }
     else
         return Beacon::NONE;
+}
+
+Point RangeFinder::getWorldCoordinates(const cv:: Point &p_img) {
+    int distance_cm;
+    int lateral_offset_cm;
+    
+    distance_cm = VISION_DIST_BOTTOM + m_distance_cm_per_px * (m_height - p_img.y);
+    lateral_offset_cm = m_lateral_offset_cm_per_px[p_img.x] * (p_img.x - m_width / 2.0);
+    
+    return Point(lateral_offset_cm, distance_cm);
 }
