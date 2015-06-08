@@ -261,7 +261,7 @@ int Simulation::emergencyDetected() {
 
 	//regression corresponds to a line, and no obstacle is detected
 	//200 corresponds to a value regressed with rock angles
-	if(m_vm.line.error < 200 && m_vm.line.intercept < 60)
+	if(m_vm.line.error < 200 && m_vm.line.intercept < 150)
 	{
 		return STATE_CAM_AVOIDANCE;
 	}
@@ -287,7 +287,7 @@ void Simulation::emptyTailGate() {
 
 bool Simulation::homeReached() {
 	//no beacon detected
-	if(m_vm.beacon.y < 150)
+	if(m_vm.beacon.y < 150 && m_vm.beacon.y != -1)
 	{
 		if(m_robot->getPose().angle > 180 && m_robot->getPose().angle < 270)
 			return true;
@@ -357,7 +357,7 @@ void Simulation::loop(void) {
 		}
 		break;
 	case STATE_CAM_AVOIDANCE:
-		if(m_vm.line.intercept > 60) //from approx the middle of the cam : 50 cm in front of robot.
+		if(m_vm.line.intercept > 150) //from approx the middle of the cam : 50 cm in front of robot.
 		{
 			change_state(STATE_MOVE);
 			break;
@@ -365,6 +365,7 @@ void Simulation::loop(void) {
 		else
 			avoidObstaclesCam();
 			m_robot->setShovel(VAL_LIFT_TRAVEL);
+			m_robot->setWheelSpeeds(VAL_WHEELS_STOP, VAL_WHEELS_STOP);
 			m_robot->sendInstructions();
 			sleep(1);
 			moveWithVector();
