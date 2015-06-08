@@ -340,6 +340,7 @@ int main(int argc, char** args) {
         cout << "trying to connect to camera " << camnum << endl;
         /* ----- create needed objects ---- */
         detector = new Detector(camnum, exposure, 240, 320);
+//        detector = new Detector(camnum, exposure, 480, 640);
 
         // threading stuff
         if (detector->isReady()) {
