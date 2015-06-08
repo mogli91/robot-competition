@@ -354,30 +354,4 @@ void Simulation::change_state(int newState) {
 void Simulation::updateVision()
 {
 	m_robot->getVisionData(m_vm);
-//	std::vector<Point> points;
-//	for(uint i = 0; i < m_vm.rays.size(); i++)
-//	{
-//		points.push_back(Point(i, m_vm.rays[i]));
-//	}
-	fitLine(m_vm.rays, m_regressionLine, CV_DIST_L1, 0, 0.01, 0.01);
-}
-
-//calculates the average error between regression "line" and the rays
-float Simulation::calculateError()
-{
-	float vx = m_regressionLine[0];
-	float vy = m_regressionLine[1];
-	float x0 = m_regressionLine[2];
-	float y0 = m_regressionLine[3];
-	//set the origin at xb = 0, yb = h
-	//rays goes from x = 0 to x = 10
-	float xb = 0; // = x0 - a*vx // a = x0/vx
-	float yb = y0 - (x0-xb)*vy/vx;//=y0 - x0/vx*vy;// = y0 - a*vy //
-
-	float sum = 0;
-	for(uint i = 0; i < m_vm.rays.size(); i++)
-	{
-		sum += abs(((float)m_vm.rays[i].y) - (yb + vy/vx*i));
-	}
-	return sum/m_vm.rays.size();
 }

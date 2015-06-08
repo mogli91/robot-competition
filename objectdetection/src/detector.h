@@ -17,8 +17,8 @@ using namespace cv;
 
 struct RegressionLine {
     int delta_x;
-    int delta_y;
-    int intercept;
+    int delta_y; //x from -95 to 95 in px y from 0 to 240
+    int intercept; //y from the middle
     float error;
 };
 
