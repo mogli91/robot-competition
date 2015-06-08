@@ -9,6 +9,7 @@
 #define OPT_ARDUINO_2   "ard2"
 #define OPT_WTC         "wtc"
 #define OPT_NO_CAM      "no_cam"
+#define OPT_NO_DISPLAY      "no_disp"
 #define OPT_BAUDRATE    "br"
 #define OPT_IMAGE_LOG_TIME "img_interval"
 
@@ -90,6 +91,7 @@
 // vision
 #define PI 3.14159265
 #define VISION_NUM_RAYS         16
+#define VISION_NUM_VIRTUAL_RAYS 9
 #define VISION_DIST_BOTTOM      10          // distance of an object if seen in last pixel row
 #define VISION_DIST_TOP         250         // distance of an object if seen in first pixel row
 #define VISION_CM_TOP           200         // 200 cm visible at top pixel line

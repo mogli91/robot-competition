@@ -27,6 +27,7 @@ static void help() {
 	cout << "Usage: ./detect [<OPT> <value>, ...]" << endl;
 	cout << "\tavailable OPT:" << endl;
     cout << "\t\t" << OPT_NO_CAM << ", no following value" << endl;
+    cout << "\t\t" << OPT_NO_DISPLAY << ", no following value" << endl;
 	cout << "\t\t" << OPT_EXP << ", values: (0.0, 1.0]" << endl;
 	cout << "\t\t" << OPT_ARDUINO_1
 			<< "\tvalues: string to com port like /dev/ttyACM0" << endl;
@@ -54,7 +55,6 @@ pthread_cond_t action_cond = PTHREAD_COND_INITIALIZER;
 int cancel_operation = 0;
 int camera_loop_running = 0;
 bool simulation = 0;
-bool video = 1;
 
 // global objects
 Serial *ard1 = NULL;
@@ -278,6 +278,8 @@ int main(int argc, char** args) {
 	float exposure = 0.05;
 	int baudrate = BAUDRATE;
     int interval = 0;
+    bool video = 1;
+    bool display = true;
 	char *argument;
 
     if (argc < 2) {
@@ -287,6 +289,12 @@ int main(int argc, char** args) {
 	for (int i = 1; i < argc; i += 2) {
         if (0 == strcmp(args[i], OPT_NO_CAM)) {
             video = false;
+            --i;
+            continue;
+        }
+        if (0 == strcmp(args[i], OPT_NO_DISPLAY)) {
+            display = false;
+            cout << "pure command line mode" << endl;
             --i;
             continue;
         }
@@ -413,14 +421,15 @@ int main(int argc, char** args) {
     Simulation* mySim = new Simulation(brain);
     
 	for (int dummy = 0;;) {
-#ifdef DEBUG
 		if (camera_loop_running) {
 			pthread_mutex_lock (&detector_mutex);
 			cframe = detector->getFrame().clone();
 			pthread_mutex_unlock(&detector_mutex);
-			imshow("preview", cframe);
-    //        imshow("mask", mask * 255);
-			char c = (char) waitKey(1);
+            if (display) {
+                imshow("preview", cframe);
+        //        imshow("mask", mask * 255);
+                char c = (char) waitKey(1);
+            }
             if (interval)
             {
                 if (dummy == 0) {
@@ -429,13 +438,9 @@ int main(int argc, char** args) {
                     cout << "writing image " << ss.str() << imwrite(ss.str(), cframe) << endl;
                 }
                 dummy = (dummy + 1) % interval;
-//                else
-//                    cout << "here" << (t1 - clock())<< " " << CLOCKS_PER_SEC << endl;
             }
             
 		}
-
-#endif
         
         if (simulation) {
             mySim->loop();

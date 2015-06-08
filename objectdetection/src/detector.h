@@ -16,7 +16,6 @@ using namespace std;
 using namespace cv;
 
 struct CornerBeacon {
-    enum COLOR {RED, GREEN, YELLOW, BLUE};
     Point position;
     int type;
 };
