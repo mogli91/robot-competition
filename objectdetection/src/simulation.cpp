@@ -59,12 +59,12 @@ void Simulation::braitenberg_avoidance() {
 		//        msr += (80-m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) * r_weight_IR[sensor_ir]; // motor speed right
 		//		msl += (80-m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) * l_weight_IR[sensor_ir]; // motor speed left
 
-		msr += (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) * (80
-				- m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) / 25
-				* r_weight_IR[sensor_ir]; // motor speed right
-		msl += (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) * (80
-				- m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) / 25
-				* l_weight_IR[sensor_ir]; // motor speed left
+		msr += (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) *
+			   (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L))
+			   / 25	* r_weight_IR[sensor_ir]; // motor speed right
+		msl += (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) *
+			   (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L))
+			   / 25	* l_weight_IR[sensor_ir]; // motor speed left
 
 	}
 	if (msl > VAL_WHEELS_FW) {
@@ -290,8 +290,8 @@ bool Simulation::homeReached() {
 		if(m_robot->getPose().angle > 180 && m_robot->getPose().angle < 270)
 			return true;
 	}
-	else
-		return false;
+
+	return false;
 }
 
 void Simulation::search() {
@@ -308,6 +308,11 @@ void Simulation::loop(void) {
 
 	m_robot->setBrushSpeed(VAL_BRUSH_FW);
 
+	if (bottleCaptured() && m_currentState != STATE_AVOIDANCE) {
+		liftBottle();
+		m_bottlesCollected++;
+	}
+
 	// State machine
 	switch (m_currentState) {
 	case STATE_INIT:
@@ -322,16 +327,11 @@ void Simulation::loop(void) {
 			change_state(emergency);
 			break;
 		}
-
-		if (bottleCaptured()) {
-			liftBottle();
-			m_bottlesCollected++;
-		}
+		m_robot->setShovel(VAL_LIFT_LOW);
 
 		if (m_bottlesCollected >= 2 || elapsed_secs > 60 * 3) //8 minutes or 4 bottles = go home
 		{
 			goHome(); //go home using the compass
-			//TODO STATE_GO_HOME
 		} else {
 			search(); //search for bottles in the arena
 		}
@@ -342,14 +342,13 @@ void Simulation::loop(void) {
 
 	case STATE_AVOIDANCE:
 		//while (state == STATE_AVOIDANCE) {
-		if ((m_robot->getSensorValue(SENSOR_IR_FRONT_L)
-				> BRAITEN_THRESHOLD_DISABLE) && (m_robot->getSensorValue(
-				SENSOR_IR_FRONT_R) > BRAITEN_THRESHOLD_DISABLE)
-				&& (m_robot->getSensorValue(SENSOR_IR_R)
-						> BRAITEN_THRESHOLD_DISABLE)
-				&& (m_robot->getSensorValue(SENSOR_IR_L)
-						> BRAITEN_THRESHOLD_DISABLE)) {
-			change_state(STATE_MOVE);
+		if ((m_robot->getSensorValue(SENSOR_IR_FRONT_L)	> BRAITEN_THRESHOLD_DISABLE) &&
+			(m_robot->getSensorValue(SENSOR_IR_FRONT_R) > BRAITEN_THRESHOLD_DISABLE) &&
+			(m_robot->getSensorValue(SENSOR_IR_R) > BRAITEN_THRESHOLD_DISABLE) &&
+			(m_robot->getSensorValue(SENSOR_IR_L) > BRAITEN_THRESHOLD_DISABLE) &&
+			(m_robot->getSensorValue(SENSOR_IR_BACK_R) > BRAITEN_THRESHOLD_DISABLE) &&
+			(m_robot->getSensorValue(SENSOR_IR_BACK_L) > BRAITEN_THRESHOLD_DISABLE)) {
+				change_state(STATE_MOVE);
 			break;
 		} else {
 			braitenberg_avoidance();
@@ -363,6 +362,7 @@ void Simulation::loop(void) {
 		}
 		else
 			avoidObstaclesCam();
+			m_robot->setShovel(VAL_LIFT_TRAVEL);
 			moveWithVector();
 		break;
 	}

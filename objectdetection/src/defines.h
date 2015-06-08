@@ -54,7 +54,7 @@
 #define VAL_BRUSH_BW     999
 
 #define VAL_LIFT_LOW     900 // 2 bytes on Dynamixel TODO how do they map?
-#define VAL_LIFT_TRAVEL  700
+#define VAL_LIFT_TRAVEL  800
 #define VAL_LIFT_HIGH    500
 
 #define VAL_WHEELS_BW    0   // only 1 byte on
