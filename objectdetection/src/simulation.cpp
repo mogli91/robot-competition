@@ -115,7 +115,7 @@ void Simulation::liftBottle() {
 }
 bool Simulation::bottleCaptured() {
 	//if(brushIsBlocked() || m_robot->getBrushCurrent() > 220)
-	if (m_robot->getSensorValue(SENSOR_IR_BRUSH) < 25) {
+	if (m_robot->getSensorValue(SENSOR_IR_BRUSH) < 20) {
 		//usleep(500000);
 		return true;
 	}
@@ -167,6 +167,22 @@ void Simulation::moveWithVector() {
 void Simulation::approachBottlesCam() {
 	//TODO : real function
 //	m_displacementVector[X] -= 150 * abs(m_robot->getBottleAngle());
+
+	//if a bottle is detected
+	std::vector<Point> bottles = m_vm.bottles;
+	int selectedBottle = 0;
+	if(bottles.size() > 0)
+	{
+		//chose closest bottle
+		for(uint i = 0; i < bottles.size(); i++)
+		{
+			if(bottles[i].y < bottles[selectedBottle].y)
+				selectedBottle = i;
+		}
+		m_displacementVector[X] += 50 * bottles[selectedBottle].x;
+		m_displacementVector[Y] += 50;
+	}
+
 }
 void Simulation::avoidObstaclesCam() {
 	//TODO : real function
@@ -238,12 +254,13 @@ bool Simulation::homeReached() {
 }
 void Simulation::search() {
 	displacement(); //normal robot displacement if no collision detected
-	//approachBottlesCam(); //move towards bottles viewed with cam
+	approachBottlesCam(); //move towards bottles viewed with cam
 }
 // main function
 void Simulation::loop(void) {
 
 	m_robot->updateData();
+	updateVision();
 
 	int elapsed_secs = double(clock() - m_timeInit) / CLOCKS_PER_SEC;
 
@@ -274,7 +291,7 @@ void Simulation::loop(void) {
 			}
 		}
 
-		if (m_bottlesCollected >= 4 || 1)//elapsed_secs > 60 * 8) //8 minutes or 4 bottles = go home
+		if (m_bottlesCollected >= 2 || elapsed_secs > 60 * 8) //8 minutes or 4 bottles = go home
 		{
 			goHome(); //go home using the compass
 			//TODO STATE_GO_HOME
@@ -310,4 +327,9 @@ void Simulation::loop(void) {
 void Simulation::change_state(int newState) {
 	//TODO add security
 	m_currentState = newState;
+}
+
+void Simulation::updateVision()
+{
+	m_robot->getVisionData(m_vm);
 }

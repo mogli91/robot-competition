@@ -23,7 +23,7 @@ struct CornerBeacon {
 
 struct VisionMeasure {
     vector<Point> bottles;
-    vector<int> rays;
+    vector<int> rays; //between 20 and 250 cm
     CornerBeacon beacon;
 };
 

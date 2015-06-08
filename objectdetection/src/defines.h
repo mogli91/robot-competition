@@ -12,8 +12,6 @@
 #define OPT_BAUDRATE    "br"
 #define OPT_IMAGE_LOG_TIME "img_interval"
 
-#define PI 3.14159
-
 // device IDs
 #define ID_NONE -1
 #define ID_ARD1 0
