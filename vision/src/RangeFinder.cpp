@@ -150,6 +150,7 @@ void RangeFinder::locateBottles() {
     bool found = false;
     
     for (int r = 0; r < m_numRays; ++r) {
+        found = false;
         for (int run = 0; run < 2 && !found; ++run) {
             p.x = m_rays[r].x;
             p.y = m_rays[r].y - bs - bs / 2 * run;
