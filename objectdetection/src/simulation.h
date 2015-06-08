@@ -77,11 +77,6 @@ private:
 	clock_t m_timeInit;
 	int m_bottlesCollected;
 	VisionMeasure m_vm;
-	Vec4f m_regressionLine;
-
-
-
-
 };
 
 
