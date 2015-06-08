@@ -184,22 +184,22 @@ void* read_user_input(void* data) {
                 break;
         case 'a': // open gate
                 printf("tail open \n\r");
-                brain->setCommand(CMD_TAIL, 180);
+                brain->setCommand(CMD_TAIL, VAL_TAIL_OPEN);
                 new_command = true;
                 break;
         case 'A': // close gate
                 printf("tail close \n\r");
-                brain->setCommand(CMD_TAIL, 70);
+                brain->setCommand(CMD_TAIL, VAL_TAIL_CLOSE);
                 new_command = true;
                 break;
         case 'x': // lift up
                 printf("lift down \n\r");
-                brain->setCommand(CMD_LIFT, 1);
+                brain->setCommand(CMD_LIFT, VAL_LIFT_HIGH);
                 new_command = true;
                 break;
         case 'X': // lower lift
                 printf("lift up \n\r");
-                brain->setCommand(CMD_LIFT, 0);
+                brain->setCommand(CMD_LIFT, VAL_LIFT_LOW);
                 new_command = true;
                 break;
         case 's': // toggle simulation

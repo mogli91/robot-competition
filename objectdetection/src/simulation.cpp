@@ -59,12 +59,12 @@ void Simulation::braitenberg_avoidance() {
 		//        msr += (80-m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) * r_weight_IR[sensor_ir]; // motor speed right
 		//		msl += (80-m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) * l_weight_IR[sensor_ir]; // motor speed left
 
-		msr += (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) * (80
-				- m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) / 25
-				* r_weight_IR[sensor_ir]; // motor speed right
-		msl += (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) * (80
-				- m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) / 25
-				* l_weight_IR[sensor_ir]; // motor speed left
+		msr += (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) *
+			   (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L))
+			   / 25	* r_weight_IR[sensor_ir]; // motor speed right
+		msl += (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) *
+			   (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L))
+			   / 25	* l_weight_IR[sensor_ir]; // motor speed left
 
 	}
 	if (msl > VAL_WHEELS_FW) {
@@ -125,14 +125,23 @@ void Simulation::moveWithVector() {
 	int wl, wr; //wheel speeds left and right
 
 	//never go backwards, turn instead.
-	if(m_displacementVector[Y] < VAL_WHEELS_STOP)
+	/*if(m_displacementVector[Y] < VAL_WHEELS_STOP)
 	{
 		//m_displacementVector[X] += m_displacementVector[Y];
 		m_displacementVector[Y] = VAL_WHEELS_STOP;
-	}
-	wl = m_displacementVector[Y] + m_displacementVector[X];
-	wr = m_displacementVector[Y] - m_displacementVector[X];
-/*
+	}*/
+	//normalize the vector
+	float norm = sqrt(m_displacementVector[Y]*m_displacementVector[Y] + m_displacementVector[X]*m_displacementVector[X]);
+	m_displacementVector[Y] /= norm;
+	m_displacementVector[X] /= norm;
+
+	//condition for not idling
+	if(fabs(m_displacementVector[Y]) < 0.05 && fabs(m_displacementVector[X] < 0.05))
+			m_displacementVector[X] += 0.5;
+
+	wl = VAL_WHEELS_STOP + VAL_WHEELS_STOP*m_displacementVector[Y] + VAL_WHEELS_STOP*m_displacementVector[X];
+	wr = VAL_WHEELS_STOP + VAL_WHEELS_STOP*m_displacementVector[Y] - VAL_WHEELS_STOP*m_displacementVector[X];
+
 	if (wl > VAL_WHEELS_FW) {
 		wr -= wl - VAL_WHEELS_FW;
 	}
@@ -146,8 +155,8 @@ void Simulation::moveWithVector() {
 	if (wr < VAL_WHEELS_BW) {
 		wl += VAL_WHEELS_BW - wl;
 		wr = VAL_WHEELS_BW;
-	}*/
-
+	}
+/*
 	if(wr > VAL_WHEELS_FW)
 	 {
 	 wr = VAL_WHEELS_FW;
@@ -155,7 +164,7 @@ void Simulation::moveWithVector() {
 	 if(wr < VAL_WHEELS_BW)
 	 {
 	 wr = VAL_WHEELS_BW;
-	 }
+	 }*/
 	if (wl > VAL_WHEELS_FW) {
 		wl = VAL_WHEELS_FW;
 	}
@@ -179,23 +188,28 @@ void Simulation::approachBottlesCam() {
 			if(bottles[i].y < bottles[selectedBottle].y)
 				selectedBottle = i;
 		}
-		m_displacementVector[X] += 50 * bottles[selectedBottle].x;
-		m_displacementVector[Y] += 50;
+		//x from -160 to 160
+		m_displacementVector[X] += ((float)bottles[selectedBottle].x)/160.0f;
+		//m_displacementVector[Y] += 0.5;
 	}
 }
 void Simulation::avoidObstaclesCam() {
 	//TODO : real function
 
 	//create a vector that is perpendicular to the obstacle
-	m_displacementVector[X] = VAL_WHEELS_FW*m_vm.line.delta_y + 50; // vy
-	m_displacementVector[Y] = -VAL_WHEELS_FW*m_vm.line.delta_x; // vx
+	m_displacementVector[X] = m_vm.line.delta_y; // vy
+	if(m_displacementVector[X] < 0.1 && m_displacementVector[X] >= 0)
+		m_displacementVector[X] = 0.1;
+	if(m_displacementVector[X] > -0.1 && m_displacementVector[X] < 0)
+			m_displacementVector[X] = -0.1;
+	m_displacementVector[Y] = -m_vm.line.delta_x; // vx
 }
 
 //the displacement the robot should have if no collision is detected
 void Simulation::displacement() {
 	//for the moment just move forward;
 	m_displacementVector[X] = 0;
-	m_displacementVector[Y] = VAL_WHEELS_FW;
+	m_displacementVector[Y] = 1.0f;
 	//TODO : real displacement
 }
 void Simulation::homeDisplacement() {
@@ -214,8 +228,14 @@ void Simulation::homeDisplacement() {
 		m_displacementVector[Y] = VAL_WHEELS_FW;
 	}*/
 	float deltaAngle = (((float)destAngle) - ((float)angle))*PI/180.0f;
-	m_displacementVector[X] = +VAL_WHEELS_FW*sin(deltaAngle);
-	m_displacementVector[Y] = VAL_WHEELS_FW*cos(deltaAngle);
+	m_displacementVector[X] += sin(deltaAngle);
+	m_displacementVector[Y] += cos(deltaAngle);
+		if(m_displacementVector[Y] < 0)
+		{
+			m_displacementVector[X] = 0.5;
+			m_displacementVector[Y] = 0;
+		}
+
 }
 //change direction of brush if overcurrent
 bool Simulation::brushIsBlocked() {
@@ -258,21 +278,22 @@ void Simulation::goHome() {
 }
 void Simulation::emptyTailGate() {
 	m_robot->setTailGate(VAL_TAIL_OPEN);
-	usleep(2000000);
+	m_robot->sendInstructions();
+	sleep(2);
 	m_robot->setTailGate(VAL_TAIL_CLOSE);
 }
+
 bool Simulation::homeReached() {
 	//no beacon detected
-	if(m_vm.beacon.y != -1)
+	if(m_vm.beacon.y < 150)
 	{
-		if(m_vm.beacon.y < 50)
-		{
+		if(m_robot->getPose().angle > 180 && m_robot->getPose().angle < 270)
 			return true;
-		}
 	}
-	else
-		return false;
+
+	return false;
 }
+
 void Simulation::search() {
 	displacement(); //normal robot displacement if no collision detected
 	approachBottlesCam(); //move towards bottles viewed with cam
@@ -286,6 +307,11 @@ void Simulation::loop(void) {
 	int elapsed_secs = double(clock() - m_timeInit) / CLOCKS_PER_SEC;
 
 	m_robot->setBrushSpeed(VAL_BRUSH_FW);
+
+	if (bottleCaptured() && m_currentState != STATE_AVOIDANCE) {
+		liftBottle();
+		m_bottlesCollected++;
+	}
 
 	// State machine
 	switch (m_currentState) {
@@ -301,16 +327,11 @@ void Simulation::loop(void) {
 			change_state(emergency);
 			break;
 		}
-
-		if (bottleCaptured()) {
-			liftBottle();
-			m_bottlesCollected++;
-		}
+		m_robot->setShovel(VAL_LIFT_LOW);
 
 		if (m_bottlesCollected >= 2 || elapsed_secs > 60 * 3) //8 minutes or 4 bottles = go home
 		{
 			goHome(); //go home using the compass
-			//TODO STATE_GO_HOME
 		} else {
 			search(); //search for bottles in the arena
 		}
@@ -321,27 +342,27 @@ void Simulation::loop(void) {
 
 	case STATE_AVOIDANCE:
 		//while (state == STATE_AVOIDANCE) {
-		if ((m_robot->getSensorValue(SENSOR_IR_FRONT_L)
-				> BRAITEN_THRESHOLD_DISABLE) && (m_robot->getSensorValue(
-				SENSOR_IR_FRONT_R) > BRAITEN_THRESHOLD_DISABLE)
-				&& (m_robot->getSensorValue(SENSOR_IR_R)
-						> BRAITEN_THRESHOLD_DISABLE)
-				&& (m_robot->getSensorValue(SENSOR_IR_L)
-						> BRAITEN_THRESHOLD_DISABLE)) {
-			change_state(STATE_MOVE);
+		if ((m_robot->getSensorValue(SENSOR_IR_FRONT_L)	> BRAITEN_THRESHOLD_DISABLE) &&
+			(m_robot->getSensorValue(SENSOR_IR_FRONT_R) > BRAITEN_THRESHOLD_DISABLE) &&
+			(m_robot->getSensorValue(SENSOR_IR_R) > BRAITEN_THRESHOLD_DISABLE) &&
+			(m_robot->getSensorValue(SENSOR_IR_L) > BRAITEN_THRESHOLD_DISABLE) &&
+			(m_robot->getSensorValue(SENSOR_IR_BACK_R) > BRAITEN_THRESHOLD_DISABLE) &&
+			(m_robot->getSensorValue(SENSOR_IR_BACK_L) > BRAITEN_THRESHOLD_DISABLE)) {
+				change_state(STATE_MOVE);
 			break;
 		} else {
 			braitenberg_avoidance();
 		}
 		break;
 	case STATE_CAM_AVOIDANCE:
-		if(m_vm.line.intercept > 100) //from approx the middle of the cam : 50 cm in front of robot.
+		if(m_vm.line.intercept > 60) //from approx the middle of the cam : 50 cm in front of robot.
 		{
 			change_state(STATE_MOVE);
 			break;
 		}
 		else
 			avoidObstaclesCam();
+			m_robot->setShovel(VAL_LIFT_TRAVEL);
 			moveWithVector();
 		break;
 	}
