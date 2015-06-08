@@ -209,7 +209,8 @@ void RangeFinder::getBottleCoordinates(vector<Point> &dst) {
         y = it->y + it->height;     // want closest point of bottle
         
 //        angle = (atan2(lateral_offset_cm, distance_cm) * 180) / PI;
-        dst.push_back(getWorldCoordinates(Point(x, y)));
+//        dst.push_back(getWorldCoordinates(Point(x, y)));
+        dst.push_back(Point(x, y));
     }
 }
 

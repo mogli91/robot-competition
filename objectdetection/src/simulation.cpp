@@ -182,10 +182,13 @@ void Simulation::approachBottlesCam() {
 		m_displacementVector[X] += 50 * bottles[selectedBottle].x;
 		m_displacementVector[Y] += 50;
 	}
-
 }
 void Simulation::avoidObstaclesCam() {
 	//TODO : real function
+
+	//create a vector that is perpendicular to the obstacle
+	m_displacementVector[X] += 2*m_regressionLine[1]; // vy
+	m_displacementVector[Y] -= 2*m_regressionLine[0]; // vx
 }
 
 //the displacement the robot should have if no collision is detected
@@ -213,8 +216,6 @@ void Simulation::homeDisplacement() {
 	float deltaAngle = (((float)destAngle) - ((float)angle))*PI/180.0f;
 	m_displacementVector[X] = +VAL_WHEELS_FW*sin(deltaAngle);
 	m_displacementVector[Y] = VAL_WHEELS_FW*cos(deltaAngle);
-
-
 }
 //change direction of brush if overcurrent
 bool Simulation::brushIsBlocked() {
@@ -231,9 +232,21 @@ void Simulation::emergencyProcedure() {
 	//TODO : add the procedure
 }
 //detect an emergency : way too close to an obstacle or perhaps the lift is blocked...
-bool Simulation::emergencyDetected() {
-	//TODO : add the condition
-	return false;
+int Simulation::emergencyDetected() {
+	for (int i = SENSOR_IR_L; i <= SENSOR_IR_BACK; i++) {
+		if (m_robot->getSensorValue(i) < BRAITEN_THRESHOLD_ENABLE) {
+			return STATE_AVOIDANCE;
+		}
+	}
+
+	//std::vector<float> line;
+	//regression corresponds to a line, and no obstacle is detected
+	if(calculateError() < 20)
+	{
+		return STATE_CAM_AVOIDANCE;
+	}
+
+	return EMERGENCY_NONE;
 }
 void Simulation::goHome() {
 	homeDisplacement(); //normal robot displacement if no collision detected
@@ -275,20 +288,17 @@ void Simulation::loop(void) {
 
 	case STATE_MOVE:
 		m_robot->setBrushSpeed(VAL_BRUSH_FW);
-		if (emergencyDetected()) {
-			emergencyProcedure();
+
+		int emergency;
+		emergency = emergencyDetected();
+		if (emergency != EMERGENCY_NONE) {
+			change_state(emergency);
+			break;
 		}
 
 		if (bottleCaptured()) {
 			liftBottle();
 			m_bottlesCollected++;
-		}
-
-		for (int i = SENSOR_IR_L; i <= SENSOR_IR_BACK; i++) {
-			if (m_robot->getSensorValue(i) < BRAITEN_THRESHOLD_ENABLE) {
-				change_state( STATE_AVOIDANCE);
-				break;
-			}
 		}
 
 		if (m_bottlesCollected >= 2 || elapsed_secs > 60 * 8) //8 minutes or 4 bottles = go home
@@ -318,10 +328,22 @@ void Simulation::loop(void) {
 			braitenberg_avoidance();
 		}
 		break;
+	case STATE_CAM_AVOIDANCE:
+		bool noObstaclesDetected = true;
+		for(uint i = 0; i < m_vm.rays.size(); i++)
+			if(m_vm.rays[i] < 100)
+			{
+				noObstaclesDetected = false;
+				break;
+			}
+		if(noObstaclesDetected)
+			change_state(STATE_MOVE);
+		else
+			avoidObstaclesCam();
+		break;
 	}
 
 	m_robot->sendInstructions();
-
 }
 
 void Simulation::change_state(int newState) {
@@ -332,4 +354,30 @@ void Simulation::change_state(int newState) {
 void Simulation::updateVision()
 {
 	m_robot->getVisionData(m_vm);
+	std::vector<Point> points;
+	for(uint i = 0; i < m_vm.rays.size(); i++)
+	{
+		points.push_back(Point(i, m_vm.rays[i]));
+	}
+	fitLine(points, m_regressionLine, CV_DIST_L1, 0, 0.01, 0.01);
+}
+
+//calculates the average error between regression "line" and the rays
+float Simulation::calculateError()
+{
+	float vx = m_regressionLine[0];
+	float vy = m_regressionLine[1];
+	float x0 = m_regressionLine[2];
+	float y0 = m_regressionLine[3];
+	//set the origin at xb = 0, yb = h
+	//rays goes from x = 0 to x = 10
+	float xb = 0; // = x0 - a*vx // a = x0/vx
+	float yb = y0 - (x0-xb)*vy/vx;//=y0 - x0/vx*vy;// = y0 - a*vy //
+
+	float sum = 0;
+	for(uint i = 0; i < m_vm.rays.size(); i++)
+	{
+		sum += abs(((float)m_vm.rays[i]) - (yb + vy/vx*i));
+	}
+	return sum/m_vm.rays.size();
 }

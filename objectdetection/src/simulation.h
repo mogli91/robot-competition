@@ -31,6 +31,10 @@
 #define STATE_PICKUP                   3       //If bottle detected approach it and pick it up
 #define STATE_AVOIDANCE                4       //If obstacle detected (BRAITEN_THRESHOLD)
                                                // avoid it
+#define STATE_CAM_AVOIDANCE			   5
+
+#define EMERGENCY_NONE 0	//no emergency detected
+
 enum POS{X,Y};
 
 class Simulation {
@@ -58,13 +62,14 @@ private:
 	void homeDisplacement();
 	bool brushIsBlocked();
 	void emergencyProcedure();
-	bool emergencyDetected();
+	int emergencyDetected();
 	void goHome();
 	void search();
 	bool homeReached();
 	void emptyTailGate();
 	void liftBottle();
 	void updateVision();
+	float calculateError();
 
 	int m_currentState;
 	Robot* m_robot;
@@ -72,6 +77,7 @@ private:
 	clock_t m_timeInit;
 	int m_bottlesCollected;
 	VisionMeasure m_vm;
+	Vec4f m_regressionLine;
 
 
 
