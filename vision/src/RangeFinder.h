@@ -15,6 +15,11 @@
 using namespace cv;
 using namespace std;
 
+struct CornerBeacon {
+    Point position;
+    int type;
+};
+
 class RangeFinder {
 private:
     int m_height;
@@ -34,6 +39,8 @@ private:
     
     Mat m_mask;		// every pattern has its own mask image
     Mat m_integral;
+    
+    Point m_beacon;
     
 public:
     // default constructor
@@ -58,13 +65,25 @@ public:
     
     void locateBottles();
     
+    // in world coordinates
+    
     void getBottleCoordinates(vector<Point> &dst);
     
     void getRayHeights(vector<int> &dst);
     
+    // in px coordinates
+    void getBottles(vector<Point> &dst);
+    void getRays(vector<Point> &dst);
+    void getBeacon(Point &dst);
+    
+    void fitTerrainLine(Vec4f &v);
+    
+    
     int findBeacon(cv::Rect &roi);
     
     cv::Mat getMask() {return m_mask;};
+    
+    Point getWorldCoordinates(const cv:: Point &p_img);
     
 private:
     void initScales();

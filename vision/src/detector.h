@@ -15,15 +15,10 @@
 using namespace std;
 using namespace cv;
 
-struct CornerBeacon {
-    Point position;
-    int type;
-};
-
 struct VisionMeasure {
     vector<Point> bottles;
-    vector<int> rays;
-    CornerBeacon beacon;
+    vector<Point> rays; //between 20 and 250 cm
+    Point beacon;
 };
 
 class Detector {

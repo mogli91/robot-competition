@@ -27,10 +27,19 @@ int main(int argc, char** args) {
         return -1;
     }
     cout << "loading image " << args[1] << endl;
-    Mat image = cv::imread(args[1]);
-	
 
-    Detector *detector = new Detector(args[1]);
+    Detector *detector;
+    Mat image;
+	
+    if (0 == strcmp(args[1], "cam")) {
+        detector = new Detector(-1, 0.2, 240, 320);
+        image = Mat::zeros(240, 320, CV_8UC3);
+    } else {
+        image = cv::imread(args[1]);
+        detector = new Detector(args[1]);
+    }
+
+    
 
     Mat cframe = Mat::zeros(image.rows, image.cols, CV_8UC3);
     Mat cframe_2 = Mat::zeros(image.rows, image.cols, CV_8UC3);
@@ -59,9 +68,12 @@ int main(int argc, char** args) {
 	for (;;) {
         detector->detect();
 //        detector->findRanges(image);
-        cframe = detector->getFrame();
-        cmask = detector->getMask();
+        cframe = detector->getFrame().clone();
+        cmask = detector->getMask().clone();
         
+        r_masked = Scalar(0);
+        g_masked = Scalar(0);
+        b_masked = Scalar(0);
         // rgb
         mixChannels( &cframe, 1, out, 3, from_to, 3 );
         r.copyTo(r_masked, cmask);
@@ -88,7 +100,7 @@ int main(int argc, char** args) {
 //        imshow("v", v);
 //        imshow("gray", gray);
 //        imshow("th", canny);
-        char c = (char) waitKey();
+        char c = (char) waitKey(1);
         if (c == ' ') {
             break;
         }

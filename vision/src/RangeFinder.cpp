@@ -117,22 +117,16 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
     }
     Rect tmp;
     int beacon = findBeacon(tmp);
-    switch (beacon) {
-        case Beacon::BLUE:
-            rectangle(src, tmp, Scalar(255, 0, 0));
-            break;
-        case Beacon::GREEN:
-            rectangle(src, tmp, Scalar(0, 255, 0));
-            break;
-        case Beacon::RED:
-            rectangle(src, tmp, Scalar(0, 0, 255));
-            break;
-        case Beacon::YELLOW:
-            rectangle(src, tmp, Scalar(0, 255, 255));
-            break;
-        default:
-            break;
-    }
+    if(beacon)
+        rectangle(src, tmp, Scalar(255, 255, 255));
+    m_beacon.x = tmp.x + tmp.width/2;
+    m_beacon.y = tmp.y + tmp.height;
+    
+    
+    Vec4f myLine;
+    fitTerrainLine(myLine);
+    line(src, Point(myLine[2] - myLine[0]*1000,myLine[3] - myLine[1]*1000),Point(myLine[2] + myLine[0]*1000, myLine[3]+myLine[1]*1000), Scalar(255,255,0));
+    
     
     drawMask(dst);
     
@@ -214,18 +208,15 @@ void RangeFinder::drawMask(Mat dst) {
 
 void RangeFinder::getBottleCoordinates(vector<Point> &dst) {
     // TODO sort bottles by distance
-    int x, y, angle, distance_cm;
-    double lateral_offset_cm;
+    int x, y;
     dst.clear();
     for (vector<Rect>::iterator it = m_bottles.begin(); it != m_bottles.end(); ++it) {
         x = it->x + it->width / 2;  // want center of bottle
         y = it->y + it->height;     // want closest point of bottle
         
-        distance_cm = VISION_DIST_BOTTOM + m_distance_cm_per_px * (m_height - y);
-        lateral_offset_cm = m_lateral_offset_cm_per_px[x] * (x - m_width / 2.0);
 //        angle = (atan2(lateral_offset_cm, distance_cm) * 180) / PI;
-//        dst.push_back(Point(angle, distance_cm));
-        dst.push_back(Point(lateral_offset_cm, distance_cm));
+//        dst.push_back(getWorldCoordinates(Point(x, y)));
+        dst.push_back(Point(x, y));
     }
 }
 
@@ -243,14 +234,59 @@ void RangeFinder::getRayHeights(vector<int> &dst) {
 
 int RangeFinder::findBeacon(cv::Rect &roi) {
     Beacon b = Beacon(m_blocksize/2);
-    double color_th = 300;
+//    double color_th = 300;
+    double gray_th = 30;
     
     Point p(m_blocksize/2,0);
     
-    if (b.match(m_integral, p, color_th)) {
+    if (b.matchGray(m_integral, p, gray_th)) {
+//    if (b.matchGray(m_integral, p, color_th)) {
         roi = b.getROI();
-        return b.getCorner();
+        return 1;
     }
     else
-        return Beacon::NONE;
+        return 0;
+}
+
+Point RangeFinder::getWorldCoordinates(const cv:: Point &p_img) {
+    int distance_cm;
+    int lateral_offset_cm;
+    
+    distance_cm = VISION_DIST_BOTTOM + m_distance_cm_per_px * (m_height - p_img.y);
+    lateral_offset_cm = m_lateral_offset_cm_per_px[p_img.y] * (p_img.x - m_width / 2.0);
+    
+    return Point(lateral_offset_cm, distance_cm);
+}
+
+// in px coordinates
+void RangeFinder::getBottles(vector<Point> &dst) {
+    dst.clear();
+    Rect tmp;
+    for (int i = 0; i < m_bottles.size(); ++i) {
+        tmp = m_bottles[i];
+        dst.push_back(Point((tmp.x + tmp.width/2) - m_width, m_height - (tmp.y + tmp.height)));
+    }
+}
+void RangeFinder::getRays(vector<Point> &dst) {
+    dst.clear();
+    Rect tmp;
+    for (int i = 0; i < m_rays.size(); ++i) {
+        tmp = m_rays[i];
+        dst.push_back(Point((tmp.x + tmp.width/2) - m_width, m_height - (tmp.y + tmp.height)));
+    }
+}
+void RangeFinder::getBeacon(Point &dst) {
+    dst.x = m_beacon.x - m_width/2;
+    dst.y = m_height - m_beacon.y;
+}
+
+void RangeFinder::fitTerrainLine(Vec4f &line) {
+    vector<Point> pts;
+    Rect tmp;
+    for (int i = 3; i < m_rays.size() - 3; ++i) {
+        tmp = m_rays[i];
+        pts.push_back(Point2f(tmp.x + tmp.width/2, m_height - tmp.height));
+    }
+    
+    fitLine(pts, line, CV_DIST_L1, 0, 0.01, 0.01);
 }
