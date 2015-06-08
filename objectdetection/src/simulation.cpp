@@ -261,7 +261,7 @@ int Simulation::emergencyDetected() {
 
 	//regression corresponds to a line, and no obstacle is detected
 	//200 corresponds to a value regressed with rock angles
-	if(m_vm.line.error < 200)
+	if(m_vm.line.error < 200 && m_vm.line.intercept < 60)
 	{
 		return STATE_CAM_AVOIDANCE;
 	}
