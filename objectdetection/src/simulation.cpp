@@ -136,7 +136,7 @@ void Simulation::moveWithVector() {
 	m_displacementVector[X] /= norm;
 
 	//condition for not idling
-	if(fabs(m_displacementVector[Y]) < 0.05 && fabs(m_displacementVector[X] < 0.05))
+	if(fabs(m_displacementVector[Y]) < 0.05 && fabs(m_displacementVector[X]) < 0.05)
 			m_displacementVector[X] += 0.5;
 
 	wl = VAL_WHEELS_STOP + VAL_WHEELS_STOP*m_displacementVector[Y] + VAL_WHEELS_STOP*m_displacementVector[X];
@@ -274,10 +274,12 @@ void Simulation::goHome() {
 		// TODO rotate 180 degrees;
 		emptyTailGate();
 		m_bottlesCollected = 0;
+		m_currentState = STATE_AVOIDANCE;
 	}
 }
 void Simulation::emptyTailGate() {
 	m_robot->setTailGate(VAL_TAIL_OPEN);
+	m_robot->setWheelSpeeds(VAL_WHEELS_STOP, VAL_WHEELS_STOP);
 	m_robot->sendInstructions();
 	sleep(2);
 	m_robot->setTailGate(VAL_TAIL_CLOSE);
@@ -363,6 +365,8 @@ void Simulation::loop(void) {
 		else
 			avoidObstaclesCam();
 			m_robot->setShovel(VAL_LIFT_TRAVEL);
+			m_robot->sendInstructions();
+			sleep(1);
 			moveWithVector();
 		break;
 	}
