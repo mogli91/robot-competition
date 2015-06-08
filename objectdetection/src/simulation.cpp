@@ -187,8 +187,8 @@ void Simulation::avoidObstaclesCam() {
 	//TODO : real function
 
 	//create a vector that is perpendicular to the obstacle
-	m_displacementVector[X] += 2*m_regressionLine[1]; // vy
-	m_displacementVector[Y] -= 2*m_regressionLine[0]; // vx
+	m_displacementVector[X] = VAL_WHEELS_FW*m_vm.line.delta_y + 50; // vy
+	m_displacementVector[Y] = -VAL_WHEELS_FW*m_vm.line.delta_x; // vx
 }
 
 //the displacement the robot should have if no collision is detected
@@ -239,9 +239,9 @@ int Simulation::emergencyDetected() {
 		}
 	}
 
-	//std::vector<float> line;
 	//regression corresponds to a line, and no obstacle is detected
-	if(calculateError() < 20)
+	//200 corresponds to a value regressed with rock angles
+	if(m_vm.line.error < 200)
 	{
 		return STATE_CAM_AVOIDANCE;
 	}
@@ -262,8 +262,16 @@ void Simulation::emptyTailGate() {
 	m_robot->setTailGate(VAL_TAIL_CLOSE);
 }
 bool Simulation::homeReached() {
-	//TODO add the condition
-	return false;
+	//no beacon detected
+	if(m_vm.beacon.y != -1)
+	{
+		if(m_vm.beacon.y < 50)
+		{
+			return true;
+		}
+	}
+	else
+		return false;
 }
 void Simulation::search() {
 	displacement(); //normal robot displacement if no collision detected
@@ -277,18 +285,16 @@ void Simulation::loop(void) {
 
 	int elapsed_secs = double(clock() - m_timeInit) / CLOCKS_PER_SEC;
 
+	m_robot->setBrushSpeed(VAL_BRUSH_FW);
+
 	// State machine
 	switch (m_currentState) {
 	case STATE_INIT:
 		// Stuff to do at the beginning
-		m_robot->setBrushSpeed(VAL_BRUSH_FW);
-
 		change_state( STATE_MOVE);
 		break;
 
 	case STATE_MOVE:
-		m_robot->setBrushSpeed(VAL_BRUSH_FW);
-
 		int emergency;
 		emergency = emergencyDetected();
 		if (emergency != EMERGENCY_NONE) {
@@ -301,7 +307,7 @@ void Simulation::loop(void) {
 			m_bottlesCollected++;
 		}
 
-		if (m_bottlesCollected >= 2 || elapsed_secs > 60 * 8) //8 minutes or 4 bottles = go home
+		if (m_bottlesCollected >= 2 || elapsed_secs > 60 * 3) //8 minutes or 4 bottles = go home
 		{
 			goHome(); //go home using the compass
 			//TODO STATE_GO_HOME
@@ -329,17 +335,14 @@ void Simulation::loop(void) {
 		}
 		break;
 	case STATE_CAM_AVOIDANCE:
-		bool noObstaclesDetected = true;
-		for(uint i = 0; i < m_vm.rays.size(); i++)
-			if(m_vm.rays[i].y < 100)
-			{
-				noObstaclesDetected = false;
-				break;
-			}
-		if(noObstaclesDetected)
+		if(m_vm.line.intercept > 100) //from approx the middle of the cam : 50 cm in front of robot.
+		{
 			change_state(STATE_MOVE);
+			break;
+		}
 		else
 			avoidObstaclesCam();
+			moveWithVector();
 		break;
 	}
 
@@ -354,30 +357,4 @@ void Simulation::change_state(int newState) {
 void Simulation::updateVision()
 {
 	m_robot->getVisionData(m_vm);
-//	std::vector<Point> points;
-//	for(uint i = 0; i < m_vm.rays.size(); i++)
-//	{
-//		points.push_back(Point(i, m_vm.rays[i]));
-//	}
-	fitLine(m_vm.rays, m_regressionLine, CV_DIST_L1, 0, 0.01, 0.01);
-}
-
-//calculates the average error between regression "line" and the rays
-float Simulation::calculateError()
-{
-	float vx = m_regressionLine[0];
-	float vy = m_regressionLine[1];
-	float x0 = m_regressionLine[2];
-	float y0 = m_regressionLine[3];
-	//set the origin at xb = 0, yb = h
-	//rays goes from x = 0 to x = 10
-	float xb = 0; // = x0 - a*vx // a = x0/vx
-	float yb = y0 - (x0-xb)*vy/vx;//=y0 - x0/vx*vy;// = y0 - a*vy //
-
-	float sum = 0;
-	for(uint i = 0; i < m_vm.rays.size(); i++)
-	{
-		sum += abs(((float)m_vm.rays[i].y) - (yb + vy/vx*i));
-	}
-	return sum/m_vm.rays.size();
 }
