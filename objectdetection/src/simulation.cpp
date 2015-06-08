@@ -182,7 +182,6 @@ void Simulation::approachBottlesCam() {
 		m_displacementVector[X] += 50 * bottles[selectedBottle].x;
 		m_displacementVector[Y] += 50;
 	}
-
 }
 void Simulation::avoidObstaclesCam() {
 	//TODO : real function
@@ -213,8 +212,6 @@ void Simulation::homeDisplacement() {
 	float deltaAngle = (((float)destAngle) - ((float)angle))*PI/180.0f;
 	m_displacementVector[X] = +VAL_WHEELS_FW*sin(deltaAngle);
 	m_displacementVector[Y] = VAL_WHEELS_FW*cos(deltaAngle);
-
-
 }
 //change direction of brush if overcurrent
 bool Simulation::brushIsBlocked() {
