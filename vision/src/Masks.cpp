@@ -678,6 +678,7 @@ bool Beacon::match(const cv::Mat &img_integral, cv::Point p, double threshold) {
 bool Beacon::matchGray(const cv::Mat &img_integral, cv::Point p, double threshold) {
     int side_width = m_blocksize / 2;
     m_roi.width = m_blocksize;
+    m_roi.height = 2 * m_blocksize;
     
     if  ((p.x - side_width) < 0
          || (p.y + m_roi.height + side_width) >= img_integral.rows
@@ -789,6 +790,9 @@ bool Beacon::matchGray(const cv::Mat &img_integral, cv::Point p, double threshol
         if (col_max < m_roi.x) m_roi.x = col_max;
         m_corner = YELLOW;
         
+        if (m_roi.height < 3*m_blocksize) {
+            return false;
+        }
         return true;
     }
     else {

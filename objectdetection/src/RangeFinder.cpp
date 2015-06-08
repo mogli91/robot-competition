@@ -117,10 +117,14 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
     }
     Rect tmp;
     int beacon = findBeacon(tmp);
-    if(beacon)
-        rectangle(src, tmp, Scalar(255, 255, 255));
-    m_beacon.x = tmp.x + tmp.width/2;
-    m_beacon.y = m_height - (tmp.y + tmp.height);
+    if(beacon) {
+        rectangle(src, tmp, Scalar(255, 0, 255));
+        m_beacon.x = tmp.x + tmp.width/2;
+        m_beacon.y = m_height - (tmp.y + tmp.height);
+    } else {
+        m_beacon.x = -1;
+        m_beacon.y = -1;
+    }
     
     
     m_error = fitTerrainLine(m_line);
@@ -293,8 +297,8 @@ void RangeFinder::getRays(vector<Point> &dst) {
     }
 }
 void RangeFinder::getBeacon(Point &dst) {
-    dst.x = m_beacon.x - m_width/2;
-    dst.y = m_height - m_beacon.y;
+    dst.x = m_beacon.x;
+    dst.y = m_beacon.y;
 }
 
 double RangeFinder::fitTerrainLine(Vec4f &line) {
