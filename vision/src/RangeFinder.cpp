@@ -120,7 +120,7 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
     if(beacon)
         rectangle(src, tmp, Scalar(255, 255, 255));
     m_beacon.x = tmp.x + tmp.width/2;
-    m_beacon.y = tmp.y + tmp.height;
+    m_beacon.y = m_height - (tmp.y + tmp.height);
     
     
     m_error = fitTerrainLine(m_line);

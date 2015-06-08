@@ -677,6 +677,7 @@ bool Beacon::match(const cv::Mat &img_integral, cv::Point p, double threshold) {
 
 bool Beacon::matchGray(const cv::Mat &img_integral, cv::Point p, double threshold) {
     int side_width = m_blocksize / 2;
+    m_roi.width = m_blocksize;
     
     if  ((p.x - side_width) < 0
          || (p.y + m_roi.height + side_width) >= img_integral.rows
@@ -702,7 +703,7 @@ bool Beacon::matchGray(const cv::Mat &img_integral, cv::Point p, double threshol
     double mean_center[3] = {0.0, 0.0, 0.0};
     double mean_right[3] = {0.0, 0.0, 0.0};
     
-    for (int col = p.x; col < (img_integral.rows - side_width); ++col) {
+    for (int col = p.x; col < (img_integral.cols - side_width - m_roi.width); ++col) {
         left.x = col - side_width;
         m_roi.x = col;
         right.x = col + m_roi.width;
@@ -713,7 +714,7 @@ bool Beacon::matchGray(const cv::Mat &img_integral, cv::Point p, double threshol
         for (int i = 0; i < 3; ++i) {
             response[i] = (- mean_left[i] + 2* mean_center[i] - mean_right[i]) / 3;
 //            std::cout << response[i] << std::endl;
-            if (response[i] > threshold && response[i] > response_max) {
+            if (/*response[i] > threshold && */response[i] > response_max) {
                 response_max = response[i];
                 col_max = col;
             }
@@ -728,6 +729,10 @@ bool Beacon::matchGray(const cv::Mat &img_integral, cv::Point p, double threshol
 //    m_roi.y = p.y;
     
     double color_dist;
+    double color_dist_min = INFINITY;
+    int allowed_offset = m_blocksize / 2;
+    int col_before = col_max;
+    bool found = false;
     
     if (response_max > threshold) {
         m_roi.x = col_max;
@@ -736,21 +741,60 @@ bool Beacon::matchGray(const cv::Mat &img_integral, cv::Point p, double threshol
         
         // walk down the rows in the maximal column
         for (m_roi.y += m_blocksize; m_roi.y + m_roi.height < img_integral.rows; m_roi.y += m_blocksize) {
+            
             computeMeanInnerRect(img_integral, m_roi, mean_left);
             color_dist = dist(mean_center, mean_left);
+            
             if (color_dist > threshold) {
-                break;
+                col_before = m_roi.x;
+                found = false;
+                
+                // check left and right
+                left = Rect(m_roi); right = Rect(m_roi);
+                
+                for (int off = 1; off <= allowed_offset; ++off) {
+                    left.x = m_roi.x - off;
+                    right.x = m_roi.x + off;
+                    if (left.x >= 0 && left.x + right.width < img_integral.rows) {
+                        computeMeanInnerRect(img_integral, left, mean_left);
+                        color_dist = dist(mean_center, mean_left);
+                        if (color_dist <= threshold) {
+                            m_roi.x = left.x;
+                            found = true;
+                            break;
+                        }
+
+                    }
+                    if (right.x >= 0 && right.x + right.width < img_integral.cols) {
+                        computeMeanInnerRect(img_integral, right, mean_left);
+                        color_dist = dist(mean_center, mean_left);
+                        if (color_dist <= threshold) {
+                            m_roi.x = right.x;
+                            found = true;
+                            break;
+                        }
+                        
+                    }
+                }
+                
+                if (!found) {
+                    break;
+                }
             }
         }
         
         m_roi.height = m_roi.y;
         m_roi.y = 0;
+        m_roi.width = abs(m_roi.x - col_max) + m_roi.width;
+        if (col_max < m_roi.x) m_roi.x = col_max;
         m_corner = YELLOW;
         
         return true;
     }
-    else
+    else {
+//        std::cout << response_max << std::endl;
         return false;
+    }
     
 }
 
