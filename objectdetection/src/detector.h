@@ -15,13 +15,6 @@
 using namespace std;
 using namespace cv;
 
-struct RegressionLine {
-    float delta_x;
-    float delta_y;
-    int intercept; //y from the middle
-    float error;
-};
-
 struct VisionMeasure {
     vector<Point> bottles;
     vector<Point> rays; //between 20 and 250 cm
