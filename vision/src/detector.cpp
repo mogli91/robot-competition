@@ -55,7 +55,7 @@ Detector::Detector(int camnum, float exposure, int f_height, int f_width)
     }
     else {
         setSettings();
-        printSettings();
+        //printSettings();
     }
 }
 
@@ -140,11 +140,8 @@ void Detector::setSettings()
 	    if(!cap.set(CV_CAP_PROP_FRAME_WIDTH, f_width))
 	    	cout << "Could not set frame width" << endl;
 
-//    cap.set(CV_CAP_PROP_GAIN, 0.3);
-//    // http://stackoverflow.com/questions/15035420/configuring-camera-properties-in-new-ocv-2-4-3
-
-	if(!cap.set(CV_CAP_PROP_EXPOSURE, exposure))
-		cout << "Could not set exposure" << endl;
+	//if(!cap.set(CV_CAP_PROP_EXPOSURE, exposure))
+	//	cout << "Could not set exposure" << endl;
 
 }
 

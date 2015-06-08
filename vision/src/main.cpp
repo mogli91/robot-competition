@@ -32,7 +32,7 @@ int main(int argc, char** args) {
     Mat image;
 	
     if (0 == strcmp(args[1], "cam")) {
-        detector = new Detector(-1, 0.2, 240, 320);
+        detector = new Detector(-1, 0.2, 480, 640);
         image = Mat::zeros(240, 320, CV_8UC3);
     } else {
         image = cv::imread(args[1]);

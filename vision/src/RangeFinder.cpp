@@ -289,4 +289,23 @@ void RangeFinder::fitTerrainLine(Vec4f &line) {
     }
     
     fitLine(pts, line, CV_DIST_L1, 0, 0.01, 0.01);
+
+///
+
+	float vx = line[0];
+	float vy = line[1];
+	float x0 = line[2];
+	float y0 = line[3];
+	//set the origin at xb = 0, yb = h
+	//rays goes from x = 0 to x = 10
+	float xb = 0; // = x0 - a*vx // a = x0/vx
+	float yb = y0 - (x0-xb)*vy/vx;//=y0 - x0/vx*vy;// = y0 - a*vy //
+
+	float sum = 0;
+	for(uint i = 0; i < pts.size(); i++)
+	{
+		sum += abs(((float)pts[i].y) - (yb + vy/vx*i));
+	}
+	std::cout<<"error = "<<sum/((float)pts.size())<<std::endl;
+
 }
