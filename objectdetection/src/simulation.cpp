@@ -115,7 +115,7 @@ void Simulation::liftBottle() {
 }
 bool Simulation::bottleCaptured() {
 	//if(brushIsBlocked() || m_robot->getBrushCurrent() > 220)
-	if (m_robot->getSensorValue(SENSOR_IR_BRUSH) < 25) {
+	if (m_robot->getSensorValue(SENSOR_IR_BRUSH) < 20) {
 		//usleep(500000);
 		return true;
 	}
@@ -123,8 +123,16 @@ bool Simulation::bottleCaptured() {
 }
 void Simulation::moveWithVector() {
 	int wl, wr; //wheel speeds left and right
+
+	//never go backwards, turn instead.
+	if(m_displacementVector[Y] < VAL_WHEELS_STOP)
+	{
+		//m_displacementVector[X] += m_displacementVector[Y];
+		m_displacementVector[Y] = VAL_WHEELS_STOP;
+	}
 	wl = m_displacementVector[Y] + m_displacementVector[X];
 	wr = m_displacementVector[Y] - m_displacementVector[X];
+/*
 	if (wl > VAL_WHEELS_FW) {
 		wr -= wl - VAL_WHEELS_FW;
 	}
@@ -138,26 +146,43 @@ void Simulation::moveWithVector() {
 	if (wr < VAL_WHEELS_BW) {
 		wl += VAL_WHEELS_BW - wl;
 		wr = VAL_WHEELS_BW;
-	}
-	/*if(wr > VAL_WHEELS_FW)
+	}*/
+
+	if(wr > VAL_WHEELS_FW)
 	 {
 	 wr = VAL_WHEELS_FW;
 	 }
 	 if(wr < VAL_WHEELS_BW)
 	 {
 	 wr = VAL_WHEELS_BW;
-	 }*/
+	 }
 	if (wl > VAL_WHEELS_FW) {
 		wl = VAL_WHEELS_FW;
 	}
 	if (wl < VAL_WHEELS_BW) {
 		wl = VAL_WHEELS_BW;
 	}
-	m_robot->setWheelSpeeds(wl, wr);
+	m_robot->setWheelSpeeds(wr, wl);
 }
 void Simulation::approachBottlesCam() {
 	//TODO : real function
 //	m_displacementVector[X] -= 150 * abs(m_robot->getBottleAngle());
+
+	//if a bottle is detected
+	std::vector<Point> bottles = m_vm.bottles;
+	int selectedBottle = 0;
+	if(bottles.size() > 0)
+	{
+		//chose closest bottle
+		for(uint i = 0; i < bottles.size(); i++)
+		{
+			if(bottles[i].y < bottles[selectedBottle].y)
+				selectedBottle = i;
+		}
+		m_displacementVector[X] += 50 * bottles[selectedBottle].x;
+		m_displacementVector[Y] += 50;
+	}
+
 }
 void Simulation::avoidObstaclesCam() {
 	//TODO : real function
@@ -172,11 +197,24 @@ void Simulation::displacement() {
 }
 void Simulation::homeDisplacement() {
 	//TODO : move in direction of a certain absolute angle;
-	float radAngle = ((float)m_robot->getPose().angle)*PI/180.0f;
-	float radDestAngle = 225.0f*PI/180.0f;
-	float deltaAngle = radDestAngle - radAngle;
-	m_displacementVector[X] = -sin(deltaAngle);
-	m_displacementVector[Y] = cos(deltaAngle);
+	int angle = m_robot->getPose().angle;
+	int destAngle = 225;
+/*
+	if(abs(angle - destAngle) > 40)
+	{
+		m_displacementVector[X] = VAL_WHEELS_FW*sign(destAngle - angle);
+		m_displacementVector[Y] = VAL_WHEELS_STOP;
+	}
+	else
+	{
+		m_displacementVector[X] = 0;
+		m_displacementVector[Y] = VAL_WHEELS_FW;
+	}*/
+	float deltaAngle = (((float)destAngle) - ((float)angle))*PI/180.0f;
+	m_displacementVector[X] = +VAL_WHEELS_FW*sin(deltaAngle);
+	m_displacementVector[Y] = VAL_WHEELS_FW*cos(deltaAngle);
+
+
 }
 //change direction of brush if overcurrent
 bool Simulation::brushIsBlocked() {
@@ -222,6 +260,7 @@ void Simulation::search() {
 void Simulation::loop(void) {
 
 	m_robot->updateData();
+	updateVision();
 
 	int elapsed_secs = double(clock() - m_timeInit) / CLOCKS_PER_SEC;
 
@@ -252,7 +291,7 @@ void Simulation::loop(void) {
 			}
 		}
 
-		if (m_bottlesCollected >= 4 || elapsed_secs > 60 * 8) //8 minutes or 4 bottles = go home
+		if (m_bottlesCollected >= 2 || elapsed_secs > 60 * 8) //8 minutes or 4 bottles = go home
 		{
 			goHome(); //go home using the compass
 			//TODO STATE_GO_HOME
@@ -288,4 +327,9 @@ void Simulation::loop(void) {
 void Simulation::change_state(int newState) {
 	//TODO add security
 	m_currentState = newState;
+}
+
+void Simulation::updateVision()
+{
+	m_robot->getVisionData(m_vm);
 }

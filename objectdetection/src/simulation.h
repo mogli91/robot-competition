@@ -64,12 +64,14 @@ private:
 	bool homeReached();
 	void emptyTailGate();
 	void liftBottle();
+	void updateVision();
 
 	int m_currentState;
 	Robot* m_robot;
 	int m_displacementVector[2];
 	clock_t m_timeInit;
 	int m_bottlesCollected;
+	VisionMeasure m_vm;
 
 
 
