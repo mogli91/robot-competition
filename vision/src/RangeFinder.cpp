@@ -147,52 +147,68 @@ void RangeFinder::locateBottles() {
     Point p;
     
     m_bottles.clear();
+    bool found = false;
     
     for (int r = 0; r < m_numRays; ++r) {
-        p.x = m_rays[r].x;
-        p.y = m_rays[r].y - bs;
-        
-        // apply big mask only when we are close by
-        if (p.y > m_height * 0.6) {
-            if (bottleCU.match(m_integral, p, threshold)) {
-                m_bottles.push_back(bottleCU.getROI());
-            }
-            if (bottleCF.match(m_integral, p, threshold)) {
-                m_bottles.push_back(bottleCF.getROI());
-            }
+        for (int run = 0; run < 2 && !found; ++run) {
+            p.x = m_rays[r].x;
+            p.y = m_rays[r].y - bs - bs / 2 * run;
             
-        }
-        if (bottleFar.match(m_integral, p, threshold)) {
-            m_bottles.push_back(bottleFar.getROI());
-        }
-        //        p.y = m_rays[r].y - bs;
-        //        if (bottleCU.match(m_integral, p, threshold)) {
-        //            m_bottles.push_back(bottleCU.getROI());
-        //        }
-        //        if (bottleCF.match(m_integral, p, threshold)) {
-        //            m_bottles.push_back(bottleCF.getROI());
-        //        }
-        ////        if (bottleC45P.match(m_integral, p, threshold)) {
-        ////            m_bottles.push_back(bottleC45P.getROI());
-        ////        }
-        ////        if (bottleC45N.match(m_integral, p, threshold)) {
-        ////            m_bottles.push_back(bottleC45N.getROI());
-        ////        }
-        //
-        //        p.y = m_rays[r].y - 1.5 * bs;
-        //        if (bottleVCU.match(m_integral, p, threshold)) {
-        //            m_bottles.push_back(bottleVCU.getROI());
-        //        }
-        //        if (bottleVCF.match(m_integral, p, threshold)) {
-        //            m_bottles.push_back(bottleVCF.getROI());
-        //        }
-        //        if (bottleVC45P.match(m_integral, p, threshold)) {
-        //            m_bottles.push_back(bottleVC45P.getROI());
-        //        }
-        //        if (bottleVC45N.match(m_integral, p, threshold)) {
-        //            m_bottles.push_back(bottleVC45N.getROI());
-        //        }
+            if (bottleFar.match(m_integral, p, threshold)) {
+                m_bottles.push_back(bottleFar.getROI());
+                found = true;
+                break;
+            }
         
+            // apply big mask only when we are close by
+            if (p.y > m_height * 0.5) {
+                if (bottleCU.match(m_integral, p, threshold)) {
+                    m_bottles.push_back(bottleCU.getROI());
+                    found = true;
+                    break;
+                }
+                if (bottleCF.match(m_integral, p, threshold)) {
+                    m_bottles.push_back(bottleCF.getROI());
+                    found = true;
+                    break;
+                }
+                
+                
+                p.y = m_rays[r].y - 1.5 * bs - run * bs/2;
+                
+                if (bottleC45P.match(m_integral, p, threshold)) {
+                    m_bottles.push_back(bottleC45P.getROI());
+                    found = true;
+                    break;
+                }
+                if (bottleC45N.match(m_integral, p, threshold)) {
+                    m_bottles.push_back(bottleC45N.getROI());
+                    found = true;
+                    break;
+                }
+                
+                if (bottleVCU.match(m_integral, p, threshold)) {
+                    m_bottles.push_back(bottleVCU.getROI());
+                    found = true;
+                    break;
+                }
+                if (bottleVCF.match(m_integral, p, threshold)) {
+                    m_bottles.push_back(bottleVCF.getROI());
+                    found = true;
+                    break;
+                }
+                if (bottleVC45P.match(m_integral, p, threshold)) {
+                    m_bottles.push_back(bottleVC45P.getROI());
+                    found = true;
+                    break;
+                }
+                if (bottleVC45N.match(m_integral, p, threshold)) {
+                    m_bottles.push_back(bottleVC45N.getROI());
+                    found = true;
+                    break;
+                }
+            }
+        }
     }
 }
 
