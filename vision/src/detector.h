@@ -16,8 +16,8 @@ using namespace std;
 using namespace cv;
 
 struct RegressionLine {
-    int delta_x;
-    int delta_y;
+    float delta_x;
+    float delta_y;
     int intercept;
     float error;
 };

@@ -77,7 +77,7 @@ public:
     void getBottles(vector<Point> &dst);
     void getRays(vector<Point> &dst);
     void getBeacon(Point &dst);
-    void getLineParameters(int &dx, int &dy, int &intercept, float &error);
+    void getLineParameters(float &dx, float &dy, int &intercept, float &error);
     
     double fitTerrainLine(Vec4f &v);
     
