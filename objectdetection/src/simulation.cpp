@@ -331,7 +331,7 @@ void Simulation::loop(void) {
 	case STATE_CAM_AVOIDANCE:
 		bool noObstaclesDetected = true;
 		for(uint i = 0; i < m_vm.rays.size(); i++)
-			if(m_vm.rays[i] < 100)
+			if(m_vm.rays[i].y < 100)
 			{
 				noObstaclesDetected = false;
 				break;
@@ -354,12 +354,12 @@ void Simulation::change_state(int newState) {
 void Simulation::updateVision()
 {
 	m_robot->getVisionData(m_vm);
-	std::vector<Point> points;
-	for(uint i = 0; i < m_vm.rays.size(); i++)
-	{
-		points.push_back(Point(i, m_vm.rays[i]));
-	}
-	fitLine(points, m_regressionLine, CV_DIST_L1, 0, 0.01, 0.01);
+//	std::vector<Point> points;
+//	for(uint i = 0; i < m_vm.rays.size(); i++)
+//	{
+//		points.push_back(Point(i, m_vm.rays[i]));
+//	}
+	fitLine(m_vm.rays, m_regressionLine, CV_DIST_L1, 0, 0.01, 0.01);
 }
 
 //calculates the average error between regression "line" and the rays
@@ -377,7 +377,7 @@ float Simulation::calculateError()
 	float sum = 0;
 	for(uint i = 0; i < m_vm.rays.size(); i++)
 	{
-		sum += abs(((float)m_vm.rays[i]) - (yb + vy/vx*i));
+		sum += abs(((float)m_vm.rays[i].y) - (yb + vy/vx*i));
 	}
 	return sum/m_vm.rays.size();
 }
