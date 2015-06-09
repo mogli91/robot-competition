@@ -197,12 +197,15 @@ void Simulation::avoidObstaclesCam() {
 	//TODO : real function
 
 	//create a vector that is perpendicular to the obstacle
-	m_displacementVector[X] = m_vm.line.delta_y; // vy
+	m_displacementVector[X] = 2*m_vm.line.delta_y; // vy
 	if(m_displacementVector[X] < 0.1 && m_displacementVector[X] >= 0)
 		m_displacementVector[X] = 0.1;
 	if(m_displacementVector[X] > -0.1 && m_displacementVector[X] < 0)
 			m_displacementVector[X] = -0.1;
-	m_displacementVector[Y] = -m_vm.line.delta_x; // vx
+	m_displacementVector[Y] = ((float)(CAM_OBST-m_vm.line.intercept))/((float)CAM_OBST)*(-m_vm.line.delta_x); // vx
+
+	std::cout<<"delta x "<<m_vm.line.delta_x<<" delta y "<<m_vm.line.delta_y<<std::cout;
+	std::cout<<"disp x "<<m_displacementVector[X]<<" disp y "<<m_displacementVector[Y]<<std::cout;
 }
 
 //the displacement the robot should have if no collision is detected
@@ -261,7 +264,7 @@ int Simulation::emergencyDetected() {
 
 	//regression corresponds to a line, and no obstacle is detected
 	//200 corresponds to a value regressed with rock angles
-	if(m_vm.line.error < 200 && m_vm.line.intercept < 150)
+	if(m_vm.line.error < 200 && m_vm.line.intercept < CAM_OBST && m_vm.line.intercept > 50)
 	{
 		return STATE_CAM_AVOIDANCE;
 	}
@@ -357,7 +360,7 @@ void Simulation::loop(void) {
 		}
 		break;
 	case STATE_CAM_AVOIDANCE:
-		if(m_vm.line.intercept > 150) //from approx the middle of the cam : 50 cm in front of robot.
+		if(m_vm.line.intercept > CAM_OBST && m_vm.line.intercept < 50) //from approx the middle of the cam : 50 cm in front of robot.
 		{
 			change_state(STATE_MOVE);
 			break;
@@ -365,7 +368,7 @@ void Simulation::loop(void) {
 		else
 			avoidObstaclesCam();
 			m_robot->setShovel(VAL_LIFT_TRAVEL);
-			m_robot->setWheelSpeeds(VAL_WHEELS_STOP, VAL_WHEELS_STOP);
+			//m_robot->setWheelSpeeds(VAL_WHEELS_STOP, VAL_WHEELS_STOP);
 			m_robot->sendInstructions();
 			sleep(1);
 			moveWithVector();

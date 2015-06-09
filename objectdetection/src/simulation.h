@@ -35,6 +35,8 @@
 
 #define EMERGENCY_NONE 0	//no emergency detected
 
+#define CAM_OBST 100
+
 enum POS{X,Y};
 
 class Simulation {

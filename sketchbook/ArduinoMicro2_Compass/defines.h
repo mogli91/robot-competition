@@ -80,6 +80,7 @@
 
 #define SENSOR_ENCODER_L          'l'         /* on WTC       */
 #define SENSOR_ENCODER_R          'm'
+#define SENSOR_TIMER              'n'
 
 #define SENSOR_BOTTLE_DISTANCE    'x'
 #define SENSOR_BOTTLE_ANGLE       'y'
