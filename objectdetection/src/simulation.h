@@ -47,6 +47,9 @@ public:
 	void loop ();
 	//Function for the obstacle avoidance
 	void braitenberg_avoidance ();
+	void obstacle_avoidance();
+	void obstacle_avoidance_return();
+	void toggleLift();
 	//Function for the phototaxis
 //	void braitenberg_phototaxis ();
 	//Method for the change of the robot's state
