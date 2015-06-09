@@ -20,6 +20,11 @@ void Robot::updateData() {
 }
 
 void Robot::setWheelSpeeds(int left, int right) {
+	if(left > VAL_WHEELS_FW) left = VAL_WHEELS_FW;
+	if(left < VAL_WHEELS_BW) left = VAL_WHEELS_BW;
+	if(right > VAL_WHEELS_FW) right = VAL_WHEELS_FW;
+	if(right < VAL_WHEELS_BW) right = VAL_WHEELS_BW;
+
 	m_brain->setWheelSpeeds(left, right);
 }
 
@@ -68,4 +73,9 @@ Tile Robot::getTile(int x, int y) {
 
 void Robot::printMap() {
 	m_map->print();
+}
+
+int Robot::getTime()
+{
+	return m_brain->getReading(SENSOR_TIMER);
 }

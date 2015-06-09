@@ -43,6 +43,8 @@ public:
     void getVisionData(VisionMeasure &vm);
 	void printMap();
 
+	int getTime();
+
 private:
 	Brain* m_brain;
 	Map* m_map;

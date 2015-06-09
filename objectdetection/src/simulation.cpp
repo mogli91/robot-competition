@@ -197,15 +197,15 @@ void Simulation::avoidObstaclesCam() {
 	//TODO : real function
 
 	//create a vector that is perpendicular to the obstacle
-	m_displacementVector[X] = 2*m_vm.line.delta_y; // vy
+	m_displacementVector[X] = -2*m_vm.line.delta_y; // vy
 	if(m_displacementVector[X] < 0.1 && m_displacementVector[X] >= 0)
 		m_displacementVector[X] = 0.1;
 	if(m_displacementVector[X] > -0.1 && m_displacementVector[X] < 0)
 			m_displacementVector[X] = -0.1;
 	m_displacementVector[Y] = ((float)(CAM_OBST-m_vm.line.intercept))/((float)CAM_OBST)*(-m_vm.line.delta_x); // vx
 
-	std::cout<<"delta x "<<m_vm.line.delta_x<<" delta y "<<m_vm.line.delta_y<<std::cout;
-	std::cout<<"disp x "<<m_displacementVector[X]<<" disp y "<<m_displacementVector[Y]<<std::cout;
+	//std::cout<<"delta x "<<m_vm.line.delta_x<<" delta y "<<m_vm.line.delta_y<<std::cout;
+	//std::cout<<"disp x "<<m_displacementVector[X]<<" disp y "<<m_displacementVector[Y]<<std::cout;
 }
 
 //the displacement the robot should have if no collision is detected
