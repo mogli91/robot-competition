@@ -255,16 +255,16 @@ void Detector::normalize_px(uchar *src, double *dst)
 }
 
 void Detector::findRanges(cv::Mat img) {
-//    clock_t t0_frame = clock();
-//    double elapsed_secs = 1.0;
+    clock_t t0_frame = clock();
+    double elapsed_secs = 1.0;
     
     frame = img;
     mask = Scalar(0);
     m_rangeFinder->rollOut(img, mask);
     
     computeMeasurement();
-//    elapsed_secs = double(clock() - t0_frame) / CLOCKS_PER_SEC;
-//    cout << "\r" << 1.0 / elapsed_secs << " fps" << flush;
+    elapsed_secs = double(clock() - t0_frame) / CLOCKS_PER_SEC;
+    cout << "\r" << 1.0 / elapsed_secs << " fps" << flush;
     
 //    imshow("ranges", mask * 255);
 }

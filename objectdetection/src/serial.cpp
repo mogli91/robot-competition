@@ -157,7 +157,7 @@ int Serial::sread() {
 				}
 		}
 	} while (n > 0);
-
+/*
 #ifdef DEBUG_SERIAL
 	if (spot > 0) {
         printf("\n\r");
@@ -172,7 +172,7 @@ int Serial::sread() {
 		printf("\n\r");
 	}
 #endif
-
+*/
 	newread += spot;
     if (newread > max_read) newread = max_read;
 	return spot;

@@ -27,12 +27,12 @@ public:
     
     Mask(int blocksize, int type);
     
-    double dist(double *a, double *b);
-    void computeSum(const cv::Mat &img_integral, cv::Rect roi, int *dst);
+    static double dist(double *a, double *b);
+    static void computeSum(const cv::Mat &img_integral, cv::Rect roi, int *dst);
     cv::Rect getROI() {return m_roi;};
     
     virtual bool match(const cv::Mat &img_integral, cv::Point p, double threshold) = 0;
-    void computeMeanInnerRect(const cv::Mat &img_integral, cv::Rect roi, double* dst);
+    static void computeMeanInnerRect(const cv::Mat &img_integral, cv::Rect roi, double* dst);
     bool matchRect(const cv::Mat &img_integral, cv::Point p, double threshold);
 };
 

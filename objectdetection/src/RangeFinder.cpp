@@ -139,6 +139,8 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
         rectangle(src, brush, Scalar(255,255,0));
     }
     
+//    int terrain = determineTerrain(m_integral, brush);
+    
 //    std::cout << "error " << m_error << std::endl;
     
     drawMask(dst);
@@ -156,7 +158,7 @@ void RangeFinder::locateBottles() {
     BottleVeryCloseFlat bottleVCF = BottleVeryCloseFlat(bs);
     BottleVeryClose45P bottleVC45P = BottleVeryClose45P(bs);
     BottleVeryClose45N bottleVC45N = BottleVeryClose45N(bs);
-    double threshold = 30;
+    double threshold = 50;
     Point p;
     
     m_bottles.clear();
@@ -371,9 +373,9 @@ void RangeFinder::getLineParameters(RegressionLine &line) {
 }
 
 bool RangeFinder::findBrush(const cv::Mat &img_integral, Rect &r) {
-    int unused = 2;
+    int unused = 3;
     Point p = Point(m_rays[unused].x, m_blocksize);
-    double th = 150;
+    double th = 180;
     Brush brush = Brush(m_blocksize, m_numRays - 2*unused);
     if (brush.match(img_integral, p, th)) {
         r = brush.getROI();
@@ -386,3 +388,48 @@ bool RangeFinder::findBrush(const cv::Mat &img_integral, Rect &r) {
         return false;
     }
 }
+
+int RangeFinder::determineTerrain(const cv::Mat &img_integral, Rect &brush) {
+    int sum_3[3] = {0,0,0};
+    int sum_tmp[3];
+    double mean[3];
+    
+    int area = 0;
+    
+    for (int r = 0; r < m_numRays; ++r) {
+        Mask::computeSum(m_integral, m_rays[r], sum_tmp);
+        for (int i = 0; i < 3; ++i) {
+            sum_3[i] += sum_tmp[i];
+        }
+        area += m_rays[r].area();
+    }
+
+    if (brush.x > 0 && brush.y > 0) {
+        Mask::computeSum(m_integral, brush, sum_tmp);
+        for (int i = 0; i < 3; ++i) {
+            sum_3[i] -= sum_tmp[i];
+        }
+        area -= brush.area();
+    }
+    
+    for (int i = 0; i < 3; ++i) {
+        mean[i] = sum_3[i] / (1.0*area);
+    }
+    
+//    double green[3] = {41.9723, 105.003, 87.8274};
+    double green[3] = {70.2312, 120.569, 106.694};
+    double dist = Mask::dist(mean, green);
+    int threshold = 80;
+    
+    cout << "color " << mean[0] << ", " << mean[1] << ", " << mean[2] << "\t dist: " << dist << endl << flush;
+    
+    if (dist < threshold) {
+        return 1;
+    } else {
+        return 0;
+    }
+    
+    
+    
+}
+
