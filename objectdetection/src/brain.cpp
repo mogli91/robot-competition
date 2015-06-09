@@ -33,6 +33,7 @@ void Brain::updateReadings() {
     char str_val[4] = {'0', '0', '0', '\0'};
     int s;
     int idx;
+    char id;
 
 	for (int p = 0; p < m_numports; ++p) {
         ser = m_ports[p];
@@ -47,7 +48,8 @@ void Brain::updateReadings() {
 
 			while (read < endofbuffer) {
 				if (IS_READING(read[0])) {
-                    idx = read[0] - READING_ID_MIN;
+                    id = read[0];
+                    idx = id - READING_ID_MIN;
                     ++read;
                     for (s = 0; s < 3; ++s)
                     {
@@ -58,7 +60,11 @@ void Brain::updateReadings() {
                         ++read;
                     }
                     if (s == 3) {
-                        m_readings[idx] = atoi(str_val);
+                        if (id == SENSOR_TIMER) {
+                            m_readings[idx] += atoi(str_val);
+                        } else {
+                            m_readings[idx] = atoi(str_val);
+                        }
                     }
                 } else {
                     ++read;
@@ -72,13 +78,12 @@ void Brain::updateReadings() {
     
     if (m_detector != NULL) {
         m_detector->getMeasurement(m_vision);
-        for (vector<Point>::iterator it = m_vision.bottles.begin(); it != m_vision.bottles.end(); ++it) {
-            printf("Bottle at: x = %d, y = %d\n\r", it->x, it->y);
-        }
-        if (m_vision.beacon.y != -1) {
-            printf("Beacon at: x = %d, y = %d\n\r", m_vision.beacon.x, m_vision.beacon.y);
-        }
-        
+//        for (vector<Point>::iterator it = m_vision.bottles.begin(); it != m_vision.bottles.end(); ++it) {
+//            printf("Bottle at: x = %d, y = %d\n\r", it->x, it->y);
+//        }
+//        if (m_vision.beacon.y != -1) {
+//            printf("Beacon at: x = %d, y = %d\n\r", m_vision.beacon.x, m_vision.beacon.y);
+//        }
     }
 }
 

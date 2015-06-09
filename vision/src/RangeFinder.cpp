@@ -285,7 +285,7 @@ void RangeFinder::getBottles(vector<Point> &dst) {
     Rect tmp;
     for (int i = 0; i < m_bottles.size(); ++i) {
         tmp = m_bottles[i];
-        dst.push_back(Point((tmp.x + tmp.width/2) - m_width, m_height - (tmp.y + tmp.height)));
+        dst.push_back(Point((tmp.x + tmp.width/2) - m_width / 2, m_height - (tmp.y + tmp.height)));
     }
 }
 void RangeFinder::getRays(vector<Point> &dst) {

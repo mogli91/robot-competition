@@ -311,6 +311,8 @@ void Simulation::loop(void) {
 
 	int elapsed_secs = double(clock() - m_timeInit) / CLOCKS_PER_SEC;
 
+    return;
+    
 	m_robot->setBrushSpeed(VAL_BRUSH_FW);
 
 	if (bottleCaptured() && m_currentState != STATE_AVOIDANCE) {
