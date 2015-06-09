@@ -69,3 +69,8 @@ Tile Robot::getTile(int x, int y) {
 void Robot::printMap() {
 	m_map->print();
 }
+
+int Robot::getTime()
+{
+	return m_brain->getReading(SENSOR_TIMER);
+}

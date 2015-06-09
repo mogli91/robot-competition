@@ -162,7 +162,28 @@ void Simulation::obstacle_avoidance_return() {
 	}
 
 	m_robot->setWheelSpeeds(msr, msl);
+	int minimum_rays;
+	minimum_rays = find_minimum();
+	if (minimum_rays < 50 && m_vm.line.intercept < 60) //from approx the middle of the cam : 50 cm in front of robot.
+			{
+		m_robot->setWheelSpeeds(90, 90);
+		m_robot->sendInstructions();
+		sleep(1);
+		m_robot->setWheelSpeeds(VAL_WHEELS_BW, VAL_WHEELS_FW);
+		m_robot->sendInstructions();
+		sleep(1);
+	}
 }
+ int Simulation::find_minimum()
+ {
+	 int minimum;
+	 minimum = m_vm.rays[0].y;
+	 for(int j = 0; j<9;j++)
+	 {
+		 if (m_vm.rays[j+1].y<minimum) minimum = m_vm.rays[j+1].y;
+	 }
+	 return minimum;
+ }
 /*
  //Function for the phototaxis
  void Simulation::braitenberg_phototaxis() {
@@ -231,6 +252,7 @@ void Simulation::moveWithVector() {
 					+ m_displacementVector[X] * m_displacementVector[X]);
 	m_displacementVector[Y] /= norm;
 	m_displacementVector[X] /= norm;
+
 //condition for not idling
 	if (fabs(m_displacementVector[Y]) < 0.05
 			&& fabs(m_displacementVector[X] < 0.05))
@@ -239,6 +261,7 @@ void Simulation::moveWithVector() {
 			+ VAL_WHEELS_STOP * m_displacementVector[X];
 	wr = VAL_WHEELS_STOP + VAL_WHEELS_STOP * m_displacementVector[Y]
 			- VAL_WHEELS_STOP * m_displacementVector[X];
+
 	if (wl > VAL_WHEELS_FW) {
 		wr -= wl - VAL_WHEELS_FW;
 	}
@@ -288,6 +311,7 @@ void Simulation::approachBottlesCam() {
 	}
 }
 void Simulation::avoidObstaclesCam() {
+
 //TODO : real function
 //create a vector that is perpendicular to the obstacle
 	m_displacementVector[X] = m_vm.line.delta_y; // vy
@@ -296,11 +320,12 @@ void Simulation::avoidObstaclesCam() {
 	if (m_displacementVector[X] > -0.1 && m_displacementVector[X] < 0)
 		m_displacementVector[X] = -0.1;
 	m_displacementVector[Y] = -m_vm.line.delta_x; // vx
+
 }
 void Simulation::displacement() {
 //for the moment just move forward;
 	m_displacementVector[X] = 0;
-	m_displacementVector[Y] = 1.0f;
+	m_displacementVector[Y] = 0.7f;   //1.0f
 //TODO : real displacement
 }
 void Simulation::homeDisplacement() {
@@ -353,9 +378,11 @@ int Simulation::emergencyDetected() {
 			return STATE_AVOIDANCE;
 		}
 	}
+
 //regression corresponds to a line, and no obstacle is detected
 //200 corresponds to a value regressed with rock angles
 	if (m_vm.line.error < 200) {
+
 		return STATE_CAM_AVOIDANCE;
 	}
 	return EMERGENCY_NONE;
@@ -366,18 +393,23 @@ void Simulation::goHome() {
 		// TODO rotate 180 degrees;
 		emptyTailGate();
 		m_bottlesCollected = 0;
+		m_currentState = STATE_INIT;
 	}
 }
 void Simulation::emptyTailGate() {
 	m_robot->setTailGate(VAL_TAIL_OPEN);
+	m_robot->setWheelSpeeds(VAL_WHEELS_STOP, VAL_WHEELS_STOP);
 	m_robot->sendInstructions();
 	sleep(2);
 	m_robot->setTailGate(VAL_TAIL_CLOSE);
 }
 bool Simulation::homeReached() {
-//no beacon detected
-	if (m_vm.beacon.y < 150) {
-		if (m_robot->getPose().angle > 180 && m_robot->getPose().angle < 270)
+
+	//no beacon detected
+	if(m_vm.beacon.y < 150 && m_vm.beacon.y != -1)
+	{
+		if(m_robot->getPose().angle > 180 && m_robot->getPose().angle < 270)
+
 			return true;
 	}
 	return false;
@@ -395,9 +427,15 @@ void Simulation::loop(void) {
 
 	int elapsed_secs = double(clock() - m_timeInit) / CLOCKS_PER_SEC;
 
+	if (bottleCaptured() && m_currentState != STATE_AVOIDANCE) {
+		liftBottle();
+		m_bottlesCollected++;
+	}
+
 	// State machine
 	switch (m_currentState) {
 	case STATE_INIT:
+		cout << "STATE INIT";
 		// Stuff to do at the beginning
 		m_robot->setBrushSpeed(VAL_BRUSH_FW);
 
@@ -405,12 +443,13 @@ void Simulation::loop(void) {
 		break;
 
 	case STATE_MOVE:
-		int emergency;
+		cout << "STATE MOVE";
+	/*	int emergency;
 		emergency = emergencyDetected();
 		if (emergency != EMERGENCY_NONE) {
 			change_state(emergency);
 			break;
-		}
+		}*/
 		m_robot->setShovel(VAL_LIFT_LOW);
 
 		m_robot->setBrushSpeed(VAL_BRUSH_FW);
@@ -419,6 +458,29 @@ void Simulation::loop(void) {
 			liftBottle();
 			m_bottlesCollected++;
 		}
+		if (m_bottlesCollected >= 2 || elapsed_secs > 60 * 8) //8 minutes or 4 bottles = go home
+		{
+			change_state(STATE_GOHOME);
+			break;
+			/*
+			goHome(); //go home using the compass
+			moveWithVector(); //move in the direction of the vector
+					for (int i = SENSOR_IR_L; i <= SENSOR_IR_BACK_R; i++) {
+						if (m_robot->getSensorValue(i) < 70) {
+							obstacle_avoidance_return();
+						} else {
+							goHome(); //go home using the compass
+							moveWithVector(); //move in the direction of the vector
+
+						}
+					}
+*/
+				}
+
+				else {
+					search(); //search for bottles in the arena
+					moveWithVector(); //move in the direction of the vector
+				}
 
 	/*	if (m_robot->getSensorValue(SENSOR_IR_BACK) < 20) {
 			//change_state(STATE_CHANGE_ZONE);
@@ -434,40 +496,51 @@ void Simulation::loop(void) {
 			}
 		}
 
-		if (m_bottlesCollected >= 2 || elapsed_secs > 60 * 8) //8 minutes or 4 bottles = go home
-				{
-			for (int i = SENSOR_IR_L; i <= SENSOR_IR_BACK_R; i++) {
-				if (m_robot->getSensorValue(i) < 70) {
-					obstacle_avoidance_return();
-				} else {
-					goHome(); //go home using the compass
-					moveWithVector(); //move in the direction of the vector
 
-				}
+
+		break;
+	case STATE_GOHOME:
+		cout << "STATE GOHOME";
+
+		for (int i = SENSOR_IR_L; i <= SENSOR_IR_BACK_R; i++)
+		{
+			if (m_robot->getSensorValue(i) < 70)
+			{
+				obstacle_avoidance_return();
+			} else {
+				goHome(); //go home using the compass
+				moveWithVector(); //move in the direction of the vector
 			}
-
-		}
-
-		else {
-			search(); //search for bottles in the arena
-			moveWithVector(); //move in the direction of the vector
 		}
 
 		break;
 
 	case STATE_CAM_AVOIDANCE:
-		if (m_vm.line.intercept > 50) //from approx the middle of the cam : 50 cm in front of robot.
+		cout << "STATE CAM AVOIDANCE";
+
+		m_robot->setBrushSpeed(VAL_BRUSH_FW);
+		if (bottleCaptured()) {
+					liftBottle();
+					m_bottlesCollected++;
+				}
+		int minimum_rays;
+		minimum_rays = find_minimum();
+		if (minimum_rays < 50 && m_vm.line.intercept < 60 ) //from approx the middle of the cam : 50 cm in front of robot.
 				{
+					m_robot->setWheelSpeeds(90, 90);
+				    m_robot->sendInstructions();
+				    sleep(1);
+				    m_robot->setWheelSpeeds(VAL_WHEELS_BW ,VAL_WHEELS_FW );
+				    m_robot->sendInstructions();
+				    sleep(1);
+				}
+		else
+		{
 			change_state(STATE_MOVE);
 			break;
-		} else
+		}
 
-			m_robot->setWheelSpeeds(90, 90);
-		    m_robot->sendInstructions();
-		    sleep(1);
-		    m_robot->setWheelSpeeds(VAL_WHEELS_BW ,VAL_WHEELS_FW );
-		    m_robot->sendInstructions();
-		    sleep(1);
+
 
 		//	toggleLift();
 
@@ -478,6 +551,17 @@ void Simulation::loop(void) {
 		break;
 
 	case STATE_AVOIDANCE:
+		cout << "STATE AVOIDANCE;
+		m_robot->setBrushSpeed(VAL_BRUSH_FW);
+		/*if (bottleCaptured()) {
+					liftBottle();
+					m_bottlesCollected++;
+				}*/
+		if (minimum_rays < 50 && m_vm.line.intercept < 60 )
+		{
+			change_state(STATE_CAM_AVOIDANCE);
+			break;
+		}
 		//while (state == STATE_AVOIDANCE) {
 		if ((m_robot->getSensorValue(SENSOR_IR_FRONT_L)
 				> BRAITEN_THRESHOLD_DISABLE) && (m_robot->getSensorValue(
@@ -496,6 +580,7 @@ void Simulation::loop(void) {
 			braitenberg_avoidance();
 		}
 		break;
+
 	}
 
 	m_robot->sendInstructions();

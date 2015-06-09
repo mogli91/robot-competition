@@ -19,6 +19,7 @@ SET (objectdetect_SOURCES
     simulation.cpp
     RangeFinder.cpp
     Masks.cpp
+    autonomous.cpp
 
 # h files
     bgpattern.h
@@ -31,6 +32,7 @@ SET (objectdetect_SOURCES
     simulation.h
     RangeFinder.h
     Masks.h
+    autonomous.h
 )
 
 # add the binary tree to the search path for include files

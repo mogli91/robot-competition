@@ -81,6 +81,8 @@ void loop() {
   t1 = millis();
   if ((t1 - t0) >= communication_interval) 
   {
+      print_value(SENSOR_TIMER, t1 - t0);
+      
       // check for new commands
       handle_instructions();
       // send collected data
@@ -96,6 +98,8 @@ void loop() {
   pose.offset = degree2Offset(local_angle_deg);// + pose.delta_old; // TODO intelligent weighting
   
   print_value(SENSOR_POSE_ANGLE, local_angle_deg);
+  
+  
 
   delay(100);
 }

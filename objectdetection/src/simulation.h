@@ -28,12 +28,14 @@
 #define STATE_INIT                     0       //State at the beginning of the 10:00
 #define STATE_MOVE                     1       //Follow the predetermined checkpoints
 #define STATE_RETURN                   2       //If storage is full return to the recycling area
-#define STATE_PICKUP                   3       //If bottle detected approach it and pick it up
+#define STATE_GOHOME                   3       //If bottle detected approach it and pick it up
 #define STATE_AVOIDANCE                4       //If obstacle detected (BRAITEN_THRESHOLD)
                                                // avoid it
 #define STATE_CAM_AVOIDANCE			   5
 
 #define EMERGENCY_NONE 0	//no emergency detected
+
+#define CAM_OBST 100
 
 enum POS{X,Y};
 
@@ -50,6 +52,7 @@ public:
 	void obstacle_avoidance();
 	void obstacle_avoidance_return();
 	void toggleLift();
+	int find_minimum();
 	//Function for the phototaxis
 //	void braitenberg_phototaxis ();
 	//Method for the change of the robot's state
