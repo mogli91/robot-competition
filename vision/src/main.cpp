@@ -21,6 +21,8 @@ static void help() {
 }
 
 int main(int argc, char** args) {
+    
+    cout << sizeof(int) << endl;
 
     if (argc < 2) {
         help();
