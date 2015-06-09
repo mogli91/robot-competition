@@ -197,7 +197,7 @@ void Simulation::avoidObstaclesCam() {
 	//TODO : real function
 
 	//create a vector that is perpendicular to the obstacle
-	m_displacementVector[X] = 2*m_vm.line.delta_y; // vy
+	m_displacementVector[X] = -2*m_vm.line.delta_y; // vy
 	if(m_displacementVector[X] < 0.1 && m_displacementVector[X] >= 0)
 		m_displacementVector[X] = 0.1;
 	if(m_displacementVector[X] > -0.1 && m_displacementVector[X] < 0)

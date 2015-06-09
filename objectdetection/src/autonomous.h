@@ -7,18 +7,20 @@
 
 #ifndef AUTONOMOUS_H_
 #define AUTONOMOUS_H_
-/*
+
 #include "brain.h"
 #include "Map.h"
 #include "Robot.h"
 
 #include <ctime>
 #include <unistd.h>
+#include <queue>
 
 //Define the number of sensors for obstacle avoidance (IR)
 #define IR_SENSORS           8
 
-enum STATES{	STATE_LIFT_UP,
+enum STATES{	STATE_INIT,
+				STATE_LIFT_UP,
 	    		STATE_LIFT_DOWN,
 				STATE_LIFT_MED,
 				STATE_STOP,
@@ -28,11 +30,15 @@ enum STATES{	STATE_LIFT_UP,
 				STATE_AVOID_CAM,
 				STATE_AVOID_IR,
 				STATE_TAIL_DOWN,
-				STATE_TAIL_UP}
+				STATE_TAIL_UP,
+				STATE_WAIT};
 
 #define CAM_OBST 100
+#define BOTTLE_ENABLE 100
 
-enum POS{X,Y};
+/*DEFINE THE THRESHOLDS FOR THE ACTIVATIONS OF THE LOCAL OBSTACLE AVOIDANCE (BRAITENBERG VEHICLES)*/
+#define BRAITEN_THRESHOLD_ENABLE       55      //50 cm
+#define BRAITEN_THRESHOLD_DISABLE      75    //HYSTERESIS
 
 class Autonomous {
 private:
@@ -45,29 +51,33 @@ public:
 	void change_state(int newState);
 
 private:
-	/*bool bottleCaptured();
-	void moveWithVector();
-	void approachBottlesCam();
-	void avoidObstaclesCam();
-	void avoidObstaclesIR();
+	void changeState(int newState);
+	void goToNextState();
+	void wait(int msec);
+	bool stateChanged();
+	bool braitenbergEnable();
+	bool braitenbergDisable();
+	void braitenberg_avoidance();
+	void liftBottle();
+	bool bottleCaptured();
+	float norm(float x, float y);
+	void moveBottle();
 	void displacement();
 	void homeDisplacement();
-	bool brushIsBlocked();
-	void emergencyProcedure();
-	int emergencyDetected();
 	void goHome();
-	void search();
-	bool homeReached();
 	void emptyTailGate();
-	void liftBottle();
+	bool homeReached();
 	void updateVision();
-	float calculateError();
-*
+	bool bottleEnable();
+
+	int l_weight_IR[IR_SENSORS] = { 3, 5, -5, -3, 0, 1,-1}; //for the power of 2 law
+	int r_weight_IR[IR_SENSORS] = { -2, -4, 4, 3, 0, -1, 1}; //for the power of 2 law
+
 	int m_currentState;
 	Robot* m_robot;
 	//float m_displacementVector[2];
 	clock_t m_timeInit;
-	int m_bottlesCollected;
+	int m_bottlesCaptured;
 	VisionMeasure m_vm;
 	int m_tInit;
 	int m_time;
@@ -77,6 +87,5 @@ private:
 };
 
 
-*/
-#endif  AUTONOMOUS_H_
-/*#endif /* SIMULATION_H_ */
+
+#endif
