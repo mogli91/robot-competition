@@ -1,50 +1,126 @@
 /*
- * simulation.cpp
+ * AUTONOMOUS.CPP
  *
- *  Created on: Jun 3, 2015
- *      Author: pasquale
  */
+/*
 
-#include "simulation.h"
+#include "autonomous.h"
 
-/*         1             2
- _IR___________IR_
- |                 |                    Disposition of the IR sensors on the robot and
- 0   IR                 IR  3                corresponding ID
- |                 |
- |                 |
- |________IR_______|
- 4
- */
-//Obstacle avoidance
-//int l_weight_IR[IR_SENSORS] = { 5, 8, -8, -5, 0 };     //{ 5, 8, -8, -5, 0 }
-//int r_weight_IR[IR_SENSORS] = { -4, -7, 7, 5, 0 };     //{ -5, -8, 8, 5, 0 };
 int l_weight_IR[IR_SENSORS] = { 3, 5, -5, -3, 0, 1,-1}; //for the power of 2 law
 int r_weight_IR[IR_SENSORS] = { -2, -4, 4, 3, 0, -1, 1}; //for the power of 2 law
-/*
- 1                2
- US______________US
- |              |                    Disposition of the US sensors on the robot and
- 0  US              US  3                corresponding ID
- |              |
- |              |
- |______________|
- */
-//Phototaxis
-//int l_weight_US[US_SENSORS] = { -10, -5, 5, 10 };
-//int r_weight_US[US_SENSORS] = { 10, 5, -5, -10 };
-int l_weight_US[US_SENSORS] = { 0, 0, -5, 5 };
-int r_weight_US[US_SENSORS] = { 0, 0, 5, -5 };
 
-Simulation::Simulation(Brain* brain) {
+Autonomous::Autonomous(Brain* brain) {
 	m_robot = new Robot(brain);
+	m_robot->updateData();
 	m_displacementVector[X] = 0;
 	m_displacementVector[Y] = 0;
 
 	m_timeInit = clock();
 	m_bottlesCollected = 0;
 
-	change_state( STATE_INIT);
+	change_state(STATE_MOVE_TRAVEL);
+
+	m_tInit = m_robot->getTime();
+	m_wait = 0;
+	m_waitInit = 0;
+}
+
+void Autonomous::change_state(int newState) {
+	m_nextState.push(newState);
+	m_currentState = m_nextState.pop();
+}
+
+void Autonomous::loop()
+{
+	m_robot->updateData();
+	//update time
+	m_time = m_robot->getTime() - m_tInit;
+
+	if(m_time - m_waitInit > m_wait)
+	{
+		switch(m_currentState)
+		{
+			case(STATE_LIFT_UP):
+				m_robot->setLift(VAL_LIFT_HIGH);
+				wait(3000);
+				break;
+
+			case(STATE_LIFT_DOWN):
+				m_robot->setLift(VAL_LIFT_LOW);
+				wait(3000);
+				break;
+
+			case(STATE_LIFT_MED):
+				m_robot->setLift(VAL_LIFT_TRAVEL);
+				wait(2000);
+				break;
+
+			case(STATE_STOP):
+				m_robot->setWheelSpeed(VAL_WHEELS_STOP, VAL_WHEELS_STOP);
+				break;
+
+			case(STATE_MOVE_TRAVEL):
+
+			break;
+
+			case(STATE_MOVE_HOME):
+
+			break;
+
+			case(STATE_MOVE_BOTTLE):
+
+			break;
+
+			case(STATE_AVOID_CAM):
+
+			break;
+
+			case(STATE_AVOID_IR):
+				if(braitenbergDisable())
+					change_state(STATE_MOVE);
+				else
+					braitenberg_avoidance();
+				break;
+
+			case(STATE_TAIL_DOWN):
+				m_robot->setLift(VAL_TAIL_OPEN);
+				wait(2000);
+			break;
+
+			case(STATE_TAIL_UP):
+				m_robot->setLift(VAL_TAIL_CLOSE);
+				wait(2000);
+			break;
+		}
+
+	m_wait = 0;
+	m_waitInit = 0;
+	m_robot->sendInstructions();
+	}
+
+
+}
+
+void Autonomous::wait(int msec)
+{
+	m_waitInit = m_time;
+	m_wait = msec;
+}
+
+/////Simulation data
+
+bool braitenbergDisable()
+{
+	if ((m_robot->getSensorValue(SENSOR_IR_FRONT_L)	> BRAITEN_THRESHOLD_DISABLE) &&
+		(m_robot->getSensorValue(SENSOR_IR_FRONT_R) > BRAITEN_THRESHOLD_DISABLE) &&
+		(m_robot->getSensorValue(SENSOR_IR_R) > BRAITEN_THRESHOLD_DISABLE) &&
+		(m_robot->getSensorValue(SENSOR_IR_L) > BRAITEN_THRESHOLD_DISABLE) &&
+		(m_robot->getSensorValue(SENSOR_IR_BACK_R) > BRAITEN_THRESHOLD_DISABLE) &&
+		(m_robot->getSensorValue(SENSOR_IR_BACK_L) > BRAITEN_THRESHOLD_DISABLE)) {
+			return true;
+	}
+
+	return false;
 }
 
 //Function for the obstacle avoidance
@@ -82,54 +158,23 @@ void Simulation::braitenberg_avoidance() {
 
 	m_robot->setWheelSpeeds(msr, msl);
 }
-/*
- //Function for the phototaxis
- void Simulation::braitenberg_phototaxis() {
-
- int sensor_us;
- int msl = 370;
- int msr = 370;
-
- for (sensor_us = 0; sensor_us < US_SENSORS; sensor_us++) {
-
- msr += (80-m_robot->getSensorValue(sensor_us + SENSOR_IR_BOTTOM_L)) * r_weight_US[sensor_us]; // motor speed right
- msl += (80-m_robot->getSensorValue(sensor_us + SENSOR_IR_BOTTOM_L)) * l_weight_US[sensor_us]; // motor speed left
- }
- if (msl>VAL_WHEELS_FW )  {msl=VAL_WHEELS_FW ;}
- if (msl<VAL_WHEELS_BW)   {msl=VAL_WHEELS_BW;}
- if (msr>VAL_WHEELS_FW )  {msr=VAL_WHEELS_FW ;}
- if (msr<VAL_WHEELS_BW)   {msr=VAL_WHEELS_BW;}
-
- m_robot->setWheelSpeeds(msl,msr);
- }
- */
 
 void Simulation::liftBottle() {
-	m_robot->setShovel(VAL_LIFT_HIGH);
-	m_robot->setWheelSpeeds(VAL_WHEELS_STOP, VAL_WHEELS_STOP);
-	m_robot->sendInstructions();
-	sleep(3);
-	m_robot->setShovel(VAL_LIFT_LOW);
-	m_robot->sendInstructions();
-	sleep(3);
+	change_state(STATE_STOP);
+	change_state(STATE_LIFT_UP);
+	change_state(STATE_LIFT_DOWN);
 }
+
 bool Simulation::bottleCaptured() {
-	//if(brushIsBlocked() || m_robot->getBrushCurrent() > 220)
 	if (m_robot->getSensorValue(SENSOR_IR_BRUSH) < 20) {
-		//usleep(500000);
 		return true;
 	}
 	return false;
 }
-void Simulation::moveWithVector() {
-	int wl, wr; //wheel speeds left and right
 
-	//never go backwards, turn instead.
-	/*if(m_displacementVector[Y] < VAL_WHEELS_STOP)
-	{
-		//m_displacementVector[X] += m_displacementVector[Y];
-		m_displacementVector[Y] = VAL_WHEELS_STOP;
-	}*/
+void Simulation::moveWithVector() {
+	int wl, wr;
+
 	//normalize the vector
 	float norm = sqrt(m_displacementVector[Y]*m_displacementVector[Y] + m_displacementVector[X]*m_displacementVector[X]);
 	m_displacementVector[Y] /= norm;
@@ -164,7 +209,7 @@ void Simulation::moveWithVector() {
 	 if(wr < VAL_WHEELS_BW)
 	 {
 	 wr = VAL_WHEELS_BW;
-	 }*/
+	 }*
 	if (wl > VAL_WHEELS_FW) {
 		wl = VAL_WHEELS_FW;
 	}
@@ -174,9 +219,7 @@ void Simulation::moveWithVector() {
 	m_robot->setWheelSpeeds(wr, wl);
 }
 void Simulation::approachBottlesCam() {
-	//TODO : real function
-//	m_displacementVector[X] -= 150 * abs(m_robot->getBottleAngle());
-
+	/
 	//if a bottle is detected
 	std::vector<Point> bottles = m_vm.bottles;
 	int selectedBottle = 0;
@@ -204,8 +247,8 @@ void Simulation::avoidObstaclesCam() {
 			m_displacementVector[X] = -0.1;
 	m_displacementVector[Y] = ((float)(CAM_OBST-m_vm.line.intercept))/((float)CAM_OBST)*(-m_vm.line.delta_x); // vx
 
-	//std::cout<<"delta x "<<m_vm.line.delta_x<<" delta y "<<m_vm.line.delta_y<<std::cout;
-	//std::cout<<"disp x "<<m_displacementVector[X]<<" disp y "<<m_displacementVector[Y]<<std::cout;
+	std::cout<<"delta x "<<m_vm.line.delta_x<<" delta y "<<m_vm.line.delta_y<<std::cout;
+	std::cout<<"disp x "<<m_displacementVector[X]<<" disp y "<<m_displacementVector[Y]<<std::cout;
 }
 
 //the displacement the robot should have if no collision is detected
@@ -229,7 +272,7 @@ void Simulation::homeDisplacement() {
 	{
 		m_displacementVector[X] = 0;
 		m_displacementVector[Y] = VAL_WHEELS_FW;
-	}*/
+	}*
 	float deltaAngle = (((float)destAngle) - ((float)angle))*PI/180.0f;
 	m_displacementVector[X] += sin(deltaAngle);
 	m_displacementVector[Y] += cos(deltaAngle);
@@ -248,7 +291,7 @@ bool Simulation::brushIsBlocked() {
 		usleep(300000);
 		m_robot->setBrushSpeed(VAL_BRUSH_FW);
 		return true;
-	}*/
+	}*
 	return false;
 }
 void Simulation::emergencyProcedure() {
@@ -312,7 +355,7 @@ void Simulation::loop(void) {
 	int elapsed_secs = double(clock() - m_timeInit) / CLOCKS_PER_SEC;
 
     return;
-    
+
 	m_robot->setBrushSpeed(VAL_BRUSH_FW);
 
 	if (bottleCaptured() && m_currentState != STATE_AVOIDANCE) {
@@ -389,3 +432,4 @@ void Simulation::updateVision()
 {
 	m_robot->getVisionData(m_vm);
 }
+*/

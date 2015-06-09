@@ -6,6 +6,7 @@
  motor
  * extra pins available for serial transfer
  */
+ int k;
  
  #include "IR.h"
  #include "DynamixelSerial.h"
@@ -39,6 +40,7 @@
 
 //dynamixel
 #define DYMX_ID 14
+//#define DYMX_ID2 13
 #define CLOCKWISE 1
 #define ANTICLOCKWISE 0
 
@@ -138,13 +140,13 @@ void setup()                    // run once, when the sketch starts
     //setup dynamixel
     Dynamixel.begin(1000000, 2);  // Initialize the servo at 1Mbps and Pin Control 2
     Dynamixel.setEndless(DYMX_ID, OFF);    
-
+    //Dynamixel.setEndless(DYMX_ID2, OFF); 
     // communication
     memset(message, '\0', MSG_MAX);
     current_message_end = 0;
     Serial.begin(BAUDRATE);
     Serial.flush();
-
+    k = 0;
     //stackInit();
 }
 
@@ -194,6 +196,18 @@ void loop()                       // run over and over again
     {
         ir_prev[i] = ir_new[i];
     }
+    
+    if(k)
+    {
+        dynamixel_move(900);
+        delay(3000);
+    }
+    else
+    {
+        dynamixel_move(500);
+        delay(3000);
+    }
+    k = !k;
     
 //    stackAdd(measure_motor_current());
 //    print_value(SENSOR_BRUSH_CURRENT, stackAvg());
@@ -302,6 +316,7 @@ void dynamixel_move(int val)
 {
     if(val < 0 || val > 1023) return;
     Dynamixel.moveSpeed(DYMX_ID, val, 100);
+    //Dynamixel.moveSpeed(DYMX_ID2, 1023-val, 100);
 }
 
 //-------------------------------------------------------------- communication  -----------------------------------------------------
