@@ -304,7 +304,9 @@ void RangeFinder::getRays(vector<Point> &dst) {
     Rect tmp;
     for (int i = 0; i < m_rays.size(); ++i) {
         tmp = m_rays[i];
-        dst.push_back(Point((tmp.x + tmp.width/2) - m_width / 2, m_height - (tmp.y + tmp.height)));
+        dst.push_back(Point((tmp.x + tmp.width/2) - m_width / 2, tmp.height));
+        
+        std::cout << dst[i] << std::endl;
     }
 }
 void RangeFinder::getBeacon(Point &dst) {
