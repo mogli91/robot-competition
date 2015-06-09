@@ -81,8 +81,11 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
     assert(src.rows == dst.rows && src.cols == dst.cols);
     
     reset();
-    
+
     integral(src, m_integral);
+    Rect brush;
+    bool brush_lifted = findBrush(m_integral, brush);
+    
     double mu_new[3] = {0.0, 0.0, 0.0};
     double mu_old[3] = {0.0, 0.0, 0.0};
     double color_dist;
@@ -107,6 +110,8 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
                  break;
             }
         }
+        // correct for eventual brush offset
+        m_rays[r].height = m_height - m_rays[r].y;
 //        cout << endl;
     }
     
@@ -129,6 +134,10 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
     
     m_error = fitTerrainLine(m_line);
     line(src, Point(m_line[2] - m_line[0]*1000,m_line[3] - m_line[1]*1000),Point(m_line[2] + m_line[0]*1000, m_line[3]+m_line[1]*1000), Scalar(255,255,0));
+    
+    if (brush_lifted) {
+        rectangle(src, brush, Scalar(255,255,0));
+    }
     
 //    std::cout << "error " << m_error << std::endl;
     
@@ -293,7 +302,7 @@ void RangeFinder::getRays(vector<Point> &dst) {
     Rect tmp;
     for (int i = 0; i < m_rays.size(); ++i) {
         tmp = m_rays[i];
-        dst.push_back(Point((tmp.x + tmp.width/2) - m_width, m_height - (tmp.y + tmp.height)));
+        dst.push_back(Point((tmp.x + tmp.width/2) - m_width / 2, m_height - (tmp.y + tmp.height)));
     }
 }
 void RangeFinder::getBeacon(Point &dst) {
@@ -355,8 +364,25 @@ void RangeFinder::getLineParameters(RegressionLine &line) {
     line.delta_x = m_line[0];
     line.delta_y = - m_line[1];
     
-//    std::cout << (line.delta_x - m_line[0]) << std::endl;
     
     line.intercept = m_height - (y0 + (x - x0) * slope);
     line.error = m_error;
+    std::cout << line.error << std::endl;
+}
+
+bool RangeFinder::findBrush(const cv::Mat &img_integral, Rect &r) {
+    int unused = 2;
+    Point p = Point(m_rays[unused].x, m_blocksize);
+    double th = 150;
+    Brush brush = Brush(m_blocksize, m_numRays - 2*unused);
+    if (brush.match(img_integral, p, th)) {
+        r = brush.getROI();
+        
+        for (int i = unused; i < (m_numRays - unused); ++i) {
+            m_rays[i].y = m_height - r.height - m_blocksize;
+        }
+        return true;
+    } else {
+        return false;
+    }
 }

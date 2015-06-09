@@ -50,6 +50,8 @@ Mask::Mask(int blocksize, int type) {
         case BEACON:
             m_roi.width = m_blocksize;
             m_roi.height = 2 * m_blocksize;
+        case BRUSH:
+            m_roi.height = m_blocksize;
         default:
             break;
     }
@@ -799,6 +801,48 @@ bool Beacon::matchGray(const cv::Mat &img_integral, cv::Point p, double threshol
 //        std::cout << response_max << std::endl;
         return false;
     }
+    
+}
+
+// ------------------------------ BRUSH ------------------------------------------
+bool Brush::match(const cv::Mat &img_integral, cv::Point p, double threshold) {
+    m_roi.height = m_blocksize;
+    m_roi.x = p.x;
+    
+    if  ((p.x) < 0
+         || (p.y + m_roi.height) >= img_integral.rows
+         || (p.x + m_roi.width) >= img_integral.cols) {
+        
+        return false;
+    }
+    
+    int height = img_integral.rows - 1;
+    double mean_color[3] = {0.0, 0.0, 0.0};
+    double response;
+    double response_max = -INFINITY;
+    bool found = false;
+    
+    
+    for (int row = height - m_blocksize; row > height / 2; --row) {
+        m_roi.y = row;
+        computeMeanInnerRect(img_integral, m_roi, mean_color);
+        response = 0;
+        for (int i = 0; i < 3; i++) {
+            response += mean_color[i] / 3;
+        }
+        if (response > threshold) {
+            if (response < response_max) {
+                m_roi.y--;
+                m_roi.height = height - m_roi.y;
+                found = true;
+                break;
+            } else {
+                response_max = response;
+            }
+        }
+    }
+    
+    return found;
     
 }
 

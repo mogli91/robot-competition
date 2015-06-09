@@ -302,7 +302,7 @@ void RangeFinder::getRays(vector<Point> &dst) {
     Rect tmp;
     for (int i = 0; i < m_rays.size(); ++i) {
         tmp = m_rays[i];
-        dst.push_back(Point((tmp.x + tmp.width/2) - m_width, m_height - (tmp.y + tmp.height)));
+        dst.push_back(Point((tmp.x + tmp.width/2) - m_width / 2, m_height - (tmp.y + tmp.height)));
     }
 }
 void RangeFinder::getBeacon(Point &dst) {
@@ -364,10 +364,10 @@ void RangeFinder::getLineParameters(RegressionLine &line) {
     line.delta_x = m_line[0];
     line.delta_y = - m_line[1];
     
-//    std::cout << (line.delta_x - m_line[0]) << std::endl;
     
     line.intercept = m_height - (y0 + (x - x0) * slope);
     line.error = m_error;
+    std::cout << line.error << std::endl;
 }
 
 bool RangeFinder::findBrush(const cv::Mat &img_integral, Rect &r) {
