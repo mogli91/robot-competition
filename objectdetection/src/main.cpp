@@ -445,6 +445,7 @@ int main(int argc, char** args) {
         
         if (simulation) {
             mySim->loop();
+            fflush(stdout);
         }
         
 		/* check if we were signaled due to user operation        */

@@ -309,7 +309,11 @@ void RangeFinder::getRays(vector<Point> &dst) {
         tmp = m_rays[i];
         dst.push_back(Point((tmp.x + tmp.width/2) - m_width / 2, tmp.height));
         
+<<<<<<< HEAD
+        //std::cout << dst[i] << std::endl;
+=======
 //        std::cout << dst[i] << std::endl;
+>>>>>>> 8c82975f73aa8d7688e37a6074da125d2c5a68a3
     }
 }
 void RangeFinder::getBeacon(Point &dst) {
@@ -374,7 +378,11 @@ void RangeFinder::getLineParameters(RegressionLine &line) {
     
     line.intercept = m_height - (y0 + (x - x0) * slope);
     line.error = m_error;
+<<<<<<< HEAD
+    //std::cout << line.error << std::endl;
+=======
 //    std::cout << line.error << std::endl;
+>>>>>>> 8c82975f73aa8d7688e37a6074da125d2c5a68a3
 }
 
 bool RangeFinder::findBrush(const cv::Mat &img_integral, Rect &r) {
@@ -426,7 +434,11 @@ int RangeFinder::determineTerrain(const cv::Mat &img_integral, Rect &brush) {
     double dist = Mask::dist(mean, green);
     int threshold = 80;
     
+<<<<<<< HEAD
+   // cout << "color " << mean[0] << ", " << mean[1] << ", " << mean[2] << "\t dist: " << dist << endl << flush;
+=======
 //    cout << "color " << mean[0] << ", " << mean[1] << ", " << mean[2] << "\t dist: " << dist << endl << flush;
+>>>>>>> 8c82975f73aa8d7688e37a6074da125d2c5a68a3
     
     if (dist < threshold) {
         return 1;
