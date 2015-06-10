@@ -9,7 +9,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Localization Module}
+\section{Localization Module}
 The localization module is composed of an arduino micro, 6 linear sensor arrays, and a compass. Mounted on a rod in a high position on the robot, it's purpose is to use the geometry of the map, the beacon peaks received by the linear sensor arrays, and the orientation read from the compass in order to triangulate the position and orientation of the robot in the map.
 
 \begin{figure}
@@ -19,18 +19,18 @@ The localization module is composed of an arduino micro, 6 linear sensor arrays,
 \label{fig:lincam}
 \end{figure}
 
-\section{Sensors}
+\subsection{Sensors}
 Data from two different sensor types are fused to obtain the robot's pose 
 (position and orientation) in the arena. A digital compass and an array of
 six linear cameras
 
-\subsection{Compass}
+\subsubsection{Compass}
 The compass directly returns the orientation in a range from $0.0^\circ$ and $360.0^\circ$.
 Pose updates are queried once per iteration. The purpose of this sensor is to 
 give absolute orientation estimates in any place of the arena and independently of
 occlusions. In the arena, the compass was also calibrated at the initialization of the program, in order to have a fixed north, pointing at the robot starting orientation.
 
-\subsection{Linear Cameras}
+\subsubsection{Linear Cameras}
 The heart of our localization module is formed by six linear cameras arranged 
 as a hexagon. All pixel arrays have the same height and inclination, which allows
 us to make the simplifying assumption that an image stitched together from all the
@@ -47,7 +47,7 @@ in any location inside the arena whereas the achievable accuracy of triangulated
 values through the camera signal varies strongly within the arena due to occlusions
 or distant light beacons.
 
-\section{Localization algorithm}
+\subsection{Localization algorithm}
 Each camera is equipped with a linear image sensor of length 102 and depth 255. This
 yields a total of 612 pixels on the whole circle. Mapping pixels to degrees causes a 
 resolution of approximately two pixels per degree. An exact determination of peeks 
@@ -129,7 +129,7 @@ is more likely to fail.
 \end{figure}
 
 % TODO place somewhere else in text
-Figure \figurename~\ref{fig:localization_grid} shows the four beacons in the corners of the map, the coordinate system used, and the robot's position.
+\figurename~\ref{fig:localization_grid} shows the four beacons in the corners of the map, the coordinate system used, and the robot's position.
 
 We want to determine the robots exact
 location $\vec{s}$. From previous measurements, we know that we are in the tile
@@ -160,7 +160,7 @@ In a very abstract manner
 
 
 
-\section{Tests}
+\subsection{Tests}
 
 In order to visualize the readings of the different sensors, and to test the algorithm performance in the arena, a python script was written. The script shows a visualization of the intensity values of the 612 pixel array obtain by combining the 6 linear cameras. The blue arrow is also the direction obtained by reading the compass.
  before having the arena, we tried visualizing the peaks in ``good'' conditions. In figure \ref{fig:goodpeak}, the peaks are very high, and easily visisble. 
@@ -189,3 +189,5 @@ In the last figure (Figure \ref{fig:roof}), multiple peaks with very high intens
 \caption{Data aquired from the linear sensor arrays in when aiming at the roof of the arena.}
 \label{fig:roof}
 \end{figure}
+
+Finally, during the competition, we were not able to make the localization work with the beacons, and we used only the compass to give to the robot the direction to where the home was. To find when it was home, the robot used the image processing to locate the beacon that would give a distance towards the recycling area.
