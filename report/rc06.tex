@@ -191,6 +191,37 @@ with the result of the terrain segmentation step. Black means non-drivable.
 \end{figure}
 
 \subsubsection{Detection of Terrain Transitions}
+Given that terrain transitions in the arena are sharp straight lines, we can detect
+those by fitting a regression line to the result of the segmentation step. Mostly, the
+next encountered terrain does not span over the whole image and also only a small portion
+of it is interesting to the robot -- the portion directly in front -- since it cannot
+displace itself laterally.
+
+Using OpenCV's \texttt{fitLine} function, we estimate a line in
+2D over the central ten column heights of the previous step. Using the resulting
+slope and offset, we compute the mean squared error of our estimate (summing up the 
+squared differences between the true column heights and the predicted ones).
+\figurename~\ref{fig:transition} shows the robot's point of view when approaching the
+rock barrier with the expected terrain boundary denoted by the regression line in blue.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.45\textwidth]{figures/terrain-transition.png}
+\label{fig:transition}
+\caption{Regression line to terrain segmentation.}
+\end{figure}
+
+A low error means that the line fitting is appropriate and a terrain change is likely
+while a high error signalizes a noisy boundary of the field of view. Boundary interruptions
+(some columns lower than others) can be caused by obstacles, bottles or difficult lightning
+conditions. Distance measures from the camera can help to detect 
+terrain transitions as they cannot be seen by the infrared sensors. Obstacles,
+however, can be detected by the infrared sensors. Consequently, range data from 
+our infrared sensors should have higher weight then vision data and vision data
+shall be used in cases where we have no response from infrared sensors.
+
+
+\subsubsection{Beacon Detection}
 
 
 \subsubsection{Bottle Detection}
@@ -202,6 +233,13 @@ in pixels, where $y=0$ is the bottom pixel row and $x=0$ is the horizontal cente
 image. There is also a vector of potential bottles with their respective coordinates,
 slope and intersect of a regression line fit to the ten central bars and an error measure
 reflecting confidence in the regression line.
+
+Even though we could work with 3D data by calibrating the camera with respect to the
+floor and compute distances and lateral offsets in cm, we decided to work with pixel
+coordinates. We tried translating pixel coordinates into cm by measuring the field of view
+of the camera and using the results for linear interpolation. However, this is eventually
+only a scaling factor that can easier be taken care of when using the vision data. Hence,
+we decided to transmit raw pixel measures and adjust accordingly in the control algorithm.
 
 \subsection{Results}
 
