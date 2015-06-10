@@ -256,7 +256,8 @@ Each mask is composed of square blocks of edge length 20 pixels. The blocks are 
 (vertical bottle), placed aside (horizontal bottle) or placed with vertical and horizontal
 offset ($45^\circ$) bottle. Depending on the distance (far, middle, close), blocks
 do also overlap. \figurename~\ref{fig:bottles1} shows the result of the bottle detection
-algorithm with three true positives and one false negative.
+algorithm with three true positives and one false negative (left). Tests with low light
+showed that the concept adapts well.
 
 \begin{figure}
 \center
@@ -264,9 +265,9 @@ algorithm with three true positives and one false negative.
 \includegraphics[width=0.45\textwidth]{figures/009.png}}
 \hfill
 \subfigure{
-\includegraphics[width=0.45\textwidth]{figures/009-mask.png}}
+\includegraphics[width=0.45\textwidth]{figures/011.png}}
 \label{fig:bottles1}
-\caption{Bottle detection.}
+\caption{Bottle detection at different lightning conditions.}
 \end{figure}
 
 
@@ -285,7 +286,7 @@ of the camera and using the results for linear interpolation. However, this is e
 only a scaling factor that can easier be taken care of when using the vision data. Hence,
 we decided to transmit raw pixel measures and adjust accordingly in the control algorithm.
 
-\subsection{Results}
+\subsection{Partial Results}
 The terrain segmentation worked very well in most cases. Strong intensity changes on grass
 produced poor segmentations. Dimming the ceiling light helped to avoid this. 
 Our bottle detection had many false positives since it was very responsive to edges in
@@ -294,14 +295,48 @@ about terrain transitions might have helped to avoid these false positives since
 rock barrier was detectable without any problems. However, this feature could not 
 be added in time before the competition. 
 
-Another problem during the competition came up regarding our beacon detection method.
-High image intensities with a matching width for the top-hat filter caused the robot
-to drop its bottle outside the recycling area. It was the same place in both cases.
-This means that the threshold was chosen too losely and we could have avoided it.
+Another problem came up during the competition. Our robot dropped off its bottle 
+outside the recycling area due to a constant false positive beacon in the audience. 
+High image intensities with a matching width for the top-hat filter.
+It was the same place in both cases.
+This means that the threshold was chosen too loosely and we could have avoided it.
 
 \section{Control Algorithm}
 At the moment our robot is a Braitenberg vehicle, meaning that depending on the type
-of reading it receives steers its wheels toward or away from the perceived object. 
-Terrain classification as well as positions of obstacles and bottles detected through 
-vision will be added to guide the robot. Special behaviors as picking up a bottle, 
+of reading it receives steers its wheels toward or away from the perceived object.
+Terrain classification as well as positions of obstacles and bottles detected through
+vision will be added to guide the robot. Special behaviors as picking up a bottle,
 returning home to the recycling station or releasing loaded bottles are planned.
+
+In order to control the robot's locomotion a finite state machine has been developed .
+In such a system to each state is associated a particular behavior of the robot that is triggered according to some predefined conditions.
+The chosen states for our robot are shown in figure \ref{fig:FSM}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{FSM.png}
+\caption{Finite State Machine of the robot.}
+\label{fig:FSM}
+\end{figure}
+
+At the beginning the robot is the STATE INIT. In this state the robot is initialized, meaning that is checked if the back-door for the bottles release is properly closed and if the brush is moving.
+After that the robot is directly moved to the STATE MOVE.
+This state represents the default behavior of the robot if no obstacles or changes of zone are detected.
+The robot simply moves straight ahead looking for bottles with the camera and, if it detects one of them, it steers toward the bottle in order to grasp it.
+Once the bottle has been grasped, it is lifted up thanks to an IR sensor placed within the elevator and which detects if something is in it.
+From this state the robot can pass to others three different behaviors according to some trigger conditions.
+First of all, if the robot is within a range of 50 cm from an obstacle, that can be either a brick or a wall it enters the STATE AVOIDANCE.
+In this state the speeds for the wheels are computed considering the robot as a Braitenberg's vehicle.
+This means that a bias speed is assigned to the wheels and then this value are modified exploiting a reactive architecture based on the IR sensors disposed on the robot.
+Each sensor gives a value of the distance of the obstacles around the robot and afterwards this value is subtracted to 80 cm (maximum range of the IR sensor) in order to obtain a value that is bigger the closer an obstacle is to the robot. These values are then multiplied for weights properly chosen to conferee a smooth behavior to the robot while avoiding obstacles and modify the bias speeds to allow the robot to avoid having an impact with the brick or the wall.
+Being the IR disposed in a symmetric way around the robot, in order to deal with the case in which the robot meets an obstacle perpendicular to it, a safety maneuver has been implemented consisting in making the robot drive backwards and turn of a small angle. This maneuver is activated when both the front IR sensors return a value of distance between a certain threshold that has been chosen of 50 cm.
+After the robot has successfully avoided a possible impact it returns in STATE MOVE if the returned values from the sensors are bigger of a disable threshold different from the enable one. The two threshold are different otherwise the robot would just continuously switch between the two states getting stuck in its current location in the arena.
+From the STATE MOVE the robot can also switch to the STATE CAM AVOIDANCE.
+This state has as objective to allow the robot to identify a change of zone in the arena and avoid crossing it.
+This has been done because, even though the robot is capable to cross all the passages areas, in case of failure of the procedure to lift up the robot's elevator the robot would simply risk to break part of its structure. As a consequence it has been chosen to avoid the bonus zones during the competition.
+This state exploits the information coming from the camera and if a change in the appearance of the terrain is detected a safety maneuver like the one described before is performed.
+Finally the robot can pass from STATE MOVE to STATE GO HOME in order to bring the bottles to the reserved recycling area exploiting the information coming from the compass and then come back to the STATE MOVE.
+To avoid an impact during this process, from this state as well is possible for the robot to switch to the two states STATE AVOIDANCE and STATE CAM AVOIDANCE.
+
+
+
