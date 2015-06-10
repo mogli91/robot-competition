@@ -118,17 +118,36 @@ is currently on drivable terrain, a small area in the lower part of the image (d
 in front of the robot) is used as sample pattern. This region is extended toward the
 top of the image whilst the change in color is below a certain threshold. Boundaries
 of this area are candidates for obstacles, bottles or sudden terrain changes. This 
-option was found to generalize better than the first.
+option was found to generalize better than the first. A more detailed description is
+given in the next section.
 
 \subsection{Middle Layer}
-The class \texttt{Brain} communicates with objects from the bottom layer (\texttt{Serial, Detector}).
+The class \texttt{Brain} serves as a wrapper for sensing and acting modules. It 
+communicates with objects from the bottom layer (\texttt{Serial, Detector}).
 It provides access to all the measurements via the respective IDs defined in \texttt{defines.h}).
-Getter and setter functions with respective value range checks are available to provide
-an abstract view on the robot's sensing and acting. 
+Getter and setter functions with respective value range checks allow to use the low-level 
+functions from a more abstract point of view.
+
+\subsection{Top Layer}
+In order to control the robot either manually or from a custom controller, it is 
+necessary to create objects from the lowest level and instantiate an object of type \texttt{Brain}.
+An example for keyboard control can be found in \texttt{main.cpp}. Keys are directly mapped
+to actions and therefore allow for remote control. Displaying visual output is optional
+and can be disabled by the option \texttt{no\_cam}.
+
+For autonomous mode, we tested two different approaches in the classes \texttt{Simulation} and
+\texttt{Autonomous}.
 
 \section{Vision}
 
 \subsection{Camera}
+A Playstation 3 Camera, an off-the-shelf USB camera, was mounted on a bridge on top of 
+the robot covering a field of view from 10~cm to 250~cm in front of the robot and 
+widths of 50~cm to 280~cm respectively. This camera was mainly chosen for its easily
+modifiable Linux driver and its wide range of manual options such as exposure time,
+gain and frame rate. Short exposure times at a constantly high frame rate were needed
+to avoid blurred images. Since the camera is mounted almost 50~cm over ground, vibrations
+and rough terrain (rocks) might cause blur and thereby make images useless.
 
 \subsection{Terrain Segmentation}
 Integral image from color image. Assuming that terrain directly in front of robot is 
