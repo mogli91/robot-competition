@@ -41,11 +41,18 @@ The sensors module, as described in it's respective section, is connected to all
 \label{fig:ard1connection}
 \end{figure}
 
-As it can be seen in Figure \ref{fig:ard1connection} above, the sensors module is connected to many different sensors. With 20 IO pins and 7 Analog input pins, the arduino Micro is also powerful enough to read, interpred, and connect to all those sensors. In purple are all the analog wires, and blue the IO pins. The Cs is a special pin on the motor driver that allows to read the current flowing through the motor. Each 140mV read on this pin corresponds to 1 Amp on the motor. For the dynamixel, as described earlier, the two serial wires are connected together with a resistance in between to simulate a half duplex connection. The ultrasound sensors, as well have both echo and ping pins connected together with a resistance in between, in order to reduce the number of pins used on the arduino micro, and facilitate the connections.\\
+As it can be seen in Figure \ref{fig:ard1connection} above, the sensors module is connected to many different sensors. With 20 IO pins and 12 Analog input pins, the arduino Micro is also powerful enough to read, interpred, and connect to all those sensors. In purple are all the analog wires, and blue the IO pins. The Cs is a special pin on the motor driver that allows to read the current flowing through the motor. Each 140mV read on this pin corresponds to 1 Amp on the motor. For the dynamixel, as described earlier, the two serial wires are connected together with a resistance in between to simulate a half duplex connection. The ultrasound sensors, as well have both echo and ping pins connected together with a resistance in between, in order to reduce the number of pins used on the arduino micro, and facilitate the connections.\\
 
-%\textbf{From the datasheets, the IR sensors draw 30mA and the Ultrasound Sensors draw 15mA. As a total, only the sensors draw 210 mA. From tests done with the arduino micro, the 5Volts output pin cannot supply such high demands in current. As a solution, it is also possible to conenct some sensors power supply to the wild thumper. RISKY}\\
+The three other IO pins connected to the motor driver are just controls for the motor. The motor driver needs two power supplies. One is for the input logic, 5V, and the other is for the motor output (we used the battery 7.2 V power supply).\\
 
-The three other IO pins connected to the motor driver are just controls for the motor. The motor driver needs two power supplies. One is for the input logic, 5V, and the other is for the motor output (we used the battery 7.2 V power supply).
+Figure \ref{fig:ard1connection} was the planned connections, but was not what was used in the end, during the competition, a more accurate figure would be Figure \ref{fig:ard1connection2} seen below, where only infrared sensors were used.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Arduino1Connection2.png}
+  \caption{The Sensors module, and it's connections.}
+\label{fig:ard1connection2}
+\end{figure}
 
 \section{Localization Module}
 
@@ -81,11 +88,37 @@ Seen in Figure \ref{fig:wtconnection} above is the connection diagram of the wil
 %how everything was connected, connectors etc.. battery... 
 
 \chapter{Results}
-%how the robot worked
+The robot was the second one in the competition. With 2.5 poits, the robot was able to capture a bottle and nearly bring it back in time. The remote control from a computer allowed us to control manually all the functions of the robot, the wheels, the servos, and the brush, and we were also able to visualize the camera, and see the values of all the different sensors. The robot was able to navigate towards a bottle, to avoid obstacles, and was also able to return home and open the tailgate. However, as many false positives were measured from the camera, the robot sometimes saw beacons, and thus released the bottles. Another feature was area distinction, which allowed the robot to avoid going in dangerous zones, but there, once again, the false positives would make the robot go towars the rocks for instance. As the shovel was close to the ground, the robot sometimes got stuck in between the tiles, under the grass or the rocks. In the beginning it was planned to use two dynamixels, because one was not strong enough to just `hover' the lift above the ground, but since the synchronization of the servos failed, we could only have two states : on the ground or lifted all the way.
 
 \chapter{Conclusion}
-%duh
+Finally, this huge project took a tremendous amount of our time. In order to accomplish a functionnal robot, nearly every day was spend in epfl until midnight, where intense work took place. It was quite sad to obtain a robot that did not manage to bring back more than one bottle at the end, especially considering the amount of work invested in the project. However, all this work allowed us to learn very much on the design, construction and programming of a robot, with all the project phases in between.
 
 \chapter{Annex}
 
-%Risk analysis, budget etc...
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{GanttChart1.jpg}
+  \caption{Gannt Chart until the third milestone.}
+\label{fig:gannt1}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{GanttChart2.jpg}
+  \caption{Gannt Chart until the end of the competition.}
+\label{fig:gannt2}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{budgetreal.png}
+  \caption{Real budget used for the robot.}
+\label{fig:real}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{budgetvirtual.png}
+  \caption{Virtual budget used for the robot.}
+\label{fig:virtual}
+\end{figure}

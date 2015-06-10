@@ -118,29 +118,92 @@ is currently on drivable terrain, a small area in the lower part of the image (d
 in front of the robot) is used as sample pattern. This region is extended toward the
 top of the image whilst the change in color is below a certain threshold. Boundaries
 of this area are candidates for obstacles, bottles or sudden terrain changes. This 
-option was found to generalize better than the first.
+option was found to generalize better than the first. A more detailed description is
+given in the next section.
 
 \subsection{Middle Layer}
-The class \texttt{Brain} communicates with objects from the bottom layer (\texttt{Serial, Detector}).
+The class \texttt{Brain} serves as a wrapper for sensing and acting modules. It 
+communicates with objects from the bottom layer (\texttt{Serial, Detector}).
 It provides access to all the measurements via the respective IDs defined in \texttt{defines.h}).
-Getter and setter functions with respective value range checks are available to provide
-an abstract view on the robot's sensing and acting. 
+Getter and setter functions with respective value range checks allow to use the low-level 
+functions from a more abstract point of view.
+
+\subsection{Top Layer}
+In order to control the robot either manually or from a custom controller, it is 
+necessary to create objects from the lowest level and instantiate an object of type \texttt{Brain}.
+An example for keyboard control can be found in \texttt{main.cpp}. Keys are directly mapped
+to actions and therefore allow for remote control. Displaying visual output is optional
+and can be disabled by the option \texttt{no\_cam}.
+
+For autonomous mode, we tested two different approaches in the classes \texttt{Simulation} and
+\texttt{Autonomous}.
 
 \section{Vision}
 
 \subsection{Camera}
+A Playstation 3 Camera, an off-the-shelf USB camera, was mounted on a bridge on top of 
+the robot covering a field of view from 10~cm to 250~cm in front of the robot and 
+widths of 50~cm to 280~cm respectively. This camera was mainly chosen for its easily
+modifiable Linux driver and its wide range of manual options such as exposure time,
+gain and frame rate. Short exposure times at a constantly high frame rate were needed
+to avoid blurred images. Since the camera is mounted almost 50~cm over ground, vibrations
+and rough terrain (rocks) might cause blur and thereby make images useless.
 
-\subsection{Terrain Segmentation}
-Integral image from color image. Assuming that terrain directly in front of robot is 
-drivable, we extend this area while ensuring that the color does not change too much.
+\subsection{Algorithms}
+Images taken by the camera were not only processed for object detection but also for 
+the detection of terrain changes. Since our robot's bottle collection mechanism can only
+work when it touches the ground, approaching the grass area or the rock barrier are
+a particular danger causing the shovel to hook under the grass carpet or a rock.
+The following explains the three key parts of our final algorithm.
 
-\subsection{Object Detection}
+\subsubsection{Preprocessing}
+The input image is a $320 \times 240$ RGB image. 
+An integral image is created from the original frame. Colors are not transformed into
+gray scale. Therefore, the resulting integral image is still a three-channel matrix
+of size $width + 1 \times height + 1$. The main advantage of integral images is 
+that sums over rectangular pixel areas can be computed in constant time. The later
+steps take advantage of this fact when computing average colors or applying filters.
 
-\subsection{Light}
-Lightning conditions play a decisive roll in most vision applications. In this
-particular scenario we are blessed with nearly optimal lighting coming from the
-ceiling. Due to the vision algorithm design and manual tuning of camera exposure time
-our images do not suffer from saturation.
+\subsubsection{Terrain Segmentation}
+Assuming that the image bottom captures drivable terrain, we want to grow determine 
+future drivable terrain by growing the region captured in the image bottom toward
+the top of the image.
+
+For this purpose, the image is divided into equally spaced columns of 20 pixels width.
+In each column, we compute the average color over a region of 20 pixels height, hence 
+a block size of $20 \times 20$ pixels. We then move up the image by half a block size
+and re-compute the average color. We repeat this step until the distance between the
+current and the preceding (half a block size lower) region is above a certain 
+threshold. From an abstract point of view, we grow the drivable area by allowing a 
+limited change in color. \figurename~\ref{fig:segmentation} shows the robots's point
+of view when approaching the elevated area. For visualization the image is masked
+with the result of the terrain segmentation step. Black means non-drivable.
+
+\begin{figure}
+\center
+\subfigure{
+\includegraphics[width=0.45\textwidth]{figures/005.png}}
+\hfill
+\subfigure{
+\includegraphics[width=0.45\textwidth]{figures/005-mask.png}}
+\label{fig:segmentation}
+\caption{Segmentation of drivable terrain.}
+\end{figure}
+
+\subsubsection{Detection of Terrain Transitions}
+
+
+\subsubsection{Bottle Detection}
+
+\subsubsection{Generated Data}
+Output data generated from the above vision algorithms is collected in an object of type
+\texttt{VisionMeasure} and handed to the \texttt{Brain}. It contains $x-$ and $y-$coordinates
+in pixels, where $y=0$ is the bottom pixel row and $x=0$ is the horizontal center of the
+image. There is also a vector of potential bottles with their respective coordinates,
+slope and intersect of a regression line fit to the ten central bars and an error measure
+reflecting confidence in the regression line.
+
+\subsection{Results}
 
 \section{Control Algorithm}
 At the moment our robot is a Braitenberg vehicle, meaning that depending on the type
