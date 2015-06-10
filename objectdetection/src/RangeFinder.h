@@ -74,6 +74,10 @@ public:
     
     void locateBottles();
     
+    bool findBrush(const cv::Mat &img_integral, Rect &brush);
+    
+    int determineTerrain(const cv::Mat &img_integral, Rect &brush);
+    
     // in world coordinates
     
     void getBottleCoordinates(vector<Point> &dst);

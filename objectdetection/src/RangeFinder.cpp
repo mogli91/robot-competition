@@ -81,8 +81,11 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
     assert(src.rows == dst.rows && src.cols == dst.cols);
     
     reset();
-    
+
     integral(src, m_integral);
+    Rect brush;
+    bool brush_lifted = findBrush(m_integral, brush);
+    
     double mu_new[3] = {0.0, 0.0, 0.0};
     double mu_old[3] = {0.0, 0.0, 0.0};
     double color_dist;
@@ -107,6 +110,8 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
                  break;
             }
         }
+        // correct for eventual brush offset
+        m_rays[r].height = m_height - m_rays[r].y;
 //        cout << endl;
     }
     
@@ -130,6 +135,12 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
     m_error = fitTerrainLine(m_line);
     line(src, Point(m_line[2] - m_line[0]*1000,m_line[3] - m_line[1]*1000),Point(m_line[2] + m_line[0]*1000, m_line[3]+m_line[1]*1000), Scalar(255,255,0));
     
+    if (brush_lifted) {
+        rectangle(src, brush, Scalar(255,255,0));
+    }
+    
+//    int terrain = determineTerrain(m_integral, brush);
+    
 //    std::cout << "error " << m_error << std::endl;
     
     drawMask(dst);
@@ -147,7 +158,7 @@ void RangeFinder::locateBottles() {
     BottleVeryCloseFlat bottleVCF = BottleVeryCloseFlat(bs);
     BottleVeryClose45P bottleVC45P = BottleVeryClose45P(bs);
     BottleVeryClose45N bottleVC45N = BottleVeryClose45N(bs);
-    double threshold = 30;
+    double threshold = 50;
     Point p;
     
     m_bottles.clear();
@@ -293,7 +304,9 @@ void RangeFinder::getRays(vector<Point> &dst) {
     Rect tmp;
     for (int i = 0; i < m_rays.size(); ++i) {
         tmp = m_rays[i];
-        dst.push_back(Point((tmp.x + tmp.width/2) - m_width, m_height - (tmp.y + tmp.height)));
+        dst.push_back(Point((tmp.x + tmp.width/2) - m_width / 2, tmp.height));
+        
+        std::cout << dst[i] << std::endl;
     }
 }
 void RangeFinder::getBeacon(Point &dst) {
@@ -355,8 +368,70 @@ void RangeFinder::getLineParameters(RegressionLine &line) {
     line.delta_x = m_line[0];
     line.delta_y = - m_line[1];
     
-//    std::cout << (line.delta_x - m_line[0]) << std::endl;
     
     line.intercept = m_height - (y0 + (x - x0) * slope);
     line.error = m_error;
+    std::cout << line.error << std::endl;
 }
+
+bool RangeFinder::findBrush(const cv::Mat &img_integral, Rect &r) {
+    int unused = 3;
+    Point p = Point(m_rays[unused].x, m_blocksize);
+    double th = 180;
+    Brush brush = Brush(m_blocksize, m_numRays - 2*unused);
+    if (brush.match(img_integral, p, th)) {
+        r = brush.getROI();
+        
+        for (int i = unused; i < (m_numRays - unused); ++i) {
+            m_rays[i].y = m_height - r.height - m_blocksize;
+        }
+        return true;
+    } else {
+        return false;
+    }
+}
+
+int RangeFinder::determineTerrain(const cv::Mat &img_integral, Rect &brush) {
+    int sum_3[3] = {0,0,0};
+    int sum_tmp[3];
+    double mean[3];
+    
+    int area = 0;
+    
+    for (int r = 0; r < m_numRays; ++r) {
+        Mask::computeSum(m_integral, m_rays[r], sum_tmp);
+        for (int i = 0; i < 3; ++i) {
+            sum_3[i] += sum_tmp[i];
+        }
+        area += m_rays[r].area();
+    }
+
+    if (brush.x > 0 && brush.y > 0) {
+        Mask::computeSum(m_integral, brush, sum_tmp);
+        for (int i = 0; i < 3; ++i) {
+            sum_3[i] -= sum_tmp[i];
+        }
+        area -= brush.area();
+    }
+    
+    for (int i = 0; i < 3; ++i) {
+        mean[i] = sum_3[i] / (1.0*area);
+    }
+    
+//    double green[3] = {41.9723, 105.003, 87.8274};
+    double green[3] = {70.2312, 120.569, 106.694};
+    double dist = Mask::dist(mean, green);
+    int threshold = 80;
+    
+    cout << "color " << mean[0] << ", " << mean[1] << ", " << mean[2] << "\t dist: " << dist << endl << flush;
+    
+    if (dist < threshold) {
+        return 1;
+    } else {
+        return 0;
+    }
+    
+    
+    
+}
+

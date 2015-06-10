@@ -23,16 +23,16 @@ protected:
 public:
     
     enum TYPE {FAR, CLOSE_UPRIGHT, CLOSE_FLAT, CLOSE_45P, CLOSE_45N,
-        VERY_CLOSE_UPRIGHT, VERY_CLOSE_FLAT, VERY_CLOSE_45P, VERY_CLOSE_45N, BEACON};
+        VERY_CLOSE_UPRIGHT, VERY_CLOSE_FLAT, VERY_CLOSE_45P, VERY_CLOSE_45N, BEACON, BRUSH};
     
     Mask(int blocksize, int type);
     
-    double dist(double *a, double *b);
-    void computeSum(const cv::Mat &img_integral, cv::Rect roi, int *dst);
+    static double dist(double *a, double *b);
+    static void computeSum(const cv::Mat &img_integral, cv::Rect roi, int *dst);
     cv::Rect getROI() {return m_roi;};
     
     virtual bool match(const cv::Mat &img_integral, cv::Point p, double threshold) = 0;
-    void computeMeanInnerRect(const cv::Mat &img_integral, cv::Rect roi, double* dst);
+    static void computeMeanInnerRect(const cv::Mat &img_integral, cv::Rect roi, double* dst);
     bool matchRect(const cv::Mat &img_integral, cv::Point p, double threshold);
 };
 
@@ -121,6 +121,12 @@ public:
     bool matchGray(const cv::Mat &img_integral, cv::Point p, double threshold);
 //    void setColor(double *color) { memcpy(m_color, color, sizeof(double)); };
     int getCorner() {return m_corner;};
+};
+
+class Brush : public Mask {
+public:
+    Brush(int blocksize, int width) : Mask(blocksize, BRUSH) { m_roi.width = width * blocksize; };
+    bool match(const cv::Mat &img_integral, cv::Point p, double threshold);
 };
 
 #endif // MASKS_H

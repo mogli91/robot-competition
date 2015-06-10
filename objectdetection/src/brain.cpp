@@ -78,12 +78,12 @@ void Brain::updateReadings() {
     
     if (m_detector != NULL) {
         m_detector->getMeasurement(m_vision);
-//        for (vector<Point>::iterator it = m_vision.bottles.begin(); it != m_vision.bottles.end(); ++it) {
-//            printf("Bottle at: x = %d, y = %d\n\r", it->x, it->y);
-//        }
-//        if (m_vision.beacon.y != -1) {
-//            printf("Beacon at: x = %d, y = %d\n\r", m_vision.beacon.x, m_vision.beacon.y);
-//        }
+        for (vector<Point>::iterator it = m_vision.bottles.begin(); it != m_vision.bottles.end(); ++it) {
+            printf("Bottle at: x = %d, y = %d\n\r", it->x, it->y);
+        }
+        if (m_vision.beacon.y != -1) {
+            printf("Beacon at: x = %d, y = %d\n\r", m_vision.beacon.x, m_vision.beacon.y);
+        }
     }
 }
 

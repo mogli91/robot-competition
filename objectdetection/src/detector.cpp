@@ -12,7 +12,7 @@ Detector::Detector(int camnum, float exposure, int f_height, int f_width)
     
     double color_dist_th = 15;
     int blocksize = f_width / VISION_NUM_RAYS;
-    int offset = 1.5 * blocksize;
+    int offset = 1 * blocksize;
     m_rangeFinder = new RangeFinder(f_height, f_width, blocksize, color_dist_th, offset);
 
     
@@ -75,7 +75,7 @@ Detector::Detector(const string &filename)
     
     double color_dist_th = 15;
     int blocksize = f_width / VISION_NUM_RAYS;
-    int offset = 3 * blocksize;
+    int offset = 1 * blocksize;
     m_rangeFinder = new RangeFinder(f_height, f_width, blocksize, color_dist_th, offset);
     
 }
@@ -255,16 +255,16 @@ void Detector::normalize_px(uchar *src, double *dst)
 }
 
 void Detector::findRanges(cv::Mat img) {
-//    clock_t t0_frame = clock();
-//    double elapsed_secs = 1.0;
+    clock_t t0_frame = clock();
+    double elapsed_secs = 1.0;
     
     frame = img;
     mask = Scalar(0);
     m_rangeFinder->rollOut(img, mask);
     
     computeMeasurement();
-//    elapsed_secs = double(clock() - t0_frame) / CLOCKS_PER_SEC;
-//    cout << "\r" << 1.0 / elapsed_secs << " fps" << flush;
+    elapsed_secs = double(clock() - t0_frame) / CLOCKS_PER_SEC;
+    cout << "\r" << 1.0 / elapsed_secs << " fps" << flush;
     
 //    imshow("ranges", mask * 255);
 }

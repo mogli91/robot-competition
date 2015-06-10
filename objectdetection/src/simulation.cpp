@@ -9,19 +9,19 @@
 #include "simulation.h"
 
 /*         1             2
-           _IR___________IR_
-          |                 |                    Disposition of the IR sensors on the robot and
-     0   IR                 IR  3                corresponding ID
-          |                 |
-          |                 |
-          |________IR_______|
-                   4
+ _IR___________IR_
+ |                 |                    Disposition of the IR sensors on the robot and
+ 0   IR                 IR  3                corresponding ID
+ |                 |
+ |                 |
+ |________IR_______|
+ 4
  */
 //Obstacle avoidance
 //int l_weight_IR[IR_SENSORS] = { 5, 8, -8, -5, 0 };     //{ 5, 8, -8, -5, 0 }
 //int r_weight_IR[IR_SENSORS] = { -4, -7, 7, 5, 0 };     //{ -5, -8, 8, 5, 0 };
-int l_weight_IR[IR_SENSORS] = { 3, 5, -5, -3, 0, 1, -1 }; //for the power of 2 law
-int r_weight_IR[IR_SENSORS] = { -2, -4, 4, 3, 0, -1, 1 }; //for the power of 2 law
+int l_weight_IR[IR_SENSORS] = { 3, 5, -5, -3, 1, 1, -1 }; //for the power of 2 law
+int r_weight_IR[IR_SENSORS] = { -2, -4, 4, 3, 1, -1, 1 }; //for the power of 2 law
 /*
  1                2
  US______________US
@@ -51,8 +51,8 @@ Simulation::Simulation(Brain* brain) {
 void Simulation::braitenberg_avoidance() {
 
 	int sensor_ir;
-	int msl = 400;
-	int msr = 400;
+	int msl = 380;
+	int msr = 380;
 
 	for (sensor_ir = 0; sensor_ir < IR_SENSORS; sensor_ir++) { // read sensor values and
 		// calculate motor speeds
@@ -82,8 +82,8 @@ void Simulation::braitenberg_avoidance() {
 	}
 	m_robot->setWheelSpeeds(msr, msl);
 
-	if ((m_robot->getSensorValue(SENSOR_IR_FRONT_L) <= 40)
-			&& (m_robot->getSensorValue(SENSOR_IR_FRONT_R) <= 40)) {
+	if ((m_robot->getSensorValue(SENSOR_IR_FRONT_L) <= 50)
+			&& (m_robot->getSensorValue(SENSOR_IR_FRONT_R) <= 50)) {
 		msr = 50;
 		msl = 50;
 		sleep(1);
@@ -92,48 +92,48 @@ void Simulation::braitenberg_avoidance() {
 
 }
 
- void Simulation::obstacle_avoidance() {
+void Simulation::obstacle_avoidance() {
 
- int sensor_ir;
- int msl = 350;
- int msr = 350;
- int l_weightIR[IR_SENSORS] = { 2, 0, 0, -2, 0, 1,-1}; //for the power of 2 law
- int r_weightIR[IR_SENSORS] = { -2, 0, 0, 2, 0, -1, 1}; //for the power of 2 law
+	int sensor_ir;
+	int msl = 350;
+	int msr = 350;
+	int l_weightIR[IR_SENSORS] = { 2, 0, 0, -2, 0, 1, -1 }; //for the power of 2 law
+	int r_weightIR[IR_SENSORS] = { -2, 0, 0, 2, 0, -1, 1 }; //for the power of 2 law
 
- for (sensor_ir = 0; sensor_ir < IR_SENSORS; sensor_ir++) { // read sensor values and
- // calculate motor speeds
- //        msr += (80-m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) * r_weight_IR[sensor_ir]; // motor speed right
- //		msl += (80-m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) * l_weight_IR[sensor_ir]; // motor speed left
+	for (sensor_ir = 0; sensor_ir < IR_SENSORS; sensor_ir++) { // read sensor values and
+		// calculate motor speeds
+		//        msr += (80-m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) * r_weight_IR[sensor_ir]; // motor speed right
+		//		msl += (80-m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) * l_weight_IR[sensor_ir]; // motor speed left
 
- msr += (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) * (80
- - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) / 25
- * r_weightIR[sensor_ir]; // motor speed right
- msl += (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) * (80
- - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) / 25
- * l_weightIR[sensor_ir]; // motor speed left
+		msr += (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L))
+				* (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) / 25
+				* r_weightIR[sensor_ir]; // motor speed right
+		msl += (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L))
+				* (80 - m_robot->getSensorValue(sensor_ir + SENSOR_IR_L)) / 25
+				* l_weightIR[sensor_ir]; // motor speed left
 
- }
- if (msl > VAL_WHEELS_FW) {
- msl = VAL_WHEELS_FW;
- }
- if (msl < VAL_WHEELS_BW) {
- msl = VAL_WHEELS_BW;
- }
- if (msr > VAL_WHEELS_FW) {
- msr = VAL_WHEELS_FW;
- }
- if (msr < VAL_WHEELS_BW) {
- msr = VAL_WHEELS_BW;
- }
+	}
+	if (msl > VAL_WHEELS_FW) {
+		msl = VAL_WHEELS_FW;
+	}
+	if (msl < VAL_WHEELS_BW) {
+		msl = VAL_WHEELS_BW;
+	}
+	if (msr > VAL_WHEELS_FW) {
+		msr = VAL_WHEELS_FW;
+	}
+	if (msr < VAL_WHEELS_BW) {
+		msr = VAL_WHEELS_BW;
+	}
 
- m_robot->setWheelSpeeds(msr, msl);
- }
+	m_robot->setWheelSpeeds(msr, msl);
+}
 
 void Simulation::obstacle_avoidance_return() {
 
 	int sensor_ir;
-	int msl = 400;
-	int msr = 400;
+	int msl = 380;
+	int msr = 380;
 	int l_weightIRreturn[IR_SENSORS] = { 4, 7, -7, -4, 0, 3, -3 }; //for the power of 2 law
 	int r_weightIRreturn[IR_SENSORS] = { -4, -7, 7, 4, 0, -3, 3 }; //for the power of 2 law
 
@@ -174,16 +174,15 @@ void Simulation::obstacle_avoidance_return() {
 		sleep(1);
 	}
 }
- int Simulation::find_minimum()
- {
-	 int minimum;
-	 minimum = m_vm.rays[0].y;
-	 for(int j = 0; j<9;j++)
-	 {
-		 if (m_vm.rays[j+1].y<minimum) minimum = m_vm.rays[j+1].y;
-	 }
-	 return minimum;
- }
+int Simulation::find_minimum() {
+	int minimum;
+	minimum = m_vm.rays[0].y;
+	for (int j = 0; j < 9; j++) {
+		if (m_vm.rays[j + 1].y < minimum)
+			minimum = m_vm.rays[j + 1].y;
+	}
+	return minimum;
+}
 /*
  //Function for the phototaxis
  void Simulation::braitenberg_phototaxis() {
@@ -316,6 +315,7 @@ void Simulation::avoidObstaclesCam() {
 //create a vector that is perpendicular to the obstacle
 	m_displacementVector[X] = m_vm.line.delta_y; // vy
 	if (m_displacementVector[X] < 0.1 && m_displacementVector[X] >= 0)
+
 		m_displacementVector[X] = 0.1;
 	if (m_displacementVector[X] > -0.1 && m_displacementVector[X] < 0)
 		m_displacementVector[X] = -0.1;
@@ -393,7 +393,7 @@ void Simulation::goHome() {
 		// TODO rotate 180 degrees;
 		emptyTailGate();
 		m_bottlesCollected = 0;
-		m_currentState = STATE_INIT;
+		m_currentState = STATE_MOVE;
 	}
 }
 void Simulation::emptyTailGate() {
@@ -402,15 +402,15 @@ void Simulation::emptyTailGate() {
 	m_robot->sendInstructions();
 	sleep(2);
 	m_robot->setTailGate(VAL_TAIL_CLOSE);
+	m_robot->sendInstructions();
 }
 bool Simulation::homeReached() {
 
 	//no beacon detected
-	if(m_vm.beacon.y < 150 && m_vm.beacon.y != -1)
-	{
-		if(m_robot->getPose().angle > 180 && m_robot->getPose().angle < 270)
+	if (m_vm.beacon.y < 160 && m_vm.beacon.y != -1) {
+		//if(m_robot->getPose().angle > 180 && m_robot->getPose().angle < 270)
 
-			return true;
+		return true;
 	}
 	return false;
 }
@@ -438,18 +438,21 @@ void Simulation::loop(void) {
 		cout << "STATE INIT";
 		// Stuff to do at the beginning
 		m_robot->setBrushSpeed(VAL_BRUSH_FW);
-
+		//m_robot->setTailGate(VAL_TAIL_CLOSE);
+		m_robot->setWheelSpeeds(VAL_WHEELS_FW,VAL_WHEELS_FW);
+		m_robot->sendInstructions();
+		sleep(7);
 		change_state( STATE_MOVE);
 		break;
 
 	case STATE_MOVE:
 		cout << "STATE MOVE";
-	/*	int emergency;
-		emergency = emergencyDetected();
-		if (emergency != EMERGENCY_NONE) {
-			change_state(emergency);
-			break;
-		}*/
+		/*	int emergency;
+		 emergency = emergencyDetected();
+		 if (emergency != EMERGENCY_NONE) {
+		 change_state(emergency);
+		 break;
+		 }*/
 		m_robot->setShovel(VAL_LIFT_LOW);
 
 		m_robot->setBrushSpeed(VAL_BRUSH_FW);
@@ -459,34 +462,34 @@ void Simulation::loop(void) {
 			m_bottlesCollected++;
 		}
 		if (m_bottlesCollected >= 2 || elapsed_secs > 60 * 8) //8 minutes or 4 bottles = go home
-		{
+				{
 			change_state(STATE_GOHOME);
 			break;
 			/*
-			goHome(); //go home using the compass
+			 goHome(); //go home using the compass
+			 moveWithVector(); //move in the direction of the vector
+			 for (int i = SENSOR_IR_L; i <= SENSOR_IR_BACK_R; i++) {
+			 if (m_robot->getSensorValue(i) < 70) {
+			 obstacle_avoidance_return();
+			 } else {
+			 goHome(); //go home using the compass
+			 moveWithVector(); //move in the direction of the vector
+
+			 }
+			 }
+			 */
+		}
+
+		else {
+			search(); //search for bottles in the arena
 			moveWithVector(); //move in the direction of the vector
-					for (int i = SENSOR_IR_L; i <= SENSOR_IR_BACK_R; i++) {
-						if (m_robot->getSensorValue(i) < 70) {
-							obstacle_avoidance_return();
-						} else {
-							goHome(); //go home using the compass
-							moveWithVector(); //move in the direction of the vector
+		}
 
-						}
-					}
-*/
-				}
-
-				else {
-					search(); //search for bottles in the arena
-					moveWithVector(); //move in the direction of the vector
-				}
-
-	/*	if (m_robot->getSensorValue(SENSOR_IR_BACK) < 20) {
-			//change_state(STATE_CHANGE_ZONE);
-			toggleLift();
-			break;
-		}*/
+		/*	if (m_robot->getSensorValue(SENSOR_IR_BACK) < 20) {
+		 //change_state(STATE_CHANGE_ZONE);
+		 toggleLift();
+		 break;
+		 }*/
 
 		for (int i = SENSOR_IR_L; i <= SENSOR_IR_BACK_R; i++) {
 			if (m_robot->getSensorValue(i) < BRAITEN_THRESHOLD_ENABLE) {
@@ -495,19 +498,28 @@ void Simulation::loop(void) {
 
 			}
 		}
-
-
+		int minimum_rays4;
+		minimum_rays4 = find_minimum();
+		if (minimum_rays4 < 50 && m_vm.line.intercept < 60) //from approx the middle of the cam : 50 cm in front of robot.
+				{
+			m_robot->setWheelSpeeds(90, 90);
+			m_robot->sendInstructions();
+			sleep(1);
+			m_robot->setWheelSpeeds(VAL_WHEELS_BW, VAL_WHEELS_FW);
+			m_robot->sendInstructions();
+			sleep(1);
+		}
 
 		break;
 	case STATE_GOHOME:
 		cout << "STATE GOHOME";
+		for (int i = SENSOR_IR_L; i <= SENSOR_IR_BACK_R; i++) {
+			if (m_robot->getSensorValue(i) < BRAITEN_THRESHOLD_ENABLE) {
+				change_state( STATE_AVOIDANCE);
+				//break;
 
-		for (int i = SENSOR_IR_L; i <= SENSOR_IR_BACK_R; i++)
-		{
-			if (m_robot->getSensorValue(i) < 70)
-			{
-				obstacle_avoidance_return();
-			} else {
+			}
+		 else {
 				goHome(); //go home using the compass
 				moveWithVector(); //move in the direction of the vector
 			}
@@ -520,45 +532,72 @@ void Simulation::loop(void) {
 
 		m_robot->setBrushSpeed(VAL_BRUSH_FW);
 		if (bottleCaptured()) {
-					liftBottle();
-					m_bottlesCollected++;
-				}
+			liftBottle();
+			m_bottlesCollected++;
+		}
 		int minimum_rays;
 		minimum_rays = find_minimum();
-		if (minimum_rays < 50 && m_vm.line.intercept < 60 ) //from approx the middle of the cam : 50 cm in front of robot.
+		if (minimum_rays < 50 && m_vm.line.intercept < 60) //from approx the middle of the cam : 50 cm in front of robot.
 				{
-					m_robot->setWheelSpeeds(90, 90);
-				    m_robot->sendInstructions();
-				    sleep(1);
-				    m_robot->setWheelSpeeds(VAL_WHEELS_BW ,VAL_WHEELS_FW );
-				    m_robot->sendInstructions();
-				    sleep(1);
-				}
-		else
-		{
+			m_robot->setWheelSpeeds(90, 90);
+			m_robot->sendInstructions();
+			sleep(1);
+			m_robot->setWheelSpeeds(VAL_WHEELS_BW, VAL_WHEELS_FW);
+			m_robot->sendInstructions();
+			sleep(1);
+		} else {
 			change_state(STATE_MOVE);
 			break;
 		}
 
-
-
 		//	toggleLift();
 
-		    /*
-			avoidObstaclesCam();
-		m_robot->setShovel(VAL_LIFT_TRAVEL);
-		moveWithVector();*/
+		/*
+		 avoidObstaclesCam();
+		 m_robot->setShovel(VAL_LIFT_TRAVEL);
+		 moveWithVector();*/
 		break;
+/*
+	case STATE_CAM_AVOIDANCE_RETURN:
+		cout << "STATE CAM AVOIDANCE";
 
+		m_robot->setBrushSpeed(VAL_BRUSH_FW);
+		if (bottleCaptured()) {
+			liftBottle();
+			m_bottlesCollected++;
+		}
+		int minimum_rays5;
+		minimum_rays5 = find_minimum();
+		if (minimum_rays5 < 50 && m_vm.line.intercept < 60) //from approx the middle of the cam : 50 cm in front of robot.
+				{
+			m_robot->setWheelSpeeds(90, 90);
+			m_robot->sendInstructions();
+			sleep(1);
+			m_robot->setWheelSpeeds(VAL_WHEELS_BW, VAL_WHEELS_FW);
+			m_robot->sendInstructions();
+			sleep(1);
+		} else {
+			change_state(STATE_GOHOME);
+			break;
+		}
+
+		//	toggleLift();
+*/
+		/*
+		 avoidObstaclesCam();
+		 m_robot->setShovel(VAL_LIFT_TRAVEL);
+		 moveWithVector();*/
+		break;
 	case STATE_AVOIDANCE:
-		cout << "STATE AVOIDANCE;
+		cout << "STATE AVOIDANCE" << endl;
 		m_robot->setBrushSpeed(VAL_BRUSH_FW);
 		/*if (bottleCaptured()) {
-					liftBottle();
-					m_bottlesCollected++;
-				}*/
-		if (minimum_rays < 50 && m_vm.line.intercept < 60 )
-		{
+		 liftBottle();
+		 m_bottlesCollected++;
+		 }*/
+		int minimum_rays2;
+		minimum_rays2 = find_minimum();
+		if (minimum_rays2 < 50 && m_vm.line.intercept < 60) {
 			change_state(STATE_CAM_AVOIDANCE);
 			break;
 		}
