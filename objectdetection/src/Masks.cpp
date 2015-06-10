@@ -125,6 +125,9 @@ bool Mask::matchRect(const cv::Mat &img_integral, cv::Point p, double threshold)
     m_roi.y = p.y;
     computeMeanInnerRect(img_integral, m_roi, m_mean);
     
+    double mean_before[3] = {0,0,0};
+    double mean_after[3] = {0,0,0};
+    
     Rect tmp;
     double color_dist;
     
@@ -151,6 +154,7 @@ bool Mask::matchRect(const cv::Mat &img_integral, cv::Point p, double threshold)
     // top
     tmp.x = m_roi.x; tmp.y = m_roi.y - m_blocksize / 2; tmp.width = m_blocksize; tmp.height = m_blocksize / 2;
     computeMeanInnerRect(img_integral, tmp, m_compare);
+    memcpy(mean_after, m_compare, 3*sizeof(double));
     
     color_dist = dist(m_compare, m_mean);
     
@@ -161,10 +165,15 @@ bool Mask::matchRect(const cv::Mat &img_integral, cv::Point p, double threshold)
     // bottom
     tmp.x = m_roi.x; tmp.y = m_roi.y + m_roi.height; tmp.width = m_blocksize; tmp.height = m_blocksize / 2;
     computeMeanInnerRect(img_integral, tmp, m_compare);
+    memcpy(mean_before, m_compare, 3*sizeof(double));
     
     color_dist = dist(m_compare, m_mean);
     
     if (color_dist < threshold) {
+        return false;
+    }
+    
+    if (dist(mean_after, mean_before) < threshold/2) {
         return false;
     }
     
@@ -183,6 +192,8 @@ bool BottleClose45P::match(const cv::Mat &img_integral, cv::Point p, double thre
         
         return false;
     }
+    double mean_before[3] = {0,0,0};
+    double mean_after[3] = {0,0,0};
     
     m_roi.x = p.x;
     m_roi.y = p.y;
@@ -245,6 +256,7 @@ bool BottleClose45P::match(const cv::Mat &img_integral, cv::Point p, double thre
     computeMeanInnerRect(img_integral, tmp, m_compare);
     
     color_dist = dist(m_compare, m_mean);
+    memcpy(mean_after, m_compare, 3*sizeof(double));
     
     if (color_dist < threshold) {
         return false;
@@ -255,6 +267,7 @@ bool BottleClose45P::match(const cv::Mat &img_integral, cv::Point p, double thre
     computeMeanInnerRect(img_integral, tmp, m_compare);
     
     color_dist = dist(m_compare, m_mean);
+    memcpy(mean_before, m_compare, 3*sizeof(double));
     
     if (color_dist < threshold) {
         return false;
@@ -280,6 +293,10 @@ bool BottleClose45P::match(const cv::Mat &img_integral, cv::Point p, double thre
         return false;
     }
     
+    if (dist(mean_after, mean_before) < threshold/2) {
+        return false;
+    }
+    
     return true;
 }
 
@@ -293,6 +310,9 @@ bool BottleClose45N::match(const cv::Mat &img_integral, cv::Point p, double thre
         
         return false;
     }
+    
+    double mean_before[3] = {0,0,0};
+    double mean_after[3] = {0,0,0};
     
     m_roi.x = p.x;
     m_roi.y = p.y;
@@ -356,6 +376,8 @@ bool BottleClose45N::match(const cv::Mat &img_integral, cv::Point p, double thre
     
     color_dist = dist(m_compare, m_mean);
     
+    memcpy(mean_after, m_compare, 3*sizeof(double));
+    
     if (color_dist < threshold) {
         return false;
     }
@@ -365,6 +387,8 @@ bool BottleClose45N::match(const cv::Mat &img_integral, cv::Point p, double thre
     computeMeanInnerRect(img_integral, tmp, m_compare);
     
     color_dist = dist(m_compare, m_mean);
+    
+    memcpy(mean_before, m_compare, 3*sizeof(double));
     
     if (color_dist < threshold) {
         return false;
@@ -387,6 +411,10 @@ bool BottleClose45N::match(const cv::Mat &img_integral, cv::Point p, double thre
     color_dist = dist(m_compare, m_mean);
     
     if (color_dist < threshold) {
+        return false;
+    }
+    
+    if (dist(mean_after, mean_before) < threshold/2) {
         return false;
     }
     

@@ -110,12 +110,15 @@ void RangeFinder::rollOut(cv::Mat src, cv::Mat dst) {
                  break;
             }
         }
-        // correct for eventual brush offset
-        m_rays[r].height = m_height - m_rays[r].y;
 //        cout << endl;
     }
     
     locateBottles();
+    
+    for (int r = 0; r < m_numRays; ++r) {
+        // correct for eventual brush offset
+        m_rays[r].height = m_height - m_rays[r].y;
+    }
     
     for (int b = 0; b < m_bottles.size(); ++b) {
         rectangle(src, m_bottles[b], Scalar(0, 255, 0));
@@ -202,27 +205,27 @@ void RangeFinder::locateBottles() {
                     found = true;
                     break;
                 }
-                
-                if (bottleVCU.match(m_integral, p, threshold)) {
-                    m_bottles.push_back(bottleVCU.getROI());
-                    found = true;
-                    break;
-                }
-                if (bottleVCF.match(m_integral, p, threshold)) {
-                    m_bottles.push_back(bottleVCF.getROI());
-                    found = true;
-                    break;
-                }
-                if (bottleVC45P.match(m_integral, p, threshold)) {
-                    m_bottles.push_back(bottleVC45P.getROI());
-                    found = true;
-                    break;
-                }
-                if (bottleVC45N.match(m_integral, p, threshold)) {
-                    m_bottles.push_back(bottleVC45N.getROI());
-                    found = true;
-                    break;
-                }
+//
+//                if (bottleVCU.match(m_integral, p, threshold)) {
+//                    m_bottles.push_back(bottleVCU.getROI());
+//                    found = true;
+//                    break;
+//                }
+//                if (bottleVCF.match(m_integral, p, threshold)) {
+//                    m_bottles.push_back(bottleVCF.getROI());
+//                    found = true;
+//                    break;
+//                }
+//                if (bottleVC45P.match(m_integral, p, threshold)) {
+//                    m_bottles.push_back(bottleVC45P.getROI());
+//                    found = true;
+//                    break;
+//                }
+//                if (bottleVC45N.match(m_integral, p, threshold)) {
+//                    m_bottles.push_back(bottleVC45N.getROI());
+//                    found = true;
+//                    break;
+//                }
             }
         }
     }
@@ -306,7 +309,7 @@ void RangeFinder::getRays(vector<Point> &dst) {
         tmp = m_rays[i];
         dst.push_back(Point((tmp.x + tmp.width/2) - m_width / 2, tmp.height));
         
-        std::cout << dst[i] << std::endl;
+//        std::cout << dst[i] << std::endl;
     }
 }
 void RangeFinder::getBeacon(Point &dst) {
@@ -371,7 +374,7 @@ void RangeFinder::getLineParameters(RegressionLine &line) {
     
     line.intercept = m_height - (y0 + (x - x0) * slope);
     line.error = m_error;
-    std::cout << line.error << std::endl;
+//    std::cout << line.error << std::endl;
 }
 
 bool RangeFinder::findBrush(const cv::Mat &img_integral, Rect &r) {
@@ -423,7 +426,7 @@ int RangeFinder::determineTerrain(const cv::Mat &img_integral, Rect &brush) {
     double dist = Mask::dist(mean, green);
     int threshold = 80;
     
-    cout << "color " << mean[0] << ", " << mean[1] << ", " << mean[2] << "\t dist: " << dist << endl << flush;
+//    cout << "color " << mean[0] << ", " << mean[1] << ", " << mean[2] << "\t dist: " << dist << endl << flush;
     
     if (dist < threshold) {
         return 1;

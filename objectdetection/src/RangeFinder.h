@@ -100,6 +100,8 @@ public:
     
     Point getWorldCoordinates(const cv:: Point &p_img);
     
+    void extendBehindBottles();
+    
 private:
     void initScales();
     
