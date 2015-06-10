@@ -264,7 +264,11 @@ void Detector::findRanges(cv::Mat img) {
     
     computeMeasurement();
     elapsed_secs = double(clock() - t0_frame) / CLOCKS_PER_SEC;
+<<<<<<< HEAD
    // cout << "\r" << 1.0 / elapsed_secs << " fps" << flush;
+=======
+//    cout << "\r" << 1.0 / elapsed_secs << " fps" << flush;
+>>>>>>> 8c82975f73aa8d7688e37a6074da125d2c5a68a3
     
 //    imshow("ranges", mask * 255);
 }
