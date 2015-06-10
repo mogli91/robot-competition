@@ -169,7 +169,7 @@ Assuming that the image bottom captures drivable terrain, we want to grow determ
 future drivable terrain by growing the region captured in the image bottom toward
 the top of the image.
 
-For this purpose, the image is divided into equally spaced columns of 20 pixels width.
+For this purpose, the image is divided into 16 equally spaced columns of 20 pixels width.
 In each column, we compute the average color over a region of 20 pixels height, hence 
 a block size of $20 \times 20$ pixels. We then move up the image by half a block size
 and re-compute the average color. We repeat this step until the distance between the
@@ -178,6 +178,11 @@ threshold. From an abstract point of view, we grow the drivable area by allowing
 limited change in color. \figurename~\ref{fig:segmentation} shows the robots's point
 of view when approaching the elevated area. For visualization the image is masked
 with the result of the terrain segmentation step. Black means non-drivable.
+
+Initially, we were planning on having a travel mode where the robot would move with the 
+shovel slightly lifted. In order to still produce a good terrain segmentation,
+we built in a mask that checks for the height of the white (high intensity) brush
+in the image and consequently allows for vertical offsets of the central ten bars.
 
 \begin{figure}
 \center
@@ -220,11 +225,50 @@ however, can be detected by the infrared sensors. Consequently, range data from
 our infrared sensors should have higher weight then vision data and vision data
 shall be used in cases where we have no response from infrared sensors.
 
-
 \subsubsection{Beacon Detection}
+Also seen in \figurename~\ref{fig:transition} is a purple frame around the light beacon.
+Beacon detection can be handled in a very simple manner if the color does not need
+to be determined. In our case, we decided to restrict to the pure detection without 
+color classification since only the yellow beacon in the recycling zone was important
+for our strategy. Having the compass and the information that there exists a beacon
+in the current image, we can determine the corner we are approaching.
 
+In our camera setup, beacons do always intersect with the upper image boundary.
+We can therefore detect beacons by convolving the upper part of the image with a top-hat filter
+moving from left to right. The pixel column with maximal response is considered a beacon
+if its response exceeds a certain threshold in one of the three color channels. The filter
+window height spans 20 pixel rows and 20 columns (5 negative columns on each side and 10 for
+the central positive part). Taking the average over multiple image rows guarantees
+that beacons are detected even though their intensity is not constantly high (due 
+to the interruptions between LEDs). 
+
+Once a tentative beacon column is found, the filter moves downward in the image.
+In order to account for tilted beacons (or the camera not being mounted perfectly
+horizontally), we allow for a small lateral motion of the filter window to the left
+or right.
 
 \subsubsection{Bottle Detection}
+Bottles are detected as objects having high color differences with respect to the surrounding
+area. Since the terrain boundaries are interrupted from such intensity changes, we find
+bottles only on top of the 16 bars used for terrain segmentation. We designed a total of
+nine different masks representing bottles at different distances and orientations.
+Each mask is composed of square blocks of edge length 20 pixels. The blocks are stacked
+(vertical bottle), placed aside (horizontal bottle) or placed with vertical and horizontal
+offset ($45^\circ$) bottle. Depending on the distance (far, middle, close), blocks
+do also overlap. \figurename~\ref{fig:bottles1} shows the result of the bottle detection
+algorithm with three true positives and one false negative.
+
+\begin{figure}
+\center
+\subfigure{
+\includegraphics[width=0.45\textwidth]{figures/009.png}}
+\hfill
+\subfigure{
+\includegraphics[width=0.45\textwidth]{figures/009-mask.png}}
+\label{fig:bottles1}
+\caption{Bottle detection.}
+\end{figure}
+
 
 \subsubsection{Generated Data}
 Output data generated from the above vision algorithms is collected in an object of type
@@ -242,6 +286,18 @@ only a scaling factor that can easier be taken care of when using the vision dat
 we decided to transmit raw pixel measures and adjust accordingly in the control algorithm.
 
 \subsection{Results}
+The terrain segmentation worked very well in most cases. Strong intensity changes on grass
+produced poor segmentations. Dimming the ceiling light helped to avoid this. 
+Our bottle detection had many false positives since it was very responsive to edges in
+general. Rocks formed a particular problem. Taking into account the information
+about terrain transitions might have helped to avoid these false positives since the 
+rock barrier was detectable without any problems. However, this feature could not 
+be added in time before the competition. 
+
+Another problem during the competition came up regarding our beacon detection method.
+High image intensities with a matching width for the top-hat filter caused the robot
+to drop its bottle outside the recycling area. It was the same place in both cases.
+This means that the threshold was chosen too losely and we could have avoided it.
 
 \section{Control Algorithm}
 At the moment our robot is a Braitenberg vehicle, meaning that depending on the type
